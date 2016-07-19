@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/tsim/Downloads/charmy/app_test/platforms/android/build/intermediates/exploded-aar/android/CordovaLib/unspecified/debug/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="764f23b1629163ad7d55f57e3f625bb0b26024ea">
+        <dex dex="/home/tsim/Downloads/charmy/app_test/platforms/android/build/intermediates/pre-dexed/debug/CordovaLib-unspecified-debug_e84d7747ea07ca2a3c43de29a504e51d62796aca.jar" />
+    </item>
+
+</items>
