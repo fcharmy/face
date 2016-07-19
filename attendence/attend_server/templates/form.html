@@ -1,0 +1,10 @@
+<div class="page-header">
+    <h3>{{ message|escape}}</h3>
+</div>
+
+<div>
+    <form action="{% url url %}" method="post" enctype="multipart/form-data">
+        {{ form }}
+        <br/><input type="submit" value="Submit" />
+    </form>
+</div>
