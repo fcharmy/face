@@ -1,0 +1,152 @@
+{% load staticfiles %}
+<link href="{% static 'css/docs.css' %}" rel="stylesheet">
+<link href="{% static 'css/highlight.css' %}" rel="stylesheet">
+{% include "header.html" %}
+
+<style>h2{
+    margin-top: -40px;
+    padding-top: 60px;
+}</style>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 bs-docs-sidebar">
+            <ul class="nav nav-list bs-docs-sidenav affix">
+              <li class=""><a href="#create-a-project">Create a project</a></li>
+              <li class=""><a href="#download">Download</a></li>
+              <li class=""><a href="#initial">Initial</a></li>
+              <li class=""><a href="#person"><i class="icon-chevron-right"></i> Person</a></li>
+              <li class=""><a href="#group"><i class="icon-chevron-right"></i> Group</a></li>
+              <li class=""><a href="#person-to-group"><i class="icon-chevron-right"></i> Person to Group</a></li>
+              <li class=""><a href="#detect-faces-and-landmarks"><i class="icon-chevron-right"></i> Detect faces and landmarks</a></li>
+              <li class=""><a href="#face-recognition"><i class="icon-chevron-right"></i> Face recognition</a></li>
+            </ul>
+        </div>
+
+        <div class="col-md-8" role="main">
+            <div class="page-header" style="margin-bottom: 0">
+                <h1>Getting Started</h1>
+            </div>
+
+            <!-- ------------ Generate from mkdocs -------------
+                Copy from browser after serve mkdocs, then correct the link href.
+            -->
+
+<h2 id="create-a-project">Create a project</h2>
+<p>Before you get started, click <a href="index.md">here</a> to register a new project.</p>
+<p>After sign in you will get your project and security key, it will be used for </p>
+<ul>
+<li>Use face APIs</li>
+<li>Create groups or persons to your project</li>
+<li>Enroll faces with identification to your project</li>
+<li>Verify faces from your project</li>
+</ul>
+<p>You can login your project to check status of groups and persons.</p>
+<p><code>Tips: Groups are belong to one project, they are used to separate persons into different groups.</code>
+<code>One person may belong to several groups and enroll many times to server.</code></p>
+<h2 id="download">Download</h2>
+<p>Click <a href="index.md">here</a> to download face_tech.py, no need to install, just make sure you have install the following.</p>
+<pre><code class="hljs vala"><span class="hljs-preprocessor"># Python3</span>
+sudo apt-<span class="hljs-keyword">get</span> install python3
+
+<span class="hljs-preprocessor"># Requests</span>
+pip install requests
+
+<span class="hljs-preprocessor"># Requests toolbelt</span>
+pip install requests-toolbelt
+</code></pre>
+<h2 id="initial">Initial</h2>
+<p>The main object is FaceAPI, it create connection between your project and the face server. Now you can call functions to do your project.</p>
+<pre><code class="hljs capnproto"><span class="hljs-keyword">from</span> face_tech <span class="hljs-keyword">import</span> FaceAPI
+</code></pre>
+
+<pre><code class="hljs stylus">project_key = <span class="hljs-string">'your project key'</span>
+security_key = <span class="hljs-string">'your security key'</span>
+
+api = <span class="hljs-function"><span class="hljs-title">FaceAPI</span><span class="hljs-params">(project_key, security_key)</span></span>
+</code></pre>
+<h2 id="group">Group</h2>
+<p>Create a new group with provided group name, and you can provide optional description to specify this group. This function will return the new group’s id.</p>
+<pre><code class="hljs stylus">r = api.<span class="hljs-function"><span class="hljs-title">create_group</span><span class="hljs-params">(name=<span class="hljs-string">'new group'</span>, desc=’create by Jim’)</span></span>
+<span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(r)</span></span>
+</code></pre>
+<p>The name may contain only letters, numbers, ' ' and @/./+/-/_ characters, make sure name is unique in your project.</p>
+<p>Pass the group id to delete_group to delete the group you just created. This will return a boolean to tell you if it is successfully deleted.</p>
+<pre><code class="hljs stylus">r = api.<span class="hljs-function"><span class="hljs-title">delete_group</span><span class="hljs-params">(group=<span class="hljs-number">1</span>)</span></span>
+<span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(r)</span></span>
+</code></pre>
+<h2 id="person">Person</h2>
+<p>To create a new person, use create_person and provide new names you want. If new persons belong to a group you just created, pass group id to this function, it will create the relation with new persons with group. Additional email, first name, last name and note is optional while creating new person.</p>
+<pre><code class="hljs stylus">r = api.create_person(name=<span class="hljs-string">'james'</span>, email=<span class="hljs-string">'test@test.com'</span>,
+                      first_name=<span class="hljs-string">'James'</span>, last_name=<span class="hljs-string">'Smith'</span>,
+                      note=<span class="hljs-string">'freshman'</span>, group=<span class="hljs-number">2</span>)
+<span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(r)</span></span>
+</code></pre>
+<p>This will return a list of person id if no error. The name may contain only letters, numbers and @/./+/-/_ characters, and should be unique in your project. All these fields except 'group' can be list to create multiple persons at one time.</p>
+<p>Or use create_person_json for creating person by json format, provide json format 'data' param and additional group id.</p>
+<p>To get all persons exist in your project or a group, use following function to retrieve, where group should be the group id.</p>
+<pre><code class="hljs stylus">r = api.<span class="hljs-function"><span class="hljs-title">get_persons_by_group</span><span class="hljs-params">(group=<span class="hljs-number">1</span>)</span></span>
+
+r = api.<span class="hljs-function"><span class="hljs-title">get_all_persons</span><span class="hljs-params">()</span></span>
+
+<span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(r)</span></span>
+</code></pre>
+<p>To delete a person, you only have to provide person id you get when you created it. And it will return [{‘person_id’: True or False}], where False means you do not have the permission to delete because this person does not belong to your project, or this person does not exist. 'person' can be a list of person ids to delete multiple persons at one time.</p>
+<pre><code class="hljs stylus">r = api.<span class="hljs-function"><span class="hljs-title">delete_person</span><span class="hljs-params">(person=<span class="hljs-number">1</span>)</span></span>
+<span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(r)</span></span>
+</code></pre>
+<h2 id="person-to-group">Person to Group</h2>
+<p>If you have several groups in your project, you probably want to relate some persons to groups. Persons do not have to belong to any group, but it is good to divide them to speed up the searching process. </p>
+<p>If you assign a group id when you create new persons, you do not need to related them together again as below.</p>
+<pre><code class="hljs stylus">r = api.<span class="hljs-function"><span class="hljs-title">person_to_group</span><span class="hljs-params">(person=<span class="hljs-number">12</span>, group=<span class="hljs-number">2</span>)</span></span>
+</code></pre>
+<p>This will return a list of numbers instead of False, which means the row id of this relationship in server. Make sure all person ids are valid and belong to your project. 'person' can be list to relate many persons to one group at one time.</p>
+<p>All parameters are the same as above when delete the relation by using remove_person_from_group.</p>
+<h2 id="detect-faces-and-landmarks">Detect faces and landmarks</h2>
+<p>You only need provide a valid image, detect function will return a list of face coordinates, which refer to [top, bottom, left, right]. Landmark detection will return all landmark coordinates and face coordinates.</p>
+<pre><code class="hljs gradle"><span class="hljs-keyword">from</span> face_tech <span class="hljs-keyword">import</span> <span class="hljs-keyword">file</span>
+</code></pre>
+
+<pre><code class="hljs mel">img = <span class="hljs-string">"image/sample.jpg"</span>
+
+r = api.detect(<span class="hljs-keyword">image</span>=<span class="hljs-keyword">file</span>(img))
+<span class="hljs-keyword">print</span>(r)
+&gt;&gt; [[<span class="hljs-number">74</span>, <span class="hljs-number">173</span>, <span class="hljs-number">312</span>, <span class="hljs-number">398</span>], [<span class="hljs-number">107</span>, <span class="hljs-number">198</span>, <span class="hljs-number">86</span>, <span class="hljs-number">165</span>]]
+
+r = api.landmark(<span class="hljs-keyword">image</span>=<span class="hljs-keyword">file</span>(img))
+<span class="hljs-keyword">print</span>(len(r))
+&gt;&gt; [{<span class="hljs-string">'landmarks'</span>: [[<span class="hljs-number">303</span>, <span class="hljs-number">108</span>], [<span class="hljs-number">302</span>, <span class="hljs-number">121</span>] .. , <span class="hljs-string">'coordinates'</span>: [<span class="hljs-number">115</span>, <span class="hljs-number">205</span>, <span class="hljs-number">85</span>, <span class="hljs-number">174</span>]}, ..]
+
+r = api.occluder(<span class="hljs-keyword">image</span>=<span class="hljs-keyword">file</span>(img))
+<span class="hljs-keyword">print</span>(r)
+&gt;&gt; [{<span class="hljs-string">'occlude'</span>: True, <span class="hljs-string">'coordinates'</span>: [<span class="hljs-number">78</span>, <span class="hljs-number">186</span>, <span class="hljs-number">293</span>, <span class="hljs-number">400</span>]}, ..]
+</code></pre>
+<h2 id="face-recognition">Face recognition</h2>
+<p>Before you want to recognize faces from images, you have to enroll faces into server. Provide a json format data to specify each person id and its face coordinates, then you can verify these persons next time. Group id is optional if this person does not belong to any group.</p>
+<pre><code class="hljs powershell"><span class="hljs-comment"># specify person_id with face coordinates</span>
+<span class="hljs-keyword">data</span> = {<span class="hljs-string">"faces"</span>: [{<span class="hljs-string">"person_id"</span>:<span class="hljs-number">63</span>, <span class="hljs-string">"coordinates"</span>: [<span class="hljs-number">78</span>, <span class="hljs-number">186</span>, <span class="hljs-number">293</span>, <span class="hljs-number">400</span>]}]}
+</code></pre>
+
+<pre><code class="hljs stylus">r = api.<span class="hljs-function"><span class="hljs-title">enrollment_faces</span><span class="hljs-params">(data=data, image=file(img)</span></span>, group=<span class="hljs-number">2</span>)
+<span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(r)</span></span>
+</code></pre>
+<p>Or you can call check_quality every time before you enroll faces, this will tell you the quality of image you provided, retake a photo to improve the result.</p>
+<pre><code class="hljs stylus">r = api.<span class="hljs-function"><span class="hljs-title">check_quality</span><span class="hljs-params">(image=file(img)</span></span>, save=True)
+<span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(r)</span></span>
+</code></pre>
+<p>If save is true, which means it will return a filename which stored in sever. Just pass the result with  person ids to enrollment_faces, you do not need to pass a whole image again.</p>
+<p>After you enroll faces to server, it’s time to verify them from photos.</p>
+<pre><code class="hljs stylus">r = api.<span class="hljs-function"><span class="hljs-title">verification_faces</span><span class="hljs-params">(image=file(img)</span></span>, group=<span class="hljs-number">2</span>)
+<span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(r)</span></span>
+</code></pre>
+<p>Group id is optional when verify, and it will return person id as following.</p>
+<pre><code class="hljs prolog">&gt;&gt; [{<span class="hljs-string">'person_id'</span>: <span class="hljs-number">34</span>, <span class="hljs-string">'name'</span>: <span class="hljs-name">Jim</span>, <span class="hljs-string">'first_name'</span>: <span class="hljs-string">'Jim'</span>, <span class="hljs-string">'last_name'</span>: <span class="hljs-string">'Smith'</span>, <span class="hljs-string">'email'</span>: <span class="hljs-string">'test@test.com'</span>, <span class="hljs-string">'note'</span>: <span class="hljs-string">'</span><span class="hljs-string">freshman</span><span class="hljs-string">'</span>, <span class="hljs-string">'coordinates'</span>: [<span class="hljs-number">78</span>, <span class="hljs-number">186</span>, <span class="hljs-number">293</span>, <span class="hljs-number">400</span>]}, {<span class="hljs-string">'person_id'</span>: <span class="hljs-name">None</span>, <span class="hljs-string">'coordinates'</span>: [<span class="hljs-number">175</span>, <span class="hljs-number">264</span>, <span class="hljs-number">214</span>, <span class="hljs-number">304</span>]}]
+</code></pre>
+<p>If there is no match identification in record, the person_id will be None.</p>
+
+
+        <!-- ----------------- End of mkdocs -------------------- -->
+
+        </div>
+    </div>
+    {% include "footer.html" %}
+</div>

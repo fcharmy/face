@@ -1,0 +1,14 @@
+{% load staticfiles %}
+{% include "header.html" %}
+<div class="page-header">
+    <h3>{{ message|escape}}</h3>
+</div>
+{% if error_message %}<p><strong>{{ error_message|escape }}</strong></p>{% endif %}
+
+<form action="{% url 'myapp:detect' %}" method="post" enctype="multipart/form-data">
+    <input id="id_title" maxlength="50" name="title" type="text">
+    <input id="id_image" name="image" type="file">
+    <input type="submit" value="Submit" />
+</form>
+
+{% include "footer.html" %}

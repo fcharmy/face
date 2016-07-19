@@ -1,0 +1,7 @@
+site_name: FaceTech
+site_description: Face algorithm API.
+site_author: Charmy Feng
+
+pages:
+- Home: 'getstart.md'
+
