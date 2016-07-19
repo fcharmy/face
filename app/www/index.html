@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="js/app.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+  </head>
+  <body ng-app="attendence">
+    <ion-nav-view></ion-nav-view>
+
+    <div id="spinner" style="display: none;height: 100%;width: 100%;position: absolute;z-index: 100;">
+      <div style="background: rgba(0, 0, 0, 0.2);position: absolute;left: 45%;top: 43%;height: 50px;width: 50px;border-radius: 10px;text-align: center;padding: 10px;">
+        <ion-spinner icon="circles" style="fill: #387ef5;"></ion-spinner>
+      </div>
+    </div>
+
+    <script id="login-page.html" type="text/ng-template">
+      <div ng-controller="loginController">
+        <ion-content scroll="false">
+          <div id="icon"></div>
+
+          <button class="button button-outline button-full button-positive ion-chevron-down" 
+              ng-click="click_login_list()" style="margin-bottom: 0px;">
+            {{login_option}}
+          </button>
+
+          <ul id="login-list" class="list" style="margin-top: -1px; display:none">
+              <button class="item button-full" ng-repeat="option in loginOptions" ng-click="choose_login('{{option}}')" style="padding: 12px 16px">
+                {{ option }}
+              </button>
+          </ul>
+
+
+          <div class="responsive-lg padding">
+            <form ng-submit="login_submit(username, password)">
+              <label class="item item-input">
+                <span class="input-label">Username</span>
+                <input type="text" ng-model="username">
+              </label>
+
+              <label class="item item-input">
+                <span class="input-label">Password</span>
+                <input type="password" ng-model="password">
+              </label>
+
+              <input id="submit-button" class="button button-full button-block button-positive" type="submit" value="Submit">
+              <ion-spinner id="submit-spinner" icon="lines" style="position: absolute; left: 47%; display: none;"></ion-spinner>
+
+            </form>
+          </div>
+        </ion-content>
+      </div>
+    </script> 
+
+    <script id="modules.html" type="text/ng-template">
+      <ion-content>
+        <div class="bar bar-header bar-positive" style="position: relative">
+          <h1 class="title">Modules</h1>
+        </div>
+
+        <ul id="module-list" class="list">
+            <a class="item" ng-repeat="module in modules" ng-click="choose_module('{{module}}')">
+              <i class="icon ion-android-bookmark orange"></i>&nbsp;&nbsp;
+              {{ module.CourseCode +' '+ module.CourseName }}
+            </a>
+        </ul>
+
+      </ion-content>
+    </script>
+
+    <script id="tabs.html" type="text/ng-template">
+      <ion-nav-bar class="bar-positive">
+        <!--ion-nav-back-button>
+        </ion-nav-back-button-->
+      </ion-nav-bar>
+
+      <ion-tabs class="tabs-positive tabs-icon-only">
+
+        <ion-tab title="Home" icon="ion-calendar" ui-sref="tabs.home">
+          <ion-nav-view name="home-tab"></ion-nav-view>
+        </ion-tab>
+
+        <ion-tab title="Attendence" icon="ion-clipboard" ui-sref="tabs.attend">
+          <ion-nav-view name="attend-tab"></ion-nav-view>
+        </ion-tab>
+
+        <ion-tab title="About" icon="ion-university" ui-sref="tabs.about">
+          <ion-nav-view name="about-tab"></ion-nav-view>
+        </ion-tab>
+
+      </ion-tabs>
+    </script>
+
+    <script id="attend.html" type="text/ng-template">
+      <ion-view view-title="Attendence" cache-view="false">
+        <ion-content>
+
+          <div class="row">
+            <button class="button button-large button-block  button-outline button-positive" ng-click="newRecord(true)" style="margin: 15px 15%">
+              <i class="icon ion-person-add"></i>&nbsp;&nbsp;Enrollment
+            </button>
+          </div>
+
+          <div class="row">
+            <button class="button button-large button-block  button-outline button-positive" ng-click="newRecord(false)" style="margin: 10px 15%">
+              <i class="icon ion-clock"></i>&nbsp;&nbsp;Check Attendence
+            </button>
+          </div>
+
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="confirm.html" type="text/ng-template">
+      <div class="modal">
+        <ion-content style="overflow: hidden">
+
+          <div class="card confirm-container">
+            <canvas id="confirm-canvas" style="display:none"></canvas>
+            <img id="confirm-img" src=""/>
+          </div>
+
+          <div class="bar bar-footer bar-positive">
+            <button class="button button-light button-clear" ng-click="cancel()" style="color: white">Cancel</button>
+            <div class="title"></div>
+            <button id="confirm-button" class="button button-light button-clear" ng-click="confirm()" style="color: white">Confirm</button>
+          </div>
+
+        </ion-content>
+      </div>
+    </script>
+
+    <script id="enroll.html" type="text/ng-template">
+      <ion-view view-title="Enrollment" cache-view="false">
+        <ion-content class="flex-container" scroll="false">
+
+          <div class="card img-container">
+            <canvas id="img-canvas"></canvas>
+            <img id="enroll-img" class="groupImg" ng-src="{{ img }}"/>
+          </div>
+
+          <div class="list-container">
+            <div class="bar bar-header bar-positive student-list-header">
+              <a class="button button-icon icon ion-chevron-left" ng-click="back()"></a>
+              <h1 class="title">Students</h1>
+              <a class="button button-icon icon ion-checkmark" ng-click="submit_enroll()"></a>
+            </div>
+
+            <ul class="list student-list">
+              <li id="{{ student.id }}" class="item" ng-repeat="student in student_list" ng-click="match_face({{ student }})">
+                {{ student.first_name }}
+              </li>
+            </ul>
+          </div>
+
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="home.html" type="text/ng-template">
+      <ion-view view-title="History" cache-view="false">
+
+        <ion-nav-buttons side="primary">
+          <button class="button icon button-icon ion-navicon"></button>
+        </ion-nav-buttons>
+
+        <ion-content>
+          <ul id="record-list" class="list">
+              <li class="item" ng-repeat="item in attend_records" ng-click="detail({{item}})">
+                {{ item.month + ' ' + item.date + ' ' + item.day}}
+                <small class="i">&nbsp;{{item.hour + ':' + item.min}}&nbsp;{{ item.lt? 'Lecture': 'Tutorial' }}</small>
+                <p style="float: right"><i class="orange">{{ item.students.length}}</i>/{{stu_amount}}</p>
+              </li>
+          </ul>
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="detail.html" type="text/ng-template">
+      <ion-view view-title="Detail" cache-view="false">
+        <ion-content scroll="false">
+
+          <div class="bar bar-header bar-positive" style="position: relative">
+            <button class="button button-icon icon ion-chevron-left" ng-click="back()"></button>
+            <div class="h1 title">{{ title }}</div>
+            <button class="button button-icon ion-plus-round" ng-disabled="add_disabled" ng-click="add_photo()"></button>
+          </div>
+
+          <div class="flex-container detail-tab">
+            <div class="card detail-container img-container" style="margin: 10px;text-align: center;display: flex;overflow: hidden;">
+              <button ng-disabled="previous_disabled" class="button button-icon icon ion-arrow-left-b" ng-click="previous()"></button>
+
+                <canvas id="detail-canvas" style="display:none"></canvas>
+                <img id="detail-img" ng-src="{{ serverUrl + images[img_index].url }}"/>
+
+              <button ng-disabled="next_disabled" class="button button-icon icon ion-arrow-right-b" ng-click="next()"></button>
+ 
+              <p class="i detail-p" style="position: absolute;">{{ subtitle }}</p>
+            </div>
+
+            <div class="list-container">
+              <div class="button-bar student-list-header">
+                <a id="attend_tab" ng-class="{'active-tab': tab_flag}" class="active-tab button button-positive button-outline" 
+                  ng-click="change_list(true)">Attend
+                  <span class="badge badge-assertive orange">{{ student_attend.length }}</span>
+                </a>
+
+                <a id="absence_tab" ng-class="{'active-tab': !tab_flag}" class="button button-positive button-outline" 
+                  ng-click="change_list(false)">Absence
+                  <span class="badge badge-assertive orange">{{ student_absence.length }}</span>
+                </a>
+              </div>
+
+              <ul class="list student-list" style="top: 0px;">
+                <li class="item" ng-repeat="student in student_show_list">
+                  {{ student.first_name }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </ion-content>
+      </ion-view>
+    </script>
+
+    <script id="about.html" type="text/ng-template">
+      <ion-view view-title="{{CourseCode}}">
+        <ion-content>
+
+          <ul id="about-list" class="list">
+              <li class="item row" style="padding: 16px">
+                <div class="i">Course Name</div>
+                <div class="item-text-wrap" style="display: inline-block;">{{ CourseName }}</div>
+              </li>
+              <li class="item">
+                <div class="i">Acadamic Year</div>
+                {{ CourseAcadYear }}
+              </li>
+              <li class="item">
+                <div class="i">Semester</div>
+                {{ CourseSemester }}
+              </li>
+              <li class="item">
+                <div class="i">Class Size</div>
+                {{ stu_amount }}
+              </li>
+              <li class="item">
+                <div class="i">Permission</div>
+                {{ Permission }}
+              </li>
+          </ul>    
+
+          <a class="button icon-left ion-chevron-left orange" style="float:right;right:10px" ng-click="back()">
+            Back to Modules
+          </a>
+        </ion-content>
+      </ion-view>
+    </script>
+
+  </body>
+</html>
