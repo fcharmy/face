@@ -33,7 +33,7 @@ label{
 	color: #FF5D33;
 }
 
-.list-container .student-list-header .active-tab{
+.detail-list .student-list-header .active-tab{
 	background-color: #387ef5;
     color: white;
 }
@@ -50,13 +50,15 @@ label{
 
 #img-canvas, #confirm-canvas{
 	margin-bottom: -5px;
+	position: relative;
 }
 
 .groupImg{
 	margin-bottom: -5px;
 	margin: 0 auto;
 	display: block;
-	image-orientation: from-image;
+	width: auto; 
+	height: 100%; 
 }
 
 .img-container {
@@ -65,6 +67,7 @@ label{
 	overflow: scroll;
 	text-align:center;
 	flex: 1 0 auto;
+	position: relative;
 }
 
 .confirm-container{
@@ -88,10 +91,11 @@ label{
 	overflow: scroll;
 }
 
-.list-container{
-	height: 100%;
+.list-container, .detail-list{
+	max-height: 100%;
 	flex-flow: column;
 	display: flex;
+	position: relative;
 }
 
 .student-list-header{
@@ -100,6 +104,7 @@ label{
 
 .flex-container{
 	display: flex;
+	height: 100%;
 }
 
 .flex-container.detail-tab{
@@ -127,23 +132,27 @@ label{
 
 	.img-container {
 		width: auto; 
-		height: auto;
-		max-height: 60%;
+		height: 50%;
 	}
 
 	.detail-container{
 		height: 45%;
+		max-height: 45%;
 	}
 
-	.groupImg{
-		width: 100%; 
-		height: auto; 
+	.list-container{
+	    flex: 0 1 auto;
+	    max-height: 47%;
+	}
+
+	.detail-list{
+	    flex: 0 1 auto;
+	    max-height: 52%;
 	}
 
 	.student-list {
 		width: auto;
-		height: 100%;
-		flex: 1 1 auto;
+		flex: 0 1 auto;
 		overflow-x: hidden;
 	}
 
@@ -168,26 +177,21 @@ label{
 @media screen and (orientation: landscape) {
 	.flex-container{
 		flex-flow: row;
+		overflow: hidden;
 	}
 
 	.img-container, .detail-container {
-		width: 70%; 
+		max-width: 70%; 
 		height: 95%;
 	}
 
-	.groupImg{
-		width: auto; 
-		height: 100%; 
-	}
-
-	.list-container{
-		width: 28%;
+	.list-container, .detail-list{
+		width: 27%;
 	}
 
 	.student-list {
 		height: 100%;
-		flex: 1 0 auto;
-		bottom: 45px;
+		flex: 1 1 auto;
 	}
 
 	.student-list-header{
