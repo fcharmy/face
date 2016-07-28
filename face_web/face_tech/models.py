@@ -13,14 +13,14 @@ class Group(models.Model):
 
     def to_dict(self):
         """ return dictionary of this object """
-        dict = {}
+        _dict = {}
         for f in self._meta.fields:
             if f.name == 'name':
-                dict[f.name] = ''.join(f.value_from_object(self).split('_')[1:])
+                _dict[f.name] = ''.join(f.value_from_object(self).split('_')[1:])
             else:
-                dict[f.name] = f.value_from_object(self)
+                _dict[f.name] = f.value_from_object(self)
 
-        return dict
+        return _dict
 
 
 class Person(models.Model):
@@ -30,19 +30,18 @@ class Person(models.Model):
     last_name = models.CharField(max_length=30, blank=True)
     note = models.CharField(max_length=200, blank=True)
     project = models.ForeignKey(User, on_delete=models.CASCADE)
-    # feature = models.CharField(max_length=5120, blank=True, null=True)
     create_date = models.DateTimeField(auto_now=True)
 
     def to_dict(self):
         """ return dictionary of this object """
-        dict = {}
+        _dict = {}
         for f in self._meta.fields:
             if f.name == 'name':
-                dict[f.name] = ''.join(f.value_from_object(self).split('_')[1:])
+                _dict[f.name] = ''.join(f.value_from_object(self).split('_')[1:])
             else:
-                dict[f.name] = f.value_from_object(self)
+                _dict[f.name] = f.value_from_object(self)
 
-        return dict
+        return _dict
 
 
 class Person_To_Group(models.Model):

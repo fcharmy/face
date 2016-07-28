@@ -5,8 +5,9 @@ import math
 import dlib
 import random
 import logging
-import numpy as np
 import traceback
+import numpy as np
+import numpy.matlib
 from math import exp
 from . import models
 from .apps import FaceTechConfig
@@ -93,7 +94,7 @@ def verify_face_from_feature_array(face, feature_array):
         max_match, person_index = 0, None
 
         for i in range(len(feature_array)):
-            if feature_array[i].shape[1] > 0:
+            if len(feature_array[i]) > 0 and feature_array[i].shape[1] > 0:
                 farray = np.concatenate((feature, feature_array[i]), axis=1)
                 flag, compare_score = compare(farray)
 
@@ -274,12 +275,12 @@ def feature_extraction(image):
     """ input, output: Numpy array """
 
     w, h = 160, 180  # w*h is columns of proj_lda60
-    lda = FaceTechConfig.lda_mat
+    wfld = FaceTechConfig.wfld
 
     img = cv2.resize(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), (w, h))
     array = np.reshape(cv2.equalizeHist(img), (w * h, 1))
 
-    return np.dot(lda, array)
+    return np.mat(wfld['V'][0][0]) * np.mat(array - np.matlib.repmat(wfld['org'][0][0], 1, array.shape[1]))
 
 
 def compare(feature):
@@ -293,9 +294,9 @@ def compare(feature):
         amin = np.amin(d)
         mean = np.mean(d)
 
-        if amin < 0.15:
+        if amin < 0.57:
             return True, exp(-amin ** 2)
-        elif mean < 0.4:
+        elif mean < 0.8:
             return True, exp(-mean**2)
         else:
             dd = np.max([amin, mean])

@@ -28,9 +28,9 @@ class FaceAPI(object):
     project = None
     security_key = None
     timeout = None
-    server = 'http://localhost/'  # Server url face_tech/
+    server = 'http://nusface-i.comp.nus.edu.sg/'  # Server url face_tech/
 
-    def __init__(self, project, seckey, timeout=10, server=None):
+    def __init__(self, project, seckey, timeout=60, server=None):
         self.project = project
         self.security_key = seckey
         self.timeout = timeout
