@@ -37,12 +37,12 @@
 
           <button class="button button-outline button-full button-positive ion-chevron-down" 
               ng-click="click_login_list()" style="margin-bottom: 0px;">
-            {{login_option}}
+            {{login_option[1]}}
           </button>
 
           <ul id="login-list" class="list" style="margin-top: -1px; display:none">
-              <button class="item button-full" ng-repeat="option in loginOptions" ng-click="choose_login('{{option}}')" style="padding: 12px 16px">
-                {{ option }}
+              <button class="item button-full" ng-repeat="option in loginOptions" ng-click="choose_login({{option}})" style="padding: 12px 16px">
+                {{ option[1] }}
               </button>
           </ul>
 
@@ -119,7 +119,7 @@
 
           <div class="row">
             <button class="button button-large button-block  button-outline button-positive" ng-click="newRecord(false)" style="margin: 10px 15%">
-              <i class="icon ion-clock"></i>&nbsp;&nbsp;Check Attendence
+              <i class="icon ion-clock"></i>&nbsp;&nbsp;Take Attendence
             </button>
           </div>
 
@@ -148,25 +148,27 @@
 
     <script id="enroll.html" type="text/ng-template">
       <ion-view view-title="Enrollment" cache-view="false">
-        <ion-content class="flex-container" scroll="false">
+        <ion-content scroll="false">
+          <div class="flex-container">
 
-          <div class="card img-container">
-            <canvas id="img-canvas"></canvas>
-            <img id="enroll-img" class="groupImg" ng-src="{{ img }}"/>
-          </div>
-
-          <div class="list-container">
-            <div class="bar bar-header bar-positive student-list-header">
-              <a class="button button-icon icon ion-chevron-left" ng-click="back()"></a>
-              <h1 class="title">Students</h1>
-              <a class="button button-icon icon ion-checkmark" ng-click="submit_enroll()"></a>
+            <div class="card img-container">
+              <canvas id="img-canvas"></canvas>
+              <img id="enroll-img" class="groupImg" ng-src="{{ img }}"/>
             </div>
 
-            <ul class="list student-list">
-              <li id="{{ student.id }}" class="item" ng-repeat="student in student_list" ng-click="match_face({{ student }})">
-                {{ student.first_name }}
-              </li>
-            </ul>
+            <div class="list-container">
+              <div class="bar bar-header bar-positive student-list-header">
+                <a class="button button-icon icon ion-chevron-left" ng-click="back()"></a>
+                <h1 class="title">Students</h1>
+                <a class="button button-icon icon ion-checkmark" ng-click="submit_enroll()"></a>
+              </div>
+
+              <ul class="list student-list">
+                <li id="{{ student.id }}" class="item" ng-repeat="student in student_list" ng-click="match_face({{ student }})">
+                  {{ student.first_name }}
+                </li>
+              </ul>
+            </div>
           </div>
 
         </ion-content>
@@ -182,10 +184,12 @@
 
         <ion-content>
           <ul id="record-list" class="list">
-              <li class="item" ng-repeat="item in attend_records" ng-click="detail({{item}})">
-                {{ item.month + ' ' + item.date + ' ' + item.day}}
-                <small class="i">&nbsp;{{item.hour + ':' + item.min}}&nbsp;{{ item.lt? 'Lecture': 'Tutorial' }}</small>
-                <p style="float: right"><i class="orange">{{ item.students.length}}</i>/{{stu_amount}}</p>
+              <li class="item" ng-repeat="index in range(attend_records.length)" ng-click="detail({{index}})">
+                {{ attend_records[index].month + ' ' + attend_records[index].date + ' ' + attend_records[index].day}}
+                <small class="i">&nbsp;{{attend_records[index].hour + ':' + attend_records[index].min}}
+                  &nbsp;{{ attend_records[index].lt? 'Lecture': 'Tutorial' }}
+                </small>
+                <p style="float: right"><i class="orange">{{ attend_records[index].students.length}}</i>/{{stu_amount}}</p>
               </li>
           </ul>
         </ion-content>
@@ -203,10 +207,10 @@
           </div>
 
           <div class="flex-container detail-tab">
-            <div class="card detail-container img-container" style="margin: 10px;text-align: center;display: flex;overflow: hidden;">
+            <div class="card detail-container img-container" style="text-align: center;display: flex;overflow: hidden;">
               <button ng-disabled="previous_disabled" class="button button-icon icon ion-arrow-left-b" ng-click="previous()"></button>
 
-                <canvas id="detail-canvas" style="display:none"></canvas>
+                <canvas id="detail-canvas" style="display: none;margin: auto;"></canvas>
                 <img id="detail-img" ng-src="{{ serverUrl + images[img_index].url }}"/>
 
               <button ng-disabled="next_disabled" class="button button-icon icon ion-arrow-right-b" ng-click="next()"></button>
@@ -214,7 +218,7 @@
               <p class="i detail-p" style="position: absolute;">{{ subtitle }}</p>
             </div>
 
-            <div class="list-container">
+            <div class="detail-list">
               <div class="button-bar student-list-header">
                 <a id="attend_tab" ng-class="{'active-tab': tab_flag}" class="active-tab button button-positive button-outline" 
                   ng-click="change_list(true)">Attend
@@ -228,7 +232,7 @@
               </div>
 
               <ul class="list student-list" style="top: 0px;">
-                <li class="item" ng-repeat="student in student_show_list">
+                <li class="item" ng-repeat="student in student_show_list" ng-click="match_face({{ student }})">
                   {{ student.first_name }}
                 </li>
               </ul>
@@ -248,7 +252,7 @@
                 <div class="item-text-wrap" style="display: inline-block;">{{ CourseName }}</div>
               </li>
               <li class="item">
-                <div class="i">Acadamic Year</div>
+                <div class="i">Academic Year</div>
                 {{ CourseAcadYear }}
               </li>
               <li class="item">
