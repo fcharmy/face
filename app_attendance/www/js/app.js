@@ -1,5 +1,5 @@
 // ajax request setting
-var serverUrl = 'http://172.26.187.124:8000',
+var serverUrl = 'http://172.26.187.124:8000/',
     requestObj = {
       type: "POST",
       dataType: 'json',
@@ -21,7 +21,8 @@ var serverUrl = 'http://172.26.187.124:8000',
       ft.upload(imgURI, url, success, fail, options);
     };
 
-var profile = {'MatriculationYear': '2013', 'FirstMajor': 'Nil', 'authToken': '89D406823E8DDDF3376EB92C9C5471B7487A515BB100B024D1664EC378C6E59D429A977902D378D375C1F042F94C9490E8B167DC8E9528C4B03912BFCF86EB3EB3A26F32F4C543362EA30703D974FA2CC09E3D3629B8D46CF4027B6BD84B1A2B441D1AA85139FFCFEA0F1E52D8A71B1923F19E98675FCA0E1E9A448D66D4B558401E661275A39DF227CA3AAFEBF13779CCDA031DB83EB4379C8C2687D3EA1BF6C7667AFD24AC52B23C0027AD5B6351D32CCCDDE80398F60078D28E0BF01BE6FCC724CF8000059379278E548C19612CED4EA43D6C8EA5F073CE93D693FC3C752F510F053DB38A4620A204E56D54592594', 'Modules': [{'ID': 'f786eceb-7861-46dc-90f2-436e8884405e', 'CourseCode': 'RI3001A', 'CourseName': 'Understanding Biometrics', 'CourseAcadYear': '2015/2016', 'face_group_id': 4, 'Permission': 'M', 'CourseSemester': 'Semester 4'}], 'Faculty': 'School of Computing', 'Email': 'a0112472@u.nus.edu', 'UserID': 'a0112472', 'Gender': 'Female', 'Name': 'LI JING', 'SecondMajor': ''}
+var option = null,
+    profile = {'MatriculationYear': '2013', 'FirstMajor': 'Nil', 'authToken': '89D406823E8DDDF3376EB92C9C5471B7487A515BB100B024D1664EC378C6E59D429A977902D378D375C1F042F94C9490E8B167DC8E9528C4B03912BFCF86EB3EB3A26F32F4C543362EA30703D974FA2CC09E3D3629B8D46CF4027B6BD84B1A2B441D1AA85139FFCFEA0F1E52D8A71B1923F19E98675FCA0E1E9A448D66D4B558401E661275A39DF227CA3AAFEBF13779CCDA031DB83EB4379C8C2687D3EA1BF6C7667AFD24AC52B23C0027AD5B6351D32CCCDDE80398F60078D28E0BF01BE6FCC724CF8000059379278E548C19612CED4EA43D6C8EA5F073CE93D693FC3C752F510F053DB38A4620A204E56D54592594', 'Modules': [{'ID': 'f786eceb-7861-46dc-90f2-436e8884405e', 'CourseCode': 'RI3001A', 'CourseName': 'Understanding Biometrics', 'CourseAcadYear': '2015/2016', 'face_group_id': 4, 'Permission': 'M', 'CourseSemester': 'Semester 4'}], 'Faculty': 'School of Computing', 'Email': 'a0112472@u.nus.edu', 'UserID': 'a0112472', 'Gender': 'Female', 'Name': 'LI JING', 'SecondMajor': ''}
 ;
 
 // Ionic attendence App
@@ -36,8 +37,6 @@ angular.module('attendence', ['ionic'])
     .state('modules',{
       url: "/modules",
       templateUrl: "modules.html",
-      // params: {//data: null
-      // },
       controller: 'moduleController'
     })
     .state('tabs',{
@@ -98,7 +97,7 @@ angular.module('attendence', ['ionic'])
       controller: 'detailController'
     });
 
-  $urlRouterProvider.otherwise("/modules");
+  $urlRouterProvider.otherwise("/login");
   $ionicConfigProvider.tabs.position('bottom');
   $ionicConfigProvider.navBar.alignTitle('center');
 
@@ -109,7 +108,7 @@ angular.module('attendence', ['ionic'])
 
   // $scope.hideList = true;
   $scope.submitDisable = false;
-  $scope.loginOptions = ["NUS Login", "Other"];
+  $scope.loginOptions = [['ivle', "NUS Login"], ['attend', "Other"]];
   $scope.login_option = $scope.loginOptions[0];
 
   $scope.click_login_list = function(){
@@ -130,38 +129,35 @@ angular.module('attendence', ['ionic'])
   };
 
   $scope.login_submit = function(username, password){
-    switch($scope.login_option){
-      case $scope.loginOptions[0]: // For IVLE Login
+    option = $scope.login_option[0];
 
-        $scope.submit_loading(true);
-        requestObj.url = serverUrl + '/ivle_login/';
-        requestObj.data = {name: username, password: password};
+    if (option != null){
+      $scope.submit_loading(true);
+      requestObj.url = serverUrl + option + '_login';
+      requestObj.data = {username: username, password: password};
 
-        requestObj.success = function(data){
-          $scope.submit_loading(false);
-          profile = data.data;
-          $state.go('modules', {data: data.data});
-        };
+      requestObj.success = function(data){
+        $scope.submit_loading(false);
+        profile = data.data;
+        $state.go('modules', {data: data.data});
+      };
 
-        requestObj.error = function(xhr, status, error){
-          if ('Not Acceptable' == error) {
-            show_message(7, xhr.responseText);
-          }
-          else{
-            show_message(0);
-          }
+      requestObj.error = function(xhr, status, error){
+        if ('Not Acceptable' == error) {
+          show_message(7, xhr.responseText);
+        }
+        else{
+          show_message(0);
+        }
 
-          $scope.submit_loading(false);
-        };
+        $scope.submit_loading(false);
+      };
 
-        $.ajax(requestObj);
-        break;
-
-      default:  // For other options
-        show_message(2);
-        break;
-    };
-
+      $.ajax(requestObj);
+    }
+    else{
+      show_message(2);
+    }
   };
 })
 
@@ -169,10 +165,11 @@ angular.module('attendence', ['ionic'])
   $scope.modules = profile.Modules;
 
   $scope.choose_module = function(data){
-    requestObj.url = serverUrl + '/update_module/';
+    requestObj.url = serverUrl + option +'_module';
     requestObj.data = {data: data, token: profile.authToken};
 
     requestObj.success = function(data){
+      $('#spinner').hide();
       $state.go('tabs.attend', {module: data.data});
     };
 
@@ -183,8 +180,10 @@ angular.module('attendence', ['ionic'])
       else{
         show_message(0);
       }
+      $('#spinner').hide();
     };
 
+    $('#spinner').show();
     $.ajax(requestObj);
   };
 })
@@ -208,9 +207,17 @@ angular.module('attendence', ['ionic'])
     $scope.attend_records[i].day = dayNames[d.getDay()];
   };
 
-  $scope.detail = function(data){
-    $state.go('detail', {data: data, module: $stateParams.module});
+  $scope.detail = function(index){
+    $state.go('detail', {data: $scope.attend_records[index], module: $stateParams.module});
   }
+
+  $scope.range = function(len){
+    var list = [];
+    for (var i = 0; i < len; i++) {
+      list.push(i);
+    };
+    return list;
+  };
 })
 
 .controller('attendController', function($scope, $stateParams, $state, $ionicModal, $ionicHistory){
@@ -248,7 +255,7 @@ angular.module('attendence', ['ionic'])
       $scope.img = data;
       document.getElementById('confirm-img').src = $scope.img;
 
-      uploadImg(serverUrl + '/' + (ev? 'detect': 'verify') + '/', data, {group: $stateParams.module.face_group_id}, 
+      uploadImg(serverUrl + (ev? 'detect': 'verify'), data, {group: $stateParams.module.face_group_id}, 
         function(r){
           // submit image to server succeed
           $scope.response_data = JSON.parse(r.response).data;
@@ -283,7 +290,7 @@ angular.module('attendence', ['ionic'])
     //   // $scope.img = "https://upload.wikimedia.org/wikipedia/commons/c/c7/Spencer_Davis_Group_1974.JPG";
     //   $scope.img = Math.random() < 0.5 ? "http://web.mit.edu/chemistry/jamison/images/Group%20Photos/Group%20Photo%207.3.2012.JPG"
     //     :"https://upload.wikimedia.org/wikipedia/commons/c/c7/Spencer_Davis_Group_1974.JPG";
-    //   $scope.response_data = {"faces": [{'id': 80, "landmarks": null, "resolution": 1, "coordinates": [353, 427, 593, 667], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [245, 320, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [237, 311, 1190, 1265], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 1057, 1132], "occlude": "False", "illumination": 0}, {'id': 81, "landmarks": null, "resolution": 1, "coordinates": [336, 411, 1878, 1953], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [701, 776, 585, 659], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 1124, 1198], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 385, 460], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [334, 424, 124, 214], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [203, 278, 1397, 1472], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [369, 444, 767, 842], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 1298, 1373], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [187, 262, 452, 526], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [71, 145, 1099, 1173], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [266, 328, 1012, 1074], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [336, 411, 1655, 1729], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [320, 394, 1489, 1563], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 949, 1024], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [228, 303, 651, 726], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 0, "coordinates": [38, 74, 1605, 1641], "occlude": "True", "illumination": 0}]};
+    //   $scope.response_data = {"faces": [{'id': 134, "landmarks": null, "resolution": 1, "coordinates": [353, 427, 593, 667], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [245, 320, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [237, 311, 1190, 1265], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 1057, 1132], "occlude": "False", "illumination": 0}, {'id': 135, "landmarks": null, "resolution": 1, "coordinates": [336, 411, 1878, 1953], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [701, 776, 585, 659], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 1124, 1198], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 385, 460], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [334, 424, 124, 214], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [203, 278, 1397, 1472], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [369, 444, 767, 842], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 1298, 1373], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [187, 262, 452, 526], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [71, 145, 1099, 1173], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [266, 328, 1012, 1074], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [336, 411, 1655, 1729], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [320, 394, 1489, 1563], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 949, 1024], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [228, 303, 651, 726], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 0, "coordinates": [38, 74, 1605, 1641], "occlude": "True", "illumination": 0}]};
 
     //   document.getElementById('confirm-img').src = $scope.img;
     //   $('#spinner').hide();
@@ -292,7 +299,7 @@ angular.module('attendence', ['ionic'])
     //     drawRects('confirm-canvas', 'confirm-img', false);
     //   }
     //   $('#confirm-button').prop('disabled', false);
-    // }, 2000);
+    // }, 1000);
 
   };
 })
@@ -311,13 +318,13 @@ angular.module('attendence', ['ionic'])
 
   $scope.back = function(){
     $state.go('modules');
-  }
+  };
 
 })
 
 .controller('enrollController', function($scope, $stateParams, $state, $ionicHistory){
   highlight = null, curPointer = null;  // initial
-  $scope.img = ($stateParams.img == null)? "http://web.mit.edu/chemistry/jamison/images/Group%20Photos/Group%20Photo%207.3.2012.JPG": $stateParams.img;
+  $scope.img = $stateParams.img;
   $scope.student_list = $stateParams.module.student;
   $scope.data = $stateParams.data;
 
@@ -328,29 +335,34 @@ angular.module('attendence', ['ionic'])
 
   $scope.match_face = function(person){
     matching('img-canvas', 'enroll-img', person);
-  }
+  };
 
   $scope.back = function(){
     $ionicHistory.goBack();
-  }
+  };
 
   $scope.submit_enroll = function(){
     // remove unnessesary property before send request
-    var cleaned_data = [];
+    var cleaned_data = [], alter_list = [];
     for (var i = 0; i < facesList.length; i++) {
       cleaned_data.push({'coordinates': facesList[i].coordinates, 'id': facesList[i].id});
+
+      if (!$stateParams.is_enroll && facesList[i].hasOwnProperty('alter') && facesList[i].alter) {
+        alter_list.push({'coordinates': facesList[i].coordinates, 'id': facesList[i].id});
+      };
     };
     $scope.data.faces = cleaned_data;
+    $scope.data['enroll'] = alter_list;
 
-    // enroll students
-    requestObj.url = serverUrl + ($stateParams.is_enroll? '/enrollment/': '/attend/');
+    // enroll or add attend students
+    requestObj.url = serverUrl + ($stateParams.is_enroll? 'enrollment': 'attendance');
     requestObj.data = {data: JSON.stringify($scope.data), group: $stateParams.module.face_group_id, 
       module: $stateParams.module.ID, owner: profile.Name, time_id: $stateParams.class? $stateParams.class.time_id: null};
 
     if (!$stateParams.is_enroll && !$stateParams.class) {
-      if (confirm('Lecture or Tutorial? Press OK if this is a lecture.')) {
-        requestObj.data['lt'] = 1;
-      }else{  requestObj.data['lt'] = 0; }
+      if ('M' == $stateParams.module.Permission) {
+        requestObj.data['lt'] = false;
+      }else{  requestObj.data['lt'] = true; }
     }
     else if(!$stateParams.is_enroll && $stateParams.class){
       requestObj.data['lt'] = $stateParams.class.lt;
@@ -362,7 +374,7 @@ angular.module('attendence', ['ionic'])
         show_message(4);
 
         // send request to update tabs info
-        requestObj.url = serverUrl + '/update_module/';
+        requestObj.url = serverUrl + 'update_module';
         requestObj.data = {data: JSON.stringify($stateParams.module), token: profile.authToken};
 
         requestObj.success = function(data){
@@ -400,7 +412,7 @@ angular.module('attendence', ['ionic'])
     $('#spinner').show();
     $.ajax(requestObj);
 
-  }
+  };
 
 })
 
@@ -431,7 +443,20 @@ angular.module('attendence', ['ionic'])
 
   $scope.$on("$ionicView.enter", function(event, data){
     $scope.change_list(true); // show attend list when entered
+    $scope.draw();  // draw rectangle on img
   });
+
+  $scope.draw = function(){
+    if ($scope.images[$scope.img_index].hasOwnProperty('data')) {
+      highlight = null, curPointer = null;  // initial
+      facesList = $scope.images[$scope.img_index].data;
+      drawRects('detail-canvas', 'detail-img', false);
+    }
+  };
+
+  $scope.match_face = function(person){
+    matching('detail-canvas', 'detail-img', person);
+  };
 
   $scope.back = function(){
     $ionicHistory.goBack();
@@ -446,13 +471,17 @@ angular.module('attendence', ['ionic'])
     $scope.img_index--;
     $scope.previous_disabled = $scope.img_index > 0? false : true;
     $scope.next_disabled = $scope.img_index + 1 < $scope.images.length? false : true;
-  }
+
+    $scope.draw();  // draw rectangle on img
+  };
 
   $scope.next = function(){
     $scope.img_index++;
     $scope.previous_disabled = $scope.img_index > 0? false : true;
     $scope.next_disabled = $scope.img_index + 1 < $scope.images.length? false : true;
-  }
+
+    $scope.draw();  // draw rectangle on img
+  };
 
   $scope.add_photo = function(){
     $('#spinner').show();
@@ -460,7 +489,7 @@ angular.module('attendence', ['ionic'])
       // take photo succeed
       $scope.img = data;
 
-      uploadImg(serverUrl + '/verify/', data, {group: $stateParams.module.face_group_id}, 
+      uploadImg(serverUrl + 'verify', data, {group: $stateParams.module.face_group_id}, 
         function(r){
           $('#spinner').hide();
           // submit image to server succeed
@@ -469,11 +498,13 @@ angular.module('attendence', ['ionic'])
             module: $stateParams.module, class: $stateParams.data});
         }, 
         function(error){
+          $('#spinner').hide();
           show_message(6, error.code);
       });
 
     },function(message){
       // take photo failed
+      $('#spinner').hide();
       show_message(7, message);
     },{
       quality: 50, 
@@ -489,9 +520,10 @@ angular.module('attendence', ['ionic'])
   For drawing rectangles on image and specify current face
 */
 
-var facesList = [],         // copy of face list
-    highlight = null;   // highlight a face
-    curPointer = null;  // point to the index of current face
+var facesList = [],     // copy of face list
+    highlight = null,   // highlight a face
+    curPointer = null,  // point to the index of current face
+    ctime = new Date(); // for save last single click time 
 
 var normal = 'green',   // faces with identification
     regular = 'blue',   // faces detected without id
@@ -578,16 +610,29 @@ function drawRects(canvasId, imgId, clickable){
     }
 
     if (clickable) {
-      c.addEventListener('click', function(e) {
+      c.onclick = function(e) {
+        var dbclick = ($.now() - ctime < 500)? true:false;
+        ctime = new Date($.now());
+
         for (var i = 0; i < facesList.length; i++) {
           if (e.offsetX >= facesList[i].coordinates[2]*ratio && e.offsetY >= facesList[i].coordinates[0]*ratio
             && e.offsetX <= facesList[i].coordinates[3]*ratio && e.offsetY <= facesList[i].coordinates[1]*ratio) {
-            highlight = null;
-            curPointer = curPointer == i ? null : i;
-            drawRects(canvasId, imgId, clickable);
+            if(!dbclick){
+              highlight = null;
+              curPointer = i;
+              drawRects(canvasId, imgId, clickable);
+              return;
+            }else{
+              $('#'+facesList[i].id).removeClass('occupied');
+              delete facesList[i]['id']; delete facesList[i]['name']; delete facesList[i]['first_name']; delete facesList[i]['alter'];
+            }
           }
         };
-      }, false);
+
+        highlight = null;
+        curPointer = null;
+        drawRects(canvasId, imgId, clickable);
+      };
     }
 
   }
@@ -614,7 +659,7 @@ function matching(canvasId, imgId, person){
       if (confirm('This student already match to a face, are you sure to delete previous one?')){
         for (var i = 0; i < facesList.length; i++) {
           if (facesList[i].hasOwnProperty('id') && facesList[i].id == person.id) {
-            delete facesList[i]['id']; delete facesList[i]['name']; delete facesList[i]['first_name'];;
+            delete facesList[i]['id']; delete facesList[i]['name']; delete facesList[i]['first_name']; delete facesList[i]['alter'];
           };
         }
       }
@@ -624,6 +669,7 @@ function matching(canvasId, imgId, person){
     facesList[curPointer]['id'] = person.id;
     facesList[curPointer]['name'] = person.name;
     facesList[curPointer]['first_name'] = person.first_name;
+    facesList[curPointer]['alter'] = true;
     $('#'+person.id).addClass('occupied');
 
     highlight = curPointer;
@@ -653,9 +699,9 @@ function show_message(){
     case 3:
       alert('Invalid Module'); break;
     case 4:
-      alert('Update succeed'); break;
+      alert('Update Succeed'); break;
     case 5:
-      alert('Update failed'); break;
+      alert('Update Failed'); break;
     case 6:
       alert("An error has occurred: Code = " + arguments[1]); break;
     case 7:
