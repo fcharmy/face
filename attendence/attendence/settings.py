@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -126,6 +126,7 @@ MEDIA_ROOT = BASE_DIR + '/media'
 MEDIA_URL = '/media/'
 
 SESSION_COOKIE_AGE = 1200
+SESSION_SAVE_EVERY_REQUEST = True
 
 LOGGING = {
     'version': 1,

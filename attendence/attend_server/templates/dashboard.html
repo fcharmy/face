@@ -1,0 +1,37 @@
+          <h1 class="page-header">Dashboard</h1>
+
+          <div class="row placeholders">
+              {% for item in attend_records %}
+                <div class="col-xs-6 col-sm-3 placeholder">
+                  <img src="{{ item.images.url }}" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+                  <h4>{{ item.time_id }}</h4>
+                  <span class="text-muted">{{ item.students.length }}</span>
+                </div>
+              {% endfor %}
+          </div>
+
+          <h2 class="sub-header">Student Attendance</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>First Name</th>
+                  <th>Email</th>
+                  <th>Number of Attendance</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in students %}
+                    <tr>
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.first_name }}</td>
+                      <td>{{ item.email }}</td>
+                      <td>{{ item.number }}</td>
+                      <td>{{ item.percentage }}</td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>

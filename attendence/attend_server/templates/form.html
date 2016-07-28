@@ -1,10 +1,19 @@
-<div class="page-header">
-    <h3>{{ message|escape}}</h3>
-</div>
+{% load staticfiles %}
+{% include "header.html" %}
 
-<div>
-    <form action="{% url url %}" method="post" enctype="multipart/form-data">
-        {{ form }}
-        <br/><input type="submit" value="Submit" />
-    </form>
+<div class="container">
+
+    <div class="page-header">
+        <h3>{{ title|escape}}</h3>
+    </div>
+    {% if message %}<p><span class="alert alert-warning"><strong>{{ message|escape }}</strong></span></p>{% endif %}
+
+    <div>
+        <form action="{% url url %}" method="post" enctype="multipart/form-data">
+            {{ form }}
+            <br/><input type="submit" value="Submit" />
+        </form>
+    </div>
+
+    {% include "footer.html" %}
 </div>

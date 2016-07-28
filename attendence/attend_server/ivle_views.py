@@ -1,29 +1,27 @@
 from shutil import copyfile
+from .face_tech import file
+from .apps import error_response
 from django.conf import settings
+from .apps import API_KEY, api, IMG_FOLDER_NAME
+from . import forms, pyivle, models
 import base64, logging, traceback, json, os
-from . import views, forms, pyivle, models, apps
-from .face_tech import FaceAPI, file
 from django.core.files.base import ContentFile
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import default_storage, FileSystemStorage
-
-project_key = '2'
-security_key = 'SWQ9HjVM'
-api = FaceAPI(project_key, security_key)
+from django.core.files.storage import default_storage
 
 log = logging.getLogger(__name__)
 
 
 @csrf_exempt
-def login(request):
+def log_in(request):
     """ Login with ivle username and password """
     form = forms.LoginForm(request.POST)
 
     if form.is_valid():
         try:
             # Authenticate for IVLE
-            data, modules = login_ivle(form.cleaned_data['name'], form.cleaned_data['password'])
+            data, modules = login_ivle(form.cleaned_data['username'], form.cleaned_data['password'])
             data['Modules'] = []
 
             for m in modules:
@@ -43,7 +41,7 @@ def login(request):
             return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
-    return views.error_response(2)
+    return error_response(2)
 
 
 @csrf_exempt
@@ -144,150 +142,19 @@ def update_module(request):
 
                 del exist_list, new_list, add_list
                 data['student'] = updated_list
-                data['attendance'] = get_records(data.get('ID'))
+                data['attendance'] = models.get_records(data.get('ID'))
 
                 return JsonResponse({'data': data})
 
             else:
-                return views.error_response(5)
+                return error_response(5)
         except:
             log.error(traceback.format_exc())
 
-    return views.error_response(1, name='update_module')
-
-
-@csrf_exempt
-def face_detection(request):
-    """ Send img to detect face and check quality """
-    form = forms.ImgForm(request.POST, request.FILES)
-
-    if form.is_valid():
-        try:
-            img = form.cleaned_data['image']
-            data = api.check_quality(image=file(img))
-            data['image'] = default_storage.save(img.name, ContentFile(img.read()))
-
-            return JsonResponse({'data': data})
-        except:
-            log.error(traceback.format_exc())
-
-    return views.error_response(1, name='face_detection')
-
-
-@csrf_exempt
-def verify(request):
-    """ verify faces with person ids"""
-    form = forms.ImgForm(request.POST, request.FILES)
-
-    if form.is_valid():
-        try:
-            # data = json.loads(form.cleaned_data['data'])
-            img = form.cleaned_data['image']
-            group = int(form.cleaned_data['group'])
-
-            response_data = api.verification_faces(image=file(img), group=group)
-
-            data = {"faces": response_data, "image": default_storage.save(img.name, ContentFile(img.read()))}
-            return JsonResponse({'data': data})
-        except:
-            log.error(traceback.format_exc())
-
-    return views.error_response(1, name='verify')
-
-
-@csrf_exempt
-def enrollment(request):
-    """ enroll faces with person ids"""
-    form = forms.DataForm(request.POST)
-
-    if form.is_valid():
-        try:
-            data = json.loads(form.cleaned_data['data'])
-            img = default_storage.path(data.get('image'))
-            group = form.cleaned_data['group']
-            response_data = api.enrollment_faces(data=data, group=group, image=file(img))
-
-            # # get attendance info
-            # time_id = models.get_time()
-            # module = form.cleaned_data['module']
-            # # lt = form.cleaned_data['lt']
-            #
-            # # copy tmp file to uploaded folder and delete tmp file
-            # img_path = models.get_image_path(module, time_id)
-            # if copyimg(img, img_path):
-            #
-            #     # create a new image record
-            #     img = models.new_image(img_path, time_id, data.get('faces'))
-            #     attendance = models.Attendance(module_id=module, group_id=group, owner=form.cleaned_data['owner'],
-            #                                    time=time_id, lecture_or_tutorial=True)
-            #     attendance.save()
-            #     if img:
-            #         aids = []
-            #         for face in data.get('faces'):
-            #             if face.get('id'):
-            #                 a, is_new = models.Attend_Recodes.objects.get_or_create(attendance=attendance,
-            #                                                                         person_id=face.get('id'))
-            #                 aids.append(a.id)
-            #
-            #         return JsonResponse({'data': response_data, 'attend': aids})
-
-            return JsonResponse({'data': response_data})
-        except:
-            log.error(traceback.format_exc())
-
-    return views.error_response(1, name='enrollment')
-
-
-@csrf_exempt
-def attend(request):
-    """ add attend records"""
-    form = forms.DataForm(request.POST)
-
-    if form.is_valid():
-        if True:
-            data = json.loads(form.cleaned_data['data'])
-            group = form.cleaned_data['group']
-            module = form.cleaned_data['module']
-            lt = form.cleaned_data['lt']
-
-            img = default_storage.path(data.get('image'))
-            response_data = data.get('faces')
-            time_id = form.cleaned_data['time_id'] if form.cleaned_data['time_id'] else models.get_time()
-
-            # copy tmp file to uploaded folder and delete tmp file
-            img_path = models.get_image_path(module, time_id)
-
-            if copyimg(img, img_path):
-                # create a new image record
-                data = []
-                for face in response_data:
-                    if face.get('id'):
-                        data.append({"id": face.get('id'), "coordinates": face.get('coordinates')})
-
-                img = models.new_image(img_path, time_id, data)
-
-                # get or create a attendance by time_id, then create attend record for each person
-                attendance, is_new = models.Attendance.objects.get_or_create(module_id=module, group_id=group,
-                                                                             owner=form.cleaned_data['owner'],
-                                                                             time=time_id, lecture_or_tutorial=lt)
-                if img and attendance:
-                    aids = []
-                    for face in data:
-                        a, is_new = models.Attend_Recodes.objects.get_or_create(attendance=attendance,
-                                                                                person_id=face.get('id'))
-                        aids.append(a.id)
-
-                    return JsonResponse({'data': response_data, 'attend': aids})
-
-        else:
-            log.error(traceback.format_exc())
-
-    return views.error_response(1, name='attend')
+    return error_response(1, name='update_module')
 
 
 # ----------------Private Functions-------------------
-
-API_KEY = "f14zzwlfh5fxiXWS2U3hU"
 
 
 def login_ivle(username, password):
@@ -314,7 +181,7 @@ def get_teaching_modules(modules):
     result = []
 
     for m in modules.get('Results'):
-        if m.get('Permission') in ['O', 'F', 'M', 'R', 'S']:
+        if m.get('Permission') in ['O', 'F', 'M', 'R']:  # , 'S']: for teseting
             needed = {}
             # filter out needed attributes of modules
             for attr in ['ID', 'CourseName', 'CourseCode',  # 'hasClassRosterItems', 'hasGuestRosterItems',
@@ -330,40 +197,8 @@ def get_students(token, module_id):
     p = pyivle.Pyivle(API_KEY, authToken=token)
 
     # auth if p has permission to access module todo
-
+    # change to class_roster after testing todo
     return p.guest_roster(module_id).get('Results')
 
-
-def copyimg(tmp_img, img_path):
-    # copy tmp file to uploaded folder and delete tmp file
-    try:
-        if not os.path.exists(os.path.dirname(img_path)):
-            os.makedirs(os.path.dirname(img_path))
-
-        copyfile(tmp_img, img_path)
-        default_storage.delete(tmp_img)
-
-        return True
-    except:
-        return False
-
-
-def get_records(module):
-    """ return list of attendance records with students ids and other info by providing module id"""
-    try:
-        classes = models.Attendance.objects.filter(module_id=module).order_by('-time')
-
-        data = []
-        for c in classes:
-            attend = {"time_id": c.time, "lt": c.lecture_or_tutorial, "owner": c.owner,
-                      "students": [p.person_id for p in models.Attend_Recodes.objects.filter(attendance=c)],
-                      "images": [{"url": settings.MEDIA_URL + apps.AttendServerConfig.IMG_FOLDER_NAME + img.path.name,
-                                  "data": img.data} for img in models.Images.objects.filter(time=c.time)]
-                      }
-            data.append(attend)
-
-        return data
-    except:
-        return None
 
 
