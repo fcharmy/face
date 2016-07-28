@@ -178,7 +178,7 @@ def create_student(request):
 
 def view_module(request):
     if 'code' in request.GET:
-        
+
         return render(request, 'user.html', {'html': 'dashboard.html', 'modules': request.session['Modules']})
 
     return HttpResponseRedirect(reverse('attend:user_index'))
