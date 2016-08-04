@@ -269,11 +269,8 @@ def get_persons_by_group(request):
                 for p in persons:
                     data.append(p.to_dict())
 
-                if data:
-                    return JsonResponse({'data': data})
+                return JsonResponse({'data': data})
 
-                else:
-                    return views.error_response(6)
             else:
                 return views.error_response(3, name=project.username)
         else:
@@ -299,11 +296,8 @@ def get_all_persons(request):
             for p in persons:
                 data.append(p.to_dict())
 
-            if data:
-                return JsonResponse({'data': data})
+            return JsonResponse({'data': data})
 
-            else:
-                return views.error_response(6)
         else:
             return views.error_response(2)
 

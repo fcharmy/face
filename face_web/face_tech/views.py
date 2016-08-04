@@ -129,8 +129,7 @@ def error_response(error_code, name='', message=''):
         2: 'Project or security key is Invalid.',
         3: 'Group does not exist or belong to your project {}'.format(name),
         4: 'Persons do not exist or belong to your project {}'.format(name),
-        5: 'No face detected in image or No person exists.',
-        6: 'No person exists.',
+        5: 'No face detected in image.',
     }
 
     response = HttpResponse(error_message.get(error_code))

@@ -139,7 +139,7 @@ Or you can call check_quality every time before you enroll faces, this will tell
 	r = api.check_quality(image=file(img), data=False)
 	print(r)
 	
-If data is True, it means it will return a filename which stored in sever. Just pass the result with  person ids to enrollment_faces, you do not need to pass a whole image again.
+If data is True, it means it will return a filename which stored in sever. Just pass the result with person ids to enrollment_faces, you do not need to pass a whole image again.
 
 After you enroll faces to server, it’s time to verify them from photos.
 

@@ -50,8 +50,9 @@ class Person_To_Group(models.Model):
 
 
 class Face(models.Model):
+    """ save face feature and path. max feature: 10 kb """
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    feature = models.CharField(max_length=5120)
+    feature = models.CharField(max_length=10240)
     image = models.ImageField(blank=True, null=True)
     create_date = models.DateTimeField(auto_now=True)
 

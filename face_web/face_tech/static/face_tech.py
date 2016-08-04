@@ -66,9 +66,9 @@ class _APICall(object):
         if response.status_code == 200:
             return json.loads(response.text).get('data')
         else:
-            # print error message, or raise ValueError(response.text)
+            # print error message, raise ValueError(response.text)
             print(response.text)
-            return False
+            raise ValueError(response.text)
 
 
 def file(image):

@@ -227,7 +227,7 @@ def verification(request):
             elif group:
                 persons = [ptp.person for ptp in models.Person_To_Group.objects.filter(group_id=group).distinct()]
 
-            if coords and persons:
+            if coords and persons is not None:
                 persons_feature_array = fac_pravite.get_feature_array(persons)
 
                 for c in coords:

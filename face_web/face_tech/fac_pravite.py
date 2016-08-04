@@ -47,27 +47,12 @@ def enroll_face(person, image):
     return False
 
 
-# if person.feature:
-#     faces = []
-#     for f in models.Face.objects.filter(person=person):
-#         if f.image:
-#             faces.append(cv2.imread(f.image.path))
-#         else:
-#             f.delete()
-#
-#     # Add new feature to identifier
-#     new_feature = str(feature_extraction(faces))
-#     person.feature = new_feature
-# else:
-#     person.feature = feature
-
-
 def get_feature_array(persons):
     try:
         persons_feature_array = []
 
         for p in persons:
-            dimension = 25  # the rows of proj_lda60
+            dimension = 248  # the rows of model
             faces = models.Face.objects.filter(person=p)
 
             feature_array = np.array([[] for _ in range(dimension)])
@@ -166,14 +151,6 @@ def detect_landmark(image, coordinates):
     b = dlib.rectangle(coordinates[2], coordinates[0], coordinates[3], coordinates[1])
     # Convert opencv RGB image to BGR then detect landmarks
     shape = predictor(cv2.cvtColor(image, cv2.COLOR_RGB2BGR), b)
-
-    # # Show results
-    # win = dlib.image_window()
-    # win.clear_overlay()
-    # win.set_image(cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
-    # win.add_overlay(shape)
-    # win.add_overlay(b)
-    # win.wait_until_closed()
 
     landmarks = [[s.x, s.y] for s in shape.parts()]
     return landmarks
