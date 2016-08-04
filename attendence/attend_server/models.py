@@ -9,7 +9,7 @@ from django.core.validators import RegexValidator
 class Attendance(models.Model):
     module_id = models.CharField(max_length=50)             # xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx from ivle
     group_id = models.IntegerField()                        # group id from face tech
-    time = models.IntegerField(unique=True)                 # unique time id for each class
+    time = models.BigIntegerField(unique=True)                 # unique time id for each class
     lecture_or_tutorial = models.BooleanField(default=True) # 1 for lecture, 0 for tutorial
     owner = models.CharField(max_length=50)                 # user name
 
@@ -62,7 +62,10 @@ class Student(models.Model):
         """ return dictionary of this object """
         _dict = {}
         for f in self._meta.fields:
-            _dict[f.name] = f.value_from_object(self)
+            if f.name == 'created':
+                _dict[f.name] = str(f.value_from_object(self))
+            else:
+                _dict[f.name] = f.value_from_object(self)
 
         return _dict
 
@@ -91,7 +94,7 @@ def new_image(path, attendance, data):
 
 def get_records(module):
     """ return list of attendance records with students ids and other info by providing module id"""
-    try:
+    if True:
         classes = Attendance.objects.filter(module_id=module).order_by('-time')
 
         data = []
@@ -99,13 +102,13 @@ def get_records(module):
             attend = {"time_id": c.time, "lt": c.lecture_or_tutorial, "owner": c.owner,
                       "students": [p.person_id for p in Attend_Recodes.objects.filter(attendance=c)],
                       "images": [{"url": settings.MEDIA_URL + IMG_FOLDER_NAME + img.path.name,
-                                  "data": json.loads(img.data)} for img in Images.objects.filter(time=c.time)]
-                      }
+                                  "data": json.loads(img.data)} for img in Images.objects.filter(attendance=c)]}
             data.append(attend)
+
         return data
-    except:
+    else:
         return None
 
 
-def get_user_modules(request):
-    return User_Module_Permission.objects.filter(user=request.user, permission__in=['O', 'F', 'M', 'R'])
+def get_user_modules(user):
+    return User_Module_Permission.objects.filter(user=user, permission__in=['O', 'F', 'M', 'R'])

@@ -23,7 +23,7 @@ def log_in(request):
                 if user.is_active:
                     data = {"Name": user.get_username(), "UserID": user.id, "Modules": []}
 
-                    modules = models.get_user_modules(request)
+                    modules = models.get_user_modules(user)
                     for m in modules:
                         dict_ = m.module.to_dict()
                         dict_['Permission'] = m.permission
@@ -61,23 +61,20 @@ def update_module(request):
                 exist_list = exist_list if exist_list else []
 
                 # Sort new_list by UserID
-                new_list = [(s.to_dict()['id'], s.to_dict()) for s in new_list]
+                new_list = [(str(s.to_dict()['id']), s.to_dict()) for s in new_list]
                 new_list.sort()
                 new_list = [dict_ for (key, dict_) in new_list]
 
-                student_ids = [i.get('id') for i in new_list]
-                student_ids.sort()
-
                 # iterate to match with each other
                 new_p, old_p = 0, 0
-                new, old = [False]*len(student_ids), [False]*len(exist_list)
+                new, old = [False]*len(new_list), [False]*len(exist_list)
 
-                while old_p < len(exist_list) and new_p < len(student_ids):
-                    if student_ids[new_p] == exist_list[old_p].get('name'):
+                while old_p < len(exist_list) and new_p < len(new_list):
+                    if str(new_list[new_p].get('id')) == exist_list[old_p].get('name'):
                         new[new_p] = True
                         old[old_p] = True
                         new_p += 1
-                    elif student_ids[new_p] < exist_list[old_p].get('name'):
+                    elif str(new_list[new_p].get('id')) < exist_list[old_p].get('name'):
                         new_p += 1
                         old_p -= 1
 
@@ -88,7 +85,11 @@ def update_module(request):
 
                 for i in range(len(new)):
                     if new[i] is False:
-                        add_list.append(new_list[i])
+                        add_list.append({'name': new_list[i].get('id'),
+                                         'email': new_list[i].get('email'),
+                                         'first_name': new_list[i].get('name'),
+                                         'last_name': new_list[i].get('last_name'),
+                                         'note': new_list[i].get('note')})
 
                 if add_list:
                     new_persons_id = api.create_json_person(data=add_list, group=data.get('face_group_id'))
@@ -116,8 +117,8 @@ def update_module(request):
                     del exist_list[i]
 
                 if exist_list:
-                    delete_result = api.remove_person_from_group(person=[i.get('id') for i in exist_list],
-                                                                 group=data.get('face_group_id'))
+                    delete_result = api.delete_person(person=[i.get('id') for i in exist_list],
+                                                      group=data.get('face_group_id'))
 
                     if delete_result:
                         if False in [list(d.values())[0] for d in delete_result]:
@@ -132,10 +133,11 @@ def update_module(request):
                 data['student'] = updated_list
                 data['attendance'] = models.get_records(data.get('ID'))
 
-                return JsonResponse({'data': data})
-
             else:
-                return error_response(5)
+                data['student'] = []
+                data['attendance'] = []
+
+            return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
 

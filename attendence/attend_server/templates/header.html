@@ -51,8 +51,10 @@
           </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                {% if user.is_authenticated %}
-                    <li><a href="{% url 'attend:user_index' %}"><span class="glyphicon glyphicon-user"></span> {{ user.username }}</a></li>
+                {% if user.is_authenticated or 'ivle_user' in request.session%}
+                    <li><a href="{% url 'attend:user_index' %}"><span class="glyphicon glyphicon-user"></span>
+                        {{ user.username }}{{ request.session.ivle_user.username }}
+                    </a></li>
                     <li><a href="{% url 'attend:log_out' %}">Logout</a></li>
                 {% else %}
                     <li><a href="{% url 'attend:create_user_form' %}">Sign in</a></li>

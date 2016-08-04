@@ -1,14 +1,9 @@
-from shutil import copyfile
-from .face_tech import file
+from .apps import API_KEY, api
 from .apps import error_response
-from django.conf import settings
-from .apps import API_KEY, api, IMG_FOLDER_NAME
 from . import forms, pyivle, models
-import base64, logging, traceback, json, os
-from django.core.files.base import ContentFile
 from django.http import JsonResponse
+import base64, logging, traceback, json
 from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import default_storage
 
 log = logging.getLogger(__name__)
 
@@ -73,19 +68,16 @@ def update_module(request):
                 new_list.sort()
                 new_list = [dict_ for (key, dict_) in new_list]
 
-                student_ids = [i.get('UserID').lower() for i in new_list]
-                student_ids.sort()
-
                 # iterate to match with each other
                 new_p, old_p = 0, 0
-                new, old = [False]*len(student_ids), [False]*len(exist_list)
+                new, old = [False]*len(new_list), [False]*len(exist_list)
 
-                while old_p < len(exist_list) and new_p < len(student_ids):
-                    if student_ids[new_p] == exist_list[old_p].get('name'):
+                while old_p < len(exist_list) and new_p < len(new_list):
+                    if new_list[new_p].get('UserID') == exist_list[old_p].get('name'):
                         new[new_p] = True
                         old[old_p] = True
                         new_p += 1
-                    elif student_ids[new_p] < exist_list[old_p].get('name'):
+                    elif new_list[new_p].get('UserID') < exist_list[old_p].get('name'):
                         new_p += 1
                         old_p -= 1
 
@@ -144,10 +136,12 @@ def update_module(request):
                 data['student'] = updated_list
                 data['attendance'] = models.get_records(data.get('ID'))
 
-                return JsonResponse({'data': data})
-
             else:
-                return error_response(5)
+                data['student'] = []
+                data['attendance'] = []
+
+            return JsonResponse({'data': data})
+
         except:
             log.error(traceback.format_exc())
 

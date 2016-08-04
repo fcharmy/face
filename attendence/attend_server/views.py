@@ -3,17 +3,18 @@ from shutil import copyfile
 from .face_tech import file
 from django.shortcuts import render
 import logging, traceback, json, os
-from django.http import JsonResponse
 from .apps import api, error_response
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from . import forms, ivle_views, attend_views
 from django.core.files.base import ContentFile
+from django.http import JsonResponse, HttpRequest
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 from django.contrib.auth.forms import UserCreationForm
+
 log = logging.getLogger(__name__)
 
 
@@ -57,7 +58,8 @@ def sign_in(request):
 
 def user_index(request):
     if (request.user.is_authenticated() or 'ivle_user' in request.session) and 'Modules' in request.session:
-        return render(request, 'user.html', {'html': 'dashboard.html', 'modules': request.session['Modules']})
+        return render(request, 'user.html', {'html': 'profile.html', 'modules': request.session['Modules'],
+                                             'message': request.GET['message'] if 'message' in request.GET else ''})
 
     else:
         form = forms.LoginForm(request.POST)
@@ -69,15 +71,16 @@ def user_index(request):
 
             if option == 'default':
                 response = attend_views.log_in(request)
-
             elif option == 'ivle':
-                response = ivle_views.log_in(request)
+                # response = ivle_views.log_in(request)
+                response = JsonResponse({'data': {'SecondMajor': '', 'Photo': '', 'FirstMajor': 'Nil', 'authToken': '5BFB9302D342CA96D73654DD7A30E9D43C4FB960A9EB8D1B6FC40EBBF924E1C23732D22DE55DE4D15788E6D4DF7CD88CC53E5A4402584E87F1A2660FAAF91178EDCFBFD8F81EABC8A1E26162F3CAAC92961219DE3D7E360A3AEED8D7E375F6792C885AFB92208B101871624CFDE4D8A9C8090201B78ED44F8914DF447CB0BCD559675E147C9FB0AAC4D95FE81A44B9121DC65D800B475C8CDDA793A174AF7B0EAE87A5D5D2A3A6FF96308D0B9EE802D68E4B24DEC02EE65EFAD5C2FAED625C112BC6F89A401E3A45DD45D8B0F94A8F35EED0EFD9FCC62E224E23DE50A689A1DFE2ECEEC5BDFE4045D260317DCBC59E65', 'UserID': 'a0112472', 'Modules': [{'CourseAcadYear': '2015/2016', 'ID': 'c8a59923-a8cc-4b5b-aee5-bf857c58b8c1', 'CourseCode': 'RI2016ALL', 'CourseName': 'NUSRI Summer Course 2016', 'Permission': 'M', 'face_group_id': 4, 'CourseSemester': 'Semester 4'}, {'CourseAcadYear': '2015/2016', 'ID': 'f786eceb-7861-46dc-90f2-436e8884405e', 'CourseCode': 'RI3001A', 'CourseName': 'Understanding Biometrics', 'Permission': 'M', 'face_group_id': 3, 'CourseSemester': 'Semester 4'}, {'CourseAcadYear': '2015/2016', 'ID': '9842befe-6138-48c4-8027-8d6481ecb5bc', 'CourseCode': 'RI3001B', 'CourseName': 'Understanding Biometrics', 'Permission': 'M', 'face_group_id': 5, 'CourseSemester': 'Semester 4'}], 'MatriculationYear': '2013', 'Faculty': 'School of Computing', 'Gender': 'Female', 'Name': 'LI JING', 'Email': 'a0112472@u.nus.edu'}})
 
             # if response is valid show user index
             if response and response.status_code == 200:
-                response = json.loads(response.content.decode("utf-8"))['data']
+                response = get_content(response)
+
                 if option == 'ivle':
-                    request.session['ivle_user'] = {'username': form.cleaned_data['username'],
+                    request.session['ivle_user'] = {'username': response['Name'],
                                                     'authToken': response['authToken']}
                 elif option == 'default':
                     login(request, authenticate(username=form.cleaned_data['username'],
@@ -155,7 +158,8 @@ def create_student(request):
 
     if form.is_valid() and request.user.is_authenticated():
         try:
-            module = [m.module for m in models.get_user_modules(request) if m.module.id == form.cleaned_data['module']]
+            module = [m.module for m in models.get_user_modules(request.user)
+                      if m.module.id == form.cleaned_data['module']]
 
             if module:
                 student = models.Student(module=module[0], name=form.cleaned_data['name'],
@@ -163,25 +167,54 @@ def create_student(request):
                                          email=form.cleaned_data['email'], note=form.cleaned_data['note'], )
                 student.save()
 
-                return HttpResponseRedirect(reverse('attend:view_module') + '?code=' + str(module[0].id))
+                return HttpResponseRedirect(reverse('attend:view_module') + '?id=' + str(module[0].id))
             else:
                 message = 'Unknown Module.'
         except:
             log.error(traceback.format_exc())
             message = 'This student name is already exist.'
 
-        return render(request, 'form_csrf.html', {'url': 'attend:create_student', 'title': 'Create Module', 'form': form,
+        return render(request, 'form_csrf.html', {'url': 'attend:create_student', 'title': 'Add Student', 'form': form,
                                                   'message': message})
     else:
         return HttpResponseRedirect(reverse('attend:user_index'))
 
 
 def view_module(request):
-    if 'code' in request.GET:
+    if request.method == 'GET' and 'id' in request.GET and 'Modules' in request.session:
+        module = [m for m in request.session['Modules'] if str(m['ID']) == request.GET['id']]
 
-        return render(request, 'user.html', {'html': 'dashboard.html', 'modules': request.session['Modules']})
+        try:
+            response = None
+            new_request = HttpRequest()
+            new_request.POST = {'data': json.dumps(module[0])}
 
-    return HttpResponseRedirect(reverse('attend:user_index'))
+            if module and request.user.is_authenticated():
+                response = attend_views.update_module(new_request)
+
+            elif module and 'ivle_user' in request.session:
+                new_request.POST['token'] = request.session['ivle_user']['authToken']
+                response = ivle_views.update_module(new_request)
+
+            if response and response.status_code == 200:
+                data = get_content(response)
+
+                for a in data['attendance']:
+                    # convert time_id to datetime and lecture_or_tutorial
+                    a['lt'] = 'Lecture' if a['lt'] else 'Tutorial'
+
+                # sort student list by student id
+                sort_list = list([(str(s['name']), s) for s in data['student']])
+                sort_list.sort()
+                data['student'] = list([dict_ for (key, dict_) in sort_list])
+
+                return render(request, 'user.html', {'html': 'dashboard.html', 'modules': request.session['Modules'],
+                                                     'attend_records': data['attendance'], 'module': module[0],
+                                                     'students': data['student']})
+        except:
+            log.error(traceback.format_exc())
+
+    return HttpResponseRedirect(reverse('attend:user_index') + "?message=Unknown Module.")
 
 
 # ----------------Public Functions-------------------
@@ -210,17 +243,16 @@ def verify(request):
     form = forms.ImgForm(request.POST, request.FILES)
 
     if form.is_valid():
+        img = form.cleaned_data['image']
+        group = int(form.cleaned_data['group'])
+
         try:
-            # data = json.loads(form.cleaned_data['data'])
-            img = form.cleaned_data['image']
-            group = int(form.cleaned_data['group'])
-
             response_data = api.verification_faces(image=file(img), group=group)
-
-            data = {"faces": response_data, "image": default_storage.save(img.name, ContentFile(img.read()))}
-            return JsonResponse({'data': data})
         except:
-            log.error(traceback.format_exc())
+            response_data = []
+
+        data = {"faces": response_data, "image": default_storage.save(img.name, ContentFile(img.read()))}
+        return JsonResponse({'data': data})
 
     return error_response(1, name='verify')
 
@@ -239,13 +271,13 @@ def enrollment(request):
 
             # # get attendance info
             # time_id = models.get_time()
-            # module = form.cleaned_data['module']
+            module = form.cleaned_data['module']
             # # lt = form.cleaned_data['lt']
-            #
-            # # copy tmp file to uploaded folder and delete tmp file
-            # img_path = models.get_image_path(module, time_id)
-            # if copyimg(img, img_path):
-            #
+
+            # copy tmp file to uploaded folder and delete tmp file
+            img_path = models.get_image_path(module, 'enroll')
+            copyimg(img, img_path)
+
             #     # create a new image record
             #     img = models.new_image(img_path, time_id, data.get('faces'))
             #     attendance = models.Attendance(module_id=module, group_id=group, owner=form.cleaned_data['owner'],
@@ -274,7 +306,7 @@ def attend(request):
     form = forms.DataForm(request.POST)
 
     if form.is_valid():
-        if True:
+        try:
             data = json.loads(form.cleaned_data['data'])
             group = form.cleaned_data['group']
             module = form.cleaned_data['module']
@@ -302,7 +334,7 @@ def attend(request):
                 # create a new image record
                 data = []
                 for face in response_data:
-                    if face.get('id'):
+                    if 'id' in face.keys() and face.get('id') != 'None':
                         data.append({"id": face.get('id'), "coordinates": face.get('coordinates')})
 
                 img = models.new_image(img_path, attendance, data)
@@ -315,10 +347,9 @@ def attend(request):
                         aids.append(a.id)
 
                     result['data'] = aids
-            print(result)
             if result:
                 return JsonResponse(result)
-        else:
+        except:
             log.error(traceback.format_exc())
 
     return error_response(1, name='attend')
@@ -344,3 +375,5 @@ def copyimg(tmp_img, img_path):
         return False
 
 
+def get_content(http_response):
+    return json.loads(http_response.content.decode("utf-8"))['data']

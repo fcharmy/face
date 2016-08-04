@@ -7,12 +7,22 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">Overview</a></li>
-            {% if user.is_authenticated %}<li><a href="{% url 'attend:module_form' %}">Create Module</a></li>{% endif %}
+            <li {% if not module %}class="active"{% endif %}><a href="{% url 'attend:user_index' %}">Overview</a></li>
           </ul>
           <ul class="nav nav-sidebar">
             {% for item in modules %}
-                <li><a href="{% url 'attend:view_module' %}?code={{ item.ID }}">{{ item.CourseCode }} {{ item.CourseName }}</a></li>
+                <li {% if module and module.ID == item.ID %}class="active"{% endif %}>
+                    <a href="{% url 'attend:view_module' %}?id={{ item.ID }}">
+                    {{ item.CourseCode }} {{ item.CourseName }}</a>
+
+                    {% if module and module.ID == item.ID %}
+                      <ul class="nav nav-sidebar" style="padding-left: 35px;margin: 10px 0;">
+                        <li><a href="#weekly_chart" style="padding: 5px">Weekly Attendance</a></li>
+                        <li><a href="#summary_table" style="padding: 5px">Attendance Summary</a></li>
+                        <li><a href="#student_table" style="padding: 5px">Student Attendance</a></li>
+                      </ul>
+                    {% endif %}
+                </li>
             {% endfor %}
           </ul>
         </div>

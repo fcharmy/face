@@ -6,7 +6,7 @@
     <div class="page-header">
         <h3>{{ title|escape}}</h3>
     </div>
-    {% if message %}<p><span class="alert alert-warning"><strong>{{ message|escape }}</strong></span></p>{% endif %}
+    {% if message %}<p><span class="alert alert-warning"><strong>{{ message|escape }}</strong></span></p><br/>{% endif %}
 
     <div>
         <form action="{% url url %}" method="post" enctype="multipart/form-data">

@@ -6,8 +6,8 @@ from django.http import HttpResponse
 
 API_KEY = "f14zzwlfh5fxiXWS2U3hU"
 
-project_key = '2'
-security_key = 'SWQ9HjVM'
+project_key = '1'
+security_key = 'nTrk4fvx'
 api = FaceAPI(project_key, security_key, server='http://localhost/')
 
 IMG_FOLDER_NAME = 'img_upload'
@@ -37,9 +37,6 @@ class ErrorResponse(object):
             0: message,
             1: '{} Error: Invalid input.'.format(name),
             2: 'Invalid user name or password.',
-            # 3: 'Group does not exist or belong to your project',
-            # 4: 'Persons do not exist or belong to your project',
-            5: 'No student existed.',
         }
         self.error_code = error_code
         response = HttpResponse(self.error_message.get(self.error_code))
