@@ -1,5 +1,5 @@
 // ajax request setting
-var serverUrl = 'http://172.26.187.124:8000/',
+var serverUrl = 'http://172.26.187.110:8000/',
     requestObj = {
       type: "POST",
       dataType: 'json',
@@ -21,12 +21,12 @@ var serverUrl = 'http://172.26.187.124:8000/',
       ft.upload(imgURI, url, success, fail, options);
     };
 
-var option = null,
-    profile = {'MatriculationYear': '2013', 'FirstMajor': 'Nil', 'authToken': '89D406823E8DDDF3376EB92C9C5471B7487A515BB100B024D1664EC378C6E59D429A977902D378D375C1F042F94C9490E8B167DC8E9528C4B03912BFCF86EB3EB3A26F32F4C543362EA30703D974FA2CC09E3D3629B8D46CF4027B6BD84B1A2B441D1AA85139FFCFEA0F1E52D8A71B1923F19E98675FCA0E1E9A448D66D4B558401E661275A39DF227CA3AAFEBF13779CCDA031DB83EB4379C8C2687D3EA1BF6C7667AFD24AC52B23C0027AD5B6351D32CCCDDE80398F60078D28E0BF01BE6FCC724CF8000059379278E548C19612CED4EA43D6C8EA5F073CE93D693FC3C752F510F053DB38A4620A204E56D54592594', 'Modules': [{'ID': 'f786eceb-7861-46dc-90f2-436e8884405e', 'CourseCode': 'RI3001A', 'CourseName': 'Understanding Biometrics', 'CourseAcadYear': '2015/2016', 'face_group_id': 4, 'Permission': 'M', 'CourseSemester': 'Semester 4'}], 'Faculty': 'School of Computing', 'Email': 'a0112472@u.nus.edu', 'UserID': 'a0112472', 'Gender': 'Female', 'Name': 'LI JING', 'SecondMajor': ''}
+var option = 'ivle',
+    profile = {'SecondMajor': '', 'Photo': '', 'FirstMajor': 'Nil', 'authToken': '5BFB9302D342CA96D73654DD7A30E9D43C4FB960A9EB8D1B6FC40EBBF924E1C23732D22DE55DE4D15788E6D4DF7CD88CC53E5A4402584E87F1A2660FAAF91178EDCFBFD8F81EABC8A1E26162F3CAAC92961219DE3D7E360A3AEED8D7E375F6792C885AFB92208B101871624CFDE4D8A9C8090201B78ED44F8914DF447CB0BCD559675E147C9FB0AAC4D95FE81A44B9121DC65D800B475C8CDDA793A174AF7B0EAE87A5D5D2A3A6FF96308D0B9EE802D68E4B24DEC02EE65EFAD5C2FAED625C112BC6F89A401E3A45DD45D8B0F94A8F35EED0EFD9FCC62E224E23DE50A689A1DFE2ECEEC5BDFE4045D260317DCBC59E65', 'UserID': 'a0112472', 'Modules': [{'CourseAcadYear': '2015/2016', 'ID': 'c8a59923-a8cc-4b5b-aee5-bf857c58b8c1', 'CourseCode': 'RI2016ALL', 'CourseName': 'NUSRI Summer Course 2016', 'Permission': 'M', 'face_group_id': 4, 'CourseSemester': 'Semester 4'}, {'CourseAcadYear': '2015/2016', 'ID': 'f786eceb-7861-46dc-90f2-436e8884405e', 'CourseCode': 'RI3001A', 'CourseName': 'Understanding Biometrics', 'Permission': 'M', 'face_group_id': 3, 'CourseSemester': 'Semester 4'}, {'CourseAcadYear': '2015/2016', 'ID': '9842befe-6138-48c4-8027-8d6481ecb5bc', 'CourseCode': 'RI3001B', 'CourseName': 'Understanding Biometrics', 'Permission': 'M', 'face_group_id': 5, 'CourseSemester': 'Semester 4'}], 'MatriculationYear': '2013', 'Faculty': 'School of Computing', 'Gender': 'Female', 'Name': 'LI JING', 'Email': 'a0112472@u.nus.edu'}
 ;
 
-// Ionic attendence App
-angular.module('attendence', ['ionic'])
+// Ionic attendance App
+angular.module('attendance', ['ionic'])
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider){
   $stateProvider
     .state('login',{
@@ -97,7 +97,7 @@ angular.module('attendence', ['ionic'])
       controller: 'detailController'
     });
 
-  $urlRouterProvider.otherwise("/login");
+  $urlRouterProvider.otherwise("/modules");
   $ionicConfigProvider.tabs.position('bottom');
   $ionicConfigProvider.navBar.alignTitle('center');
 
@@ -165,12 +165,18 @@ angular.module('attendence', ['ionic'])
   $scope.modules = profile.Modules;
 
   $scope.choose_module = function(data){
-    requestObj.url = serverUrl + option +'_module';
+    requestObj.url = serverUrl + option + '_module';
     requestObj.data = {data: data, token: profile.authToken};
 
     requestObj.success = function(data){
+      if(data.data.student.length > 0) {
+        $state.go('tabs.attend', {module: data.data});
+      }
+      else{
+        show_message(7, 'No Student.');
+      }
+
       $('#spinner').hide();
-      $state.go('tabs.attend', {module: data.data});
     };
 
     requestObj.error = function(xhr, status, error){
@@ -194,18 +200,28 @@ angular.module('attendence', ['ionic'])
   // for show list in home tab
   $scope.attend_records = $stateParams.module.attendance? $stateParams.module.attendance : [];
 
-  var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   for (var i = 0; i < $scope.attend_records.length; i++) {
-    $scope.attend_records[i].year = parseInt($scope.attend_records[i].time_id/1e10);
-    $scope.attend_records[i].month = monthNames[parseInt($scope.attend_records[i].time_id%1e10/1e8) - 1];
-    $scope.attend_records[i].date = parseInt($scope.attend_records[i].time_id%1e8/1e6);
-    $scope.attend_records[i].hour = parseInt($scope.attend_records[i].time_id%1e6/1e4);
-    $scope.attend_records[i].min = $scope.attend_records[i].time_id.toString().slice(10,12);
+    var d = new Date($scope.attend_records[i].time_id/1e10, $scope.attend_records[i].time_id%1e10/1e8 - 1,
+        $scope.attend_records[i].time_id%1e8/1e6, $scope.attend_records[i].time_id%1e6/1e4, $scope.attend_records[i].time_id%1e4/1e2);
 
-    var d = new Date($scope.attend_records[i].year, parseInt($scope.attend_records[i].time_id%1e10/1e8) - 1, $scope.attend_records[i].date);
-    $scope.attend_records[i].day = dayNames[d.getDay()];
+    $scope.attend_records[i].year = d.getFullYear();
+    $scope.attend_records[i].date = d.toLocaleDateString("en-us",{ month: "short", day: "numeric"});
+    $scope.attend_records[i].time = d.toLocaleTimeString("en-us",{ hour: "2-digit", minute: "2-digit"});
+    $scope.attend_records[i].day = d.toLocaleDateString("en-us",{ weekday: "long" });
+    $scope.attend_records[i].week = d.getWeekNumber();
+
+    if($scope.min_week == undefined || $scope.min_week > $scope.attend_records[i].week){
+      $scope.min_week = $scope.attend_records[i].week;
+    }
   };
+
+  $scope.$on("$ionicView.afterEnter", function(event, data) {
+    for (var i = 0; i < $scope.attend_records.length; i++) {
+      if(i == 0 || $scope.attend_records[i].week != $scope.attend_records[i-1].week){
+        $('#'+$scope.attend_records[i].time_id).before('<li class="item item-divider">Week ' + ($scope.attend_records[i].week - $scope.min_week + 1) + '</li>');
+      }
+    }
+  });
 
   $scope.detail = function(index){
     $state.go('detail', {data: $scope.attend_records[index], module: $stateParams.module});
@@ -238,6 +254,7 @@ angular.module('attendence', ['ionic'])
     };
 
     $scope.cancel = function() {
+      $('#spinner').hide();
       $scope.confirmModal.hide();
     };
   });
@@ -255,7 +272,7 @@ angular.module('attendence', ['ionic'])
       $scope.img = data;
       document.getElementById('confirm-img').src = $scope.img;
 
-      uploadImg(serverUrl + (ev? 'detect': 'verify'), data, {group: $stateParams.module.face_group_id}, 
+      uploadImg(serverUrl + (ev? 'detect': 'verify'), data, {group: $stateParams.module.face_group_id},
         function(r){
           // submit image to server succeed
           $scope.response_data = JSON.parse(r.response).data;
@@ -266,8 +283,8 @@ angular.module('attendence', ['ionic'])
           if ($scope.response_data.hasOwnProperty('faces')) {
                 facesList = $scope.response_data.faces;
             drawRects('confirm-canvas', 'confirm-img', false);
-          }; 
-        }, 
+          };
+        },
         function(error){
           show_message(6, error.code);
           $scope.confirmModal.hide();
@@ -280,8 +297,8 @@ angular.module('attendence', ['ionic'])
       $scope.confirmModal.hide();
       $('#spinner').hide();
     },{
-      quality: 50, 
-      correctOrientation: true, 
+      quality: 50,
+      correctOrientation: true,
       encodingType: Camera.EncodingType.JPEG
     });
     
@@ -291,7 +308,7 @@ angular.module('attendence', ['ionic'])
     //   $scope.img = Math.random() < 0.5 ? "http://web.mit.edu/chemistry/jamison/images/Group%20Photos/Group%20Photo%207.3.2012.JPG"
     //     :"https://upload.wikimedia.org/wikipedia/commons/c/c7/Spencer_Davis_Group_1974.JPG";
     //   $scope.response_data = {"faces": [{'id': 134, "landmarks": null, "resolution": 1, "coordinates": [353, 427, 593, 667], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [245, 320, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [237, 311, 1190, 1265], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 1057, 1132], "occlude": "False", "illumination": 0}, {'id': 135, "landmarks": null, "resolution": 1, "coordinates": [336, 411, 1878, 1953], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [701, 776, 585, 659], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 1124, 1198], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 385, 460], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [334, 424, 124, 214], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [203, 278, 1397, 1472], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [369, 444, 767, 842], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 1298, 1373], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [187, 262, 452, 526], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [71, 145, 1099, 1173], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [266, 328, 1012, 1074], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [336, 411, 1655, 1729], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [320, 394, 1489, 1563], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 949, 1024], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [228, 303, 651, 726], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 0, "coordinates": [38, 74, 1605, 1641], "occlude": "True", "illumination": 0}]};
-
+    //
     //   document.getElementById('confirm-img').src = $scope.img;
     //   $('#spinner').hide();
     //   if ($scope.response_data.hasOwnProperty('faces')) {
@@ -327,6 +344,12 @@ angular.module('attendence', ['ionic'])
   $scope.img = $stateParams.img;
   $scope.student_list = $stateParams.module.student;
   $scope.data = $stateParams.data;
+
+  // if ($('#enroll-img').height() > $('#enroll-img').width()){
+  //   $('#enroll-img').css({'width': '100%', 'height': 'auto'})
+  // }else{
+  //   $('#enroll-img').css({'width': 'auto', 'height': '100%'})
+  // }
 
   if ($scope.data.hasOwnProperty('faces')) {
     facesList = $scope.data.faces;
@@ -374,7 +397,7 @@ angular.module('attendence', ['ionic'])
         show_message(4);
 
         // send request to update tabs info
-        requestObj.url = serverUrl + 'update_module';
+        requestObj.url = serverUrl + option + '_module';
         requestObj.data = {data: JSON.stringify($stateParams.module), token: profile.authToken};
 
         requestObj.success = function(data){
@@ -423,12 +446,11 @@ angular.module('attendence', ['ionic'])
   $scope.serverUrl = serverUrl;
   $scope.img_index = 0;
   $scope.previous_disabled = true;
-  $scope.next_disabled = $scope.images.length > 1? false : true;
+  $scope.next_disabled = $scope.images.length < 2;
 
   // show title and subtile on detail page
-  $scope.title = $stateParams.data.date +' '+ $stateParams.data.month +' '+ $stateParams.data.year;
-  $scope.subtitle = ($stateParams.data.lt? 'Lecture': 'Tutorial') +' on '+ $stateParams.data.day +' '+ $stateParams.data.hour 
-    +':'+ $stateParams.data.min +' by '+ $stateParams.data.owner;
+  $scope.title = $stateParams.data.date +' '+ $stateParams.data.year;
+  $scope.subtitle = ($stateParams.data.lt? 'Lecture': 'Tutorial') +' on '+ $stateParams.data.day +' '+ $stateParams.data.time +' by '+ $stateParams.data.owner;
 
   // calculate the attend and abcent student list
   $scope.student_attend = [], $scope.student_absence = [];
@@ -469,16 +491,16 @@ angular.module('attendence', ['ionic'])
 
   $scope.previous = function(){
     $scope.img_index--;
-    $scope.previous_disabled = $scope.img_index > 0? false : true;
-    $scope.next_disabled = $scope.img_index + 1 < $scope.images.length? false : true;
+    $scope.previous_disabled = ($scope.img_index <= 0);
+    $scope.next_disabled = ($scope.img_index + 1 >= $scope.images.length);
 
     $scope.draw();  // draw rectangle on img
   };
 
   $scope.next = function(){
     $scope.img_index++;
-    $scope.previous_disabled = $scope.img_index > 0? false : true;
-    $scope.next_disabled = $scope.img_index + 1 < $scope.images.length? false : true;
+    $scope.previous_disabled = ($scope.img_index <= 0);
+    $scope.next_disabled = ($scope.img_index + 1 >= $scope.images.length);
 
     $scope.draw();  // draw rectangle on img
   };
@@ -611,7 +633,7 @@ function drawRects(canvasId, imgId, clickable){
 
     if (clickable) {
       c.onclick = function(e) {
-        var dbclick = ($.now() - ctime < 500)? true:false;
+        var dbclick = ($.now() - ctime < 500);
         ctime = new Date($.now());
 
         for (var i = 0; i < facesList.length; i++) {
@@ -710,3 +732,11 @@ function show_message(){
       alert('Unknown Error');
   }
 }
+
+// calculate date's week number in current year
+Date.prototype.getWeekNumber = function() {
+  var d = new Date(+this);
+  d.setHours(0,0,0);
+  d.setDate(d.getDate()+4-(d.getDay()||7));
+  return Math.ceil((((d-new Date(d.getFullYear(),0,1))/8.64e7)+1)/7);
+};

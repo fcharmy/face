@@ -21,10 +21,10 @@
     <script src="cordova.js"></script>
 
   </head>
-  <body ng-app="attendence">
+  <body ng-app="attendance">
     <ion-nav-view></ion-nav-view>
 
-    <div id="spinner" style="display: none;height: 100%;width: 100%;position: absolute;z-index: 100;">
+    <div id="spinner" style="display: none;height: 100%;width: 100%;position: absolute;z-index: 1000;">
       <div style="background: rgba(0, 0, 0, 0.2);position: absolute;left: 45%;top: 43%;height: 50px;width: 50px;border-radius: 10px;text-align: center;padding: 10px;">
         <ion-spinner icon="circles" style="fill: #387ef5;"></ion-spinner>
       </div>
@@ -96,7 +96,7 @@
           <ion-nav-view name="home-tab"></ion-nav-view>
         </ion-tab>
 
-        <ion-tab title="Attendence" icon="ion-clipboard" ui-sref="tabs.attend">
+        <ion-tab title="attendance" icon="ion-clipboard" ui-sref="tabs.attend">
           <ion-nav-view name="attend-tab"></ion-nav-view>
         </ion-tab>
 
@@ -108,7 +108,7 @@
     </script>
 
     <script id="attend.html" type="text/ng-template">
-      <ion-view view-title="Attendence" cache-view="false">
+      <ion-view view-title="attendance" cache-view="false">
         <ion-content>
 
           <div class="row">
@@ -119,7 +119,7 @@
 
           <div class="row">
             <button class="button button-large button-block  button-outline button-positive" ng-click="newRecord(false)" style="margin: 10px 15%">
-              <i class="icon ion-clock"></i>&nbsp;&nbsp;Take Attendence
+              <i class="icon ion-clock"></i>&nbsp;&nbsp;Take attendance
             </button>
           </div>
 
@@ -184,12 +184,12 @@
 
         <ion-content>
           <ul id="record-list" class="list">
-              <li class="item" ng-repeat="index in range(attend_records.length)" ng-click="detail({{index}})">
-                {{ attend_records[index].month + ' ' + attend_records[index].date + ' ' + attend_records[index].day}}
-                <small class="i">&nbsp;{{attend_records[index].hour + ':' + attend_records[index].min}}
-                  &nbsp;{{ attend_records[index].lt? 'Lecture': 'Tutorial' }}
-                </small>
-                <p style="float: right"><i class="orange">{{ attend_records[index].students.length}}</i>/{{stu_amount}}</p>
+              <li id="{{ attend_records[index].time_id}}" class="item" ng-repeat="index in range(attend_records.length)" ng-click="detail({{ index }})">
+
+                <span>{{ attend_records[index].day}}</span>
+                <small class="i">&nbsp;{{attend_records[index].date}},&nbsp;{{attend_records[index].time}}</small>
+                <small class="i" style="text-align: right;float: right;min-width: 55px;">{{ attend_records[index].lt? 'Lecture': 'Tutorial' }}</small>
+                <p style="float: right;">&nbsp;&nbsp;<i class="orange">{{ attend_records[index].students.length}}</i>/{{stu_amount}}</p>
               </li>
           </ul>
         </ion-content>
