@@ -241,7 +241,7 @@
         </ion-content>
       </ion-view>
     </script>
- 
+
     <script id="about.html" type="text/ng-template">
       <ion-view view-title="{{CourseCode}}">
         <ion-content>
