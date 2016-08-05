@@ -17,7 +17,7 @@
 6. migrate whole database of django
 	python3 manage.py migrate
 
-7. generate static folder
+7. generate static folder 
 	python3 manage.py collectstatic
 
 8. cd to this path, run following cmd and open site in browser, then check log file '/var/log/nginx/error.log' if permission denied. if so, '--chmod-socket=664' or 666
