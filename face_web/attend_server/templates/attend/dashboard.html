@@ -1,0 +1,383 @@
+          <h2 class="page-header">{{ module.CourseCode }} {{ module.CourseName }}
+              {% if user.is_authenticated %}
+                  <small><a href="{% url 'attend:student_form' %}?module={{ module.ID }}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add students</a></small>
+              {% endif %}
+            <div class="btn-group" style="float: right">
+                <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Table</button>
+                <ul class="dropdown-menu " role="menu">
+                    <li><a href="#" onclick="export_data({type:'csv',escape:'false'})"> CSV</a></li>
+                    <li><a href="#" onclick="export_data({type:'txt',escape:'false'})"> TXT</a></li>
+                    <li><a href="#" onclick="export_data({type:'pdf',pdfFontSize:'7',escape:'false'})"> PDF</a></li>
+                    <li class="divider"></li>
+
+                    <li><a href="#" onclick="export_data({type:'excel',escape:'false'})"> XLS</a></li>
+                    <li><a href="#" onclick="export_data({type:'doc',escape:'false'})"> Word</a></li>
+                    <li><a href="#" onclick="export_data({type:'powerpoint',escape:'false'})"> PowerPoint</a></li>
+                </ul>
+            </div>
+          </h2>
+
+          <style>
+              th, td{ text-align: center; }
+              .progress{ margin-bottom: 0; }
+          </style>
+
+          <div class="row placeholders" style="max-height: 255px; overflow-x: hidden; overflow-y: scroll;">
+              {% for item in attend_records %}
+                <div class="col-xs-6 col-sm-3 placeholder">
+                  <img src="{% with item.images|first as item %}{{ item.url }}{% endwith %}" width="200" height="200"
+                       class="img-responsive" alt="Generic placeholder thumbnail" style="height: 200px;">
+                  <h5><i class="text-muted datetime">{{ item.time_id }}</i></h5>
+                  <small class="datetime_week">{{ item.lt }} <a>{{ item.students|length }}</a>/{{ students|length }}</small>
+                </div>
+              {% endfor %}
+          </div>
+
+          <h3 id="weekly_chart" class="sub-header">Weekly Attendance</h3>
+          <canvas id="canvas" height="100"></canvas>
+          <br/>
+
+          <h3 id="summary_table" class="sub-header">Attendance Summary
+              <small style="font-size: 15px;float: right;">
+                  <label style="font-weight: normal;">Lectures:&nbsp;</label>
+                  <input id="lecture_per_week" type="number" value="1" style="width: 30px;border-radius: 4px;border: 1px solid #ccc;">
+
+                  <label style="font-weight: normal;">Tutorial:&nbsp;</label>
+                  <input id="tutorial_per_week" type="number" value="1" style="width: 30px;border-radius: 4px;border: 1px solid #ccc;">
+              per week
+              </small>
+          </h3>
+
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Lecture</th>
+                  <th>Tutorial</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in students %}
+                    <tr>
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.first_name }} {{ item.last_name }}</td>
+                      <td>{{ item.email }}</td>
+                      <td id="{{ item.id }}_l"><a></a>/<span></span></td>
+                      <td id="{{ item.id }}_t"><a></a>/<span></span></td>
+                      <td><div class="progress">
+                              <div id="{{ item.id }}_p" class="progress-bar progress-bar-info" role="progressbar"
+                                   aria-valuemin="0" aria-valuemax="100" style="width: 0"></div>
+                          </div>
+                      </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td><i>No student</i></td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 id="student_table" class="sub-header">Student Attendance</h3>
+
+          <div class="table-responsive">
+            <table id="export_table" class="table table-striped">
+              <thead>
+                <tr>
+                  <th rowspan="2" style="vertical-align: middle;">ID</th>
+                  <th rowspan="2" style="vertical-align: middle;">Full Name</th>
+                  <th rowspan="2" style="vertical-align: middle;">Email</th>
+                  <th id="tb_head" rowspan="2" style="vertical-align: middle;">Lecture</th>
+                  <th rowspan="2" style="vertical-align: middle;">Tutorial</th>
+                  <th rowspan="2" style="vertical-align: middle;">Total</th>
+                </tr>
+                <tr id="tb_subhead">
+                    <th class="export_tr"></th>
+                    <th class="export_tr"></th>
+                    <th class="export_tr"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if students and attend_records|length > 0 %}
+                    {% for item in students %}
+                        <tr id="{{ item.id }}_detail">
+                          <td>{{ item.name }}</td>
+                          <td>{{ item.first_name }} {{ item.last_name }}</td>
+                          <td>{{ item.email }}</td>
+                          <td id="{{ item.id }}_detail_l"><a></a>/<span></span></td>
+                          <td id="{{ item.id }}_detail_t"><a></a>/<span></span></td>
+                          <td id="{{ item.id }}_detail_p"></td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td><i>No Records</i></td>
+                    </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+          {% load staticfiles %}
+          <script src="{% static 'Chart.bundle.js' %}"></script>
+          <script src="{% static 'export/tableExport.js' %}"></script>
+          <script src="{% static 'export/jquery.base64.js' %}"></script>
+          <script src="{% static 'export/html2canvas.js' %}"></script>
+          <script src="{% static 'export/jspdf/libs/sprintf.js' %}"></script>
+          <script src="{% static 'export/jspdf/jspdf.js' %}"></script>
+          <script src="{% static 'export/jspdf/libs/base64.js' %}"></script>
+
+          <script>
+              // calculate date's week number in current year
+              Date.prototype.getWeekNumber = function() {
+                var d = new Date(+this);
+                d.setHours(0,0,0);
+                d.setDate(d.getDate()+4-(d.getDay()||7));
+                return Math.ceil((((d-new Date(d.getFullYear(),0,1))/8.64e7)+1)/7);
+              };
+
+              $(document).ready(function() {
+                  var attendance = {{ attend_records|safe }},   // attend records
+                      student_list = {{ students|safe }};       // student infomations
+
+                  // update and show local timestamp for each class
+                  $('.datetime').each(function (index) {
+                      var time = parseInt($( this ).html());
+                      var d = new Date(time/1e10, time%1e10/1e8 - 1, time%1e8/1e6, time%1e6/1e4, time%1e4/1e2);
+
+                      $( this ).html(d.toLocaleDateString("en-us",{ month: "short", day: "numeric", weekday: "long",
+                          hour: "2-digit", minute: "2-digit" }));
+                      attendance[index].time = d;
+                  });
+
+                  // calculate numbers from data to display
+                  var week_numbers = [],
+                      l_week_attend = {}, t_week_attend = {},           // data for bar chart
+                      attend_organized = {Lecture: [], Tutorial: []};   // organized attendance records
+
+                  attendance.forEach(function (a) {
+                    var week = a.time.getWeekNumber();
+
+                    if ($.inArray(week, week_numbers) < 0){
+                        week_numbers.push(week);
+                        l_week_attend[week] = [];
+                        t_week_attend[week] = [];
+                    }
+                    if (!attend_organized[a.lt].hasOwnProperty(week)){
+                        attend_organized[a.lt][week] = [];
+                    }
+                    attend_organized[a.lt][week].push(a.students.slice(0));
+
+                    if (a.lt == 'Lecture'){
+                        a.students.forEach(function (s) {
+                            if ($.inArray(s, l_week_attend[week]) < 0) {
+                                l_week_attend[week].push(s);
+                            }
+                        });
+
+                    }
+                    else if (a.lt == 'Tutorial'){
+                        a.students.forEach(function (s) {
+                            if ($.inArray(s, t_week_attend[week]) < 0) {
+                                t_week_attend[week].push(s);
+                            }
+                        });
+
+                    }
+                  });
+
+                  // count student amount in each week
+                  var l_week_data = [], t_week_data = [],                   // all student attendance per week
+                      min_week = Math.min.apply(null, week_numbers) - 1,    // min week number
+                      week_display = ['No Data'];                           // start from Week 1 ..
+
+                  week_numbers.sort();
+                  week_numbers.forEach(function (w, index) {
+                      l_week_data.push(l_week_attend[w].length);
+                      t_week_data.push(t_week_attend[w].length);
+
+                      // set first week as Week 1 and update week numbers
+                      week_display[index] = 'Week ' + (w - min_week).toString();
+                  });
+
+                  // update thumbnails' week number
+                  $('.datetime_week').each(function (index) {
+                      $( this ).html('Week ' + (attendance[index].time.getWeekNumber() - min_week) +', '+$( this ).html());
+                  });
+
+                  // show bar chart for weekly attendance
+                  var ctx = document.getElementById("canvas").getContext("2d");
+                  window.myBar = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        'labels': week_display,
+                        'datasets': [{
+                            'label': "Lecture Attendance",
+                            'backgroundColor': 'rgba(54, 162, 235, 0.5)',
+                            'borderColor': 'rgba(54, 162, 235, 1)',
+                            'borderWidth': 2,
+                            'data': l_week_data.length > 0? l_week_data : [0]
+                        }, {
+                            'label': "Tutorial Attendance",
+                            'backgroundColor': 'rgba(255, 159, 64, 0.5)',
+                            'borderColor': 'rgba(255, 159, 64, 1)',
+                            'borderWidth': 2,
+                            'data': t_week_data.length > 0? t_week_data : [0]
+                            }]
+                    },
+                    options: {
+                        elements: {
+                            rectangle: {
+                                borderSkipped: 'bottom'
+                            }
+                        },
+                        responsive: true,
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: false,
+                            text: 'Bar Chart'
+                        },
+                        scales: {
+                            yAxes: [{ticks: {
+                                min:0,
+                                beginAtZero: true
+                            }}]
+                        }
+                    }
+                  });
+
+                  
+                  var lecture = 1, tutorial = 1;        // initial with one lecture and tutorial per week per student
+                  var student_l = {}, student_t = {};   // store total attendance for each student
+
+                  // calculate attendance for each student
+                  var update_table = function () {
+                      var l_count = 0, t_count = 0, tmp_dict = {};      // count total lecture or tutorial numbers
+
+                      lecture = parseInt($('#lecture_per_week').val());
+                      tutorial = parseInt($('#tutorial_per_week').val());
+
+                      student_list.forEach(function (s) {
+                          student_l[s.id] = 0;
+                          student_t[s.id] = 0;
+                          tmp_dict[s.id] = 0;
+                      });
+
+                      attend_organized.Lecture.forEach(function (w) {
+                          var count = Object.assign({}, tmp_dict), n=0;
+
+                          w.forEach(function (l) {
+                              n++;
+                              l.forEach(function (s) {
+                                  count[s]++;
+                              });
+                          });
+
+                          for(var s in count) {
+                              student_l[s] += (count[s] >= lecture)? lecture:count[s];
+                          }
+                          l_count += (n >= lecture)? lecture:n;
+                      });
+                      attend_organized.Tutorial.forEach(function (w) {
+                          var count = Object.assign({}, tmp_dict), n=0;
+
+                          w.forEach(function (t) {
+                              n++;
+                              t.forEach(function (s) {
+                                  count[s]++;
+                              });
+                          });
+
+                          for(var s in count) {
+                              student_t[s] += (count[s] >= tutorial)? tutorial:count[s];
+                          }
+                          t_count += (n >= tutorial)? tutorial:n;
+                      });
+
+                      student_list.forEach(function (s) {
+                          $('#' + s.id + '_l a').html(student_l[s.id]);
+                          $('#' + s.id + '_detail_l a').html(student_l[s.id]);
+                          $('#' + s.id + '_t a').html(student_t[s.id]);
+                          $('#' + s.id + '_detail_t a').html(student_t[s.id]);
+
+                          $('#' + s.id + '_l span').html(l_count);
+                          $('#' + s.id + '_detail_l span').html(l_count);
+                          $('#' + s.id + '_t span').html(t_count);
+                          $('#' + s.id + '_detail_t span').html(t_count);
+
+                          var percentage = ((student_l[s.id] + student_t[s.id])/(l_count + t_count)*100).toFixed(1).toString() + '%';
+                          $('#' + s.id + '_p').width(percentage).html(percentage);
+                          $('#' + s.id + '_detail_p').html(percentage);
+                      });
+                  };
+
+                  update_table();   // do not move
+                  $('#lecture_per_week').bind('keyup mouseup', update_table);
+                  $('#tutorial_per_week').bind('keyup mouseup', update_table);
+
+                  var student_attend = {};
+                  week_numbers.forEach(function (w) {
+                      student_attend[w] = {};
+                      student_list.forEach(function (s) {
+                          student_attend[w][s.id] = {};
+                          student_attend[w][s.id].Lecture = 0;
+                          student_attend[w][s.id].Tutorial = 0;
+                      });
+                  });
+
+                  week_numbers.forEach(function (w) {
+                      $('#tb_head').before('<th colspan="2">Week ' + (w-min_week) + '</th><th class="export_tr"></th>');
+                      $('#tb_subhead').append('<th style="font-weight: normal;">Lecture</th><th style="font-weight: normal;">Tutorial</th>');
+
+                      if (attend_organized.Lecture.hasOwnProperty(w)){
+                          attend_organized.Lecture[w].forEach(function (l) {
+                              l.forEach(function (s) {
+                                  student_attend[w][s].Lecture++;
+                              });
+                          });
+                      }
+                      if (attend_organized.Tutorial.hasOwnProperty(w)) {
+                          attend_organized.Tutorial[w].forEach(function (t) {
+                              t.forEach(function (s) {
+                                  student_attend[w][s].Tutorial++;
+                              });
+                          });
+                      }
+                  });
+
+                  week_numbers.forEach(function (w) {
+                      student_list.forEach(function (s) {
+                          $('#' + s.id + '_detail_l').before('<td>'+ student_attend[w][s.id].Lecture + '</td><td>' + student_attend[w][s.id].Tutorial +'</td>');
+                      });
+                  });
+
+                  toggle_table();
+              });
+
+              // for showing table to export, hide after exported
+              function toggle_table() {
+                  $('.export_tr').toggle();
+
+                  // hide/show table head 2nd, 3rd and last 3 cols of first line
+                  $('#export_table tr:first-child th:nth-child(2), #export_table tr:first-child th:nth-child(3), ' +
+                    '#export_table tr:first-child th:last-child, #export_table tr:first-child th:nth-last-child(2), ' +
+                    '#export_table tr:first-child th:nth-last-child(3)').toggle();
+
+                  // hide/show table 2nd, 3rd and last 3 cols
+                  $('#export_table td:nth-child(2), #export_table td:nth-child(3), #export_table td:nth-last-child(1), ' +
+                    '#export_table td:nth-last-child(2), #export_table td:nth-last-child(3)').toggle();
+
+              }
+
+              function export_data(setting) {
+                  toggle_table();
+                  $('#export_table').tableExport(setting);
+                  toggle_table();
+              }
+          </script>
