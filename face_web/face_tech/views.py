@@ -11,61 +11,61 @@ def index(request):
     if 'message' in request.GET:
         message = request.GET['message']
 
-    return render(request, 'index.html', {'message': message})
+    return render(request, 'face_tech/index.html', {'message': message})
 
 
 def get_start(request):
-    return render(request, 'getstart.html')
+    return render(request, 'face_tech/getstart.html')
 
 
 def apis(request):
-    return render(request, 'apis.html')
+    return render(request, 'face_tech/apis.html')
 
 
 def image_form(request):
     form = forms.MultiPurposeForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:check_quality', 'message': 'Face Detection', 'form': form})
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:check_quality', 'message': 'Face Detection', 'form': form})
 
 
 def project_form(request):
     form = forms.ProjectForm()
-    return render(request, 'simple/form_csrf.html', {'url': 'face_tech:create_project',
+    return render(request, 'face_tech/form_csrf.html', {'url': 'face_tech:create_project',
                                                      'message': 'Create project form', 'form': form})
 
 
 def login_project(request):
     form = forms.LoginProjectForm()
-    return render(request, 'simple/form_csrf.html', {'url': 'face_tech:authentication',
+    return render(request, 'face_tech/form_csrf.html', {'url': 'face_tech:authentication',
                                                      'message': 'Login Project Form', 'form': form})
 
 
 @login_required(login_url='/face_tech/loginproject')
 def change_password_form(request):
     form = PasswordChangeForm(user=request.user)
-    return render(request, 'simple/form_csrf.html', {'url': 'face_tech:change_password',
+    return render(request, 'face_tech/form_csrf.html', {'url': 'face_tech:change_password',
                                                      'message': 'Create project form', 'form': form})
 
 
 @login_required(login_url='/face_tech/loginproject')
 def project_info(request):
-    return render(request, 'about.html', {'message': 'Project Profile'})
+    return render(request, 'face_tech/about.html', {'message': 'Project Profile'})
 
 
 def group_form(request):
     form = forms.GroupForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:create_group',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:create_group',
                                                 'message': 'Create group form', 'form': form})
 
 
 def delete_group_form(request):
     form = forms.DeleteGroupForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:delete_group',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:delete_group',
                                                 'message': 'Delete group form', 'form': form})
 
 
 def person_form(request):
     form = forms.PersonForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:create_person',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:create_person',
                                                 'message': 'Create person form (only numbers, letters and .@;+- will be allowed, '
                                                            + '";" is used to separate different persons)',
                                                 'form': form})
@@ -73,46 +73,46 @@ def person_form(request):
 
 def get_person_by_group_form(request):
     form = forms.PersonByGroupForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:get_persons_by_group',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:get_persons_by_group',
                                                 'message': 'Get persons by group id', 'form': form})
 
 
 def get_person_by_project_form(request):
     form = forms.PersonByProjectForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:get_all_persons',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:get_all_persons',
                                                 'message': 'Get persons by Project', 'form': form})
 
 
 def delete_person_form(request):
     form = forms.DeletePersonForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:delete_person',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:delete_person',
                                                 'message': 'Delete person form (";" is used to separate different person ids)',
                                                 'form': form})
 
 
 def person_to_group_form(request):
     form = forms.PersonToGroupForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:relate_person_to_group',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:relate_person_to_group',
                                                 'message': 'Add persons to group form. '
                                                            + 'Use ";" to separate different persons.', 'form': form})
 
 
 def delete_person_group_form(request):
     form = forms.PersonToGroupForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:delete_person_from_group',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:delete_person_from_group',
                                                 'message': 'Delete persons from group form. '
                                                            + 'Use ";" to separate different persons.', 'form': form})
 
 
 def enrollment_form(request):
     form = forms.EnrollmentForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:enrollment',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:enrollment',
                                                 'message': 'Enrollment form.', 'form': form})
 
 
 def verification_form(request):
     form = forms.VerificationForm()
-    return render(request, 'simple/form.html', {'url': 'face_tech:verification',
+    return render(request, 'face_tech/form.html', {'url': 'face_tech:verification',
                                                 'message': 'Verification form.', 'form': form})
 
 

@@ -1,0 +1,26 @@
+{% load staticfiles %}
+{% include "face_tech/header.html" %}
+
+<style>
+    input, select{
+        display: block;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="container">
+    <div class="page-header">
+        <h3>{{ message|escape}}</h3>
+    </div>
+    {% if error_message %}<p><span class="alert alert-warning"><strong>{{ error_message|escape}}</strong></span></p>{% endif %}
+
+    <section>
+        <form action="{% url url %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <br/><input type="submit" value="Submit" />
+        </form>
+    </section>
+
+{% include "face_tech/footer.html" %}
+</div>

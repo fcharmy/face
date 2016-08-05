@@ -29,7 +29,7 @@ def create_project(request):
             log.error(traceback.format_exc())
             message = 'Please try again with different information.'
 
-    return render(request, 'simple/form_csrf.html',
+    return render(request, 'face_tech/form_csrf.html',
                   {'url': 'face_tech:create_project', 'message': 'Create project form',
                    'error_message':message, 'form': form})
 
@@ -46,15 +46,16 @@ def authentication(request):
             # the password verified for the user
             if user.is_active:
                 login(request, user)
-                return views.redirect_index('')
+                return views.redirect_index('Your Security Key is ' + request.user.last_name
+                                            + ', project key is ' + str(request.user.id))
             else:
                 message = 'The password is valid, but the account has been disabled!'
         else:
             # the authentication system was unable to verify the username and password
             message = 'The username and password were incorrect.'
 
-    return render(request, 'simple/form_csrf.html',
-                              {'url': 'face_tech:authentication', 'message': 'Login Project Form',
+    return render(request, 'face_tech/form_csrf.html',
+                  {'url': 'face_tech:authentication', 'message': 'Login Project Form',
                                'error_message':message, 'form': form})
 
 

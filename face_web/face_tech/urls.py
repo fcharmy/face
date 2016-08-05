@@ -13,7 +13,6 @@ urlpatterns = [
     url(r'^apis', views.apis, name='apis'),
 
     url(r'^imageform', views.image_form, name='image_form'),
-
     url(r'^projectform', views.project_form, name='project_form'),
     url(r'^loginproject', views.login_project, name='login_project'),
     url(r'^changepassword', views.change_password_form, name='change_password_form'),

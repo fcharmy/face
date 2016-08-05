@@ -7,8 +7,8 @@ from django.http import HttpResponse
 API_KEY = "f14zzwlfh5fxiXWS2U3hU"
 
 project_key = '1'
-security_key = 'l1I2tpRs'
-api = FaceAPI(project_key, security_key)
+security_key = 'lZZIpZie'
+api = FaceAPI(project_key, security_key, server='http://172.26.187.110/')
 
 IMG_FOLDER_NAME = 'img_upload'
 IMG_FOLDER = os.path.join(settings.MEDIA_ROOT, IMG_FOLDER_NAME)

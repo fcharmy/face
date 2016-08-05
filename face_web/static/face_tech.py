@@ -6,9 +6,9 @@ from requests_toolbelt import MultipartEncoder
 
 _APIs = [
     'create_person',        # name, (optional: email, first_name, last_name, note, group)
-    'create_person_json',   # data, group (optional)
+    'create_json_person',   # data, group (optional)
     'create_group',         # name, desc (optional)
-    'get_groups_by_name',   # data (group name)
+    'get_groups_by_name',   # name
     'person_to_group',      # person, group
     'get_persons_by_group', # group
     'get_all_persons',      # no param
@@ -18,7 +18,7 @@ _APIs = [
     'detect',               # image
     'landmark',             # image
     'occluder',             # image
-    'check_quality',        # image, save (optional)
+    'check_quality',        # image, data (optional)
     'enrollment_faces',     # data, (optional: image, group)
     'verification_faces'    # image, group (optional)
 ]
@@ -28,9 +28,9 @@ class FaceAPI(object):
     project = None
     security_key = None
     timeout = None
-    server = 'http://localhost:8000/'  # Server url face_tech/
+    server = 'http://nusface-i.comp.nus.edu.sg/'  # Server url face_tech/
 
-    def __init__(self, project, seckey, timeout=10, server=None):
+    def __init__(self, project, seckey, timeout=60, server=None):
         self.project = project
         self.security_key = seckey
         self.timeout = timeout
@@ -54,8 +54,8 @@ class _APICall(object):
         for (k, v) in kwargs.items():
             if type(v) is tuple or type(v) is str:
                 data[k] = v
-            elif type(v) is list:
-                data[k] = ';'.join(v)
+            elif type(v) is list and True not in [type(i) is dict for i in v]:
+                data[k] = ';'.join([str(i) for i in v])
             else:
                 data[k] = json.dumps(v)
 
@@ -66,121 +66,22 @@ class _APICall(object):
         if response.status_code == 200:
             return json.loads(response.text).get('data')
         else:
+            # print error message, raise ValueError(response.text)
             print(response.text)
-            return False
+            raise ValueError(response.text)
 
 
-def file(path):
-    if os.path.getsize(path) > 2 * 1024 * 1024:
-        raise OverflowError('{}: File size too large which exceed 2M.'.format(path))
+def file(image):
+    if type(image) is str:
+        if os.path.getsize(image) > 2 * 1024 * 1024:
+            raise OverflowError('{}: File size too large which exceed 2M.'.format(image))
 
-    if not os.path.isfile(path):
-        raise IOError
+        if not os.path.isfile(image):
+            raise IOError('{}: Not a file, please provide a valid file path.'.format(image))
 
-    f = (os.path.basename(path), open(path, 'rb'))
-    return f
-
-
-if __name__ == "__main__":
-    project_key = '2'
-    security_key = '6fFVF2gG'
-    api = FaceAPI(project_key, security_key)
-
-    new_list = [2,4,6,8,10]
-    old_list = [1,3,5,7,9,10,13]
-
-    new_p, old_p, count = 0, 0, 0
-    new, old = [0]*len(new_list), [0]*len(old_list)
-
-    while old_p < len(old_list) and new_p < len(new_list):
-        if new_list[new_p] == old_list[old_p]:
-            new[new_p] = 1
-            old[old_p] = 1
-            new_p += 1
-        elif new_list[new_p] < old_list[old_p]:
-            new_p += 1
-            old_p -= 1
-
-        old_p += 1
-        count += 1
-
-    print('Add item: {}'.format([new_list[i] for i in range(len(new)) if new[i] == 0]))
-    print('Delete item: {}'.format([old_list[i] for i in range(len(old)) if old[i] == 0]))
-    print(count)
-
-    # # Group
-    # r = api.create_group(name='file test10.@+-', desc='create by me')
-    # print(r)
-    #
-    # if r:
-    #     re = api.delete_group(group=r)
-    #     print(re)
-    #
-    # # Person
-    # r = api.create_person(name='test_00', email='test@test.com', first_name='James', last_name='Smith', note='freshman', group=27)
-    # print(r)
-    #
-    # if r:
-    #     re = api.delete_person(person=r)
-    #     print(re)
-
-    # Person to group
-    # rp = api.person_to_group(person=12, group=2)
-    # print(rp)
-    #
-    # if rp:
-    #     re = api.remove_person_from_group(person=12, group=2)
-    #     print(re)
-
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/123.jpg'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/22x20/04000_09_11.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/22x20/04000_07_11.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/22x20/04000_05_11.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/22x20/04000_05_08.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/180x160/04000_05_11.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/180x160/04000_27_11.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/180x160/04001_09_08.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/180x160/04001_09_11.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/180x160/04001_27_11.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/180x160/04037_09_08.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/180x160/04003_09_11.bmp'
-    # image = '/home/tsim/Downloads/Untitled Folder/Verification_DrSim/images/180x160/04002_27_11.bmp'
-    # image = 'simple/image/sample.jpg'
-
-
-    # r = api.detect(image=file(image))
-    # print(r)
-    #
-    # re = api.landmark(image=file(image))
-    # print(re)
-    #
-    # r = api.occluder(image=file(image))
-    # print(r)
-    #
-    # r = api.check_quality(image=file(image), save=0)
-    # print(r)
-    #
-    # if r:
-    #     faces = []
-    #     pid = 81
-    #     for f in r.get('faces'):
-    #         f['person_id'] = pid
-    #         faces.append(f)
-    #         pid += 1
-    #     r['faces'] = faces
-    #
-    #     re = api.enrollment_faces(data=r)
-    #     print(re)
-    #
-    # r = api.verification_faces(image=file(image))
-    # print(r)
-    #
-    # r = api.enrollment_faces(data={"faces": [{"person_id":63, "coordinates": [78, 186, 293, 400]}]},
-    #                          image=file(image), group=2)
-    # print(r)
-
-    # import cv2
-    # img = cv2.imread(image)
-    # cv2.imshow('image', img)
-    # cv2.waitKey(0)
-
+        return os.path.basename(image), open(image, 'rb')
+    else:
+        try:
+            return image.name, image.file
+        except:
+            raise IOError('Not valid file, please provide a valid path or file content.')

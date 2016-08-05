@@ -1,5 +1,5 @@
 // ajax request setting
-var serverUrl = 'http://nusface-i.comp.nus.edu.sg/attend/',
+var serverUrl = 'http://172.26.187.110:8000/',
     requestObj = {
       type: "POST",
       dataType: 'json',
@@ -296,7 +296,7 @@ angular.module('attendance', ['ionic'])
       $scope.confirmModal.hide();
       $('#spinner').hide();
     },{
-      quality: 30,
+      quality: 40,
       correctOrientation: true,
       encodingType: Camera.EncodingType.JPEG
     });
@@ -436,7 +436,7 @@ angular.module('attendance', ['ionic'])
   $scope.student_list = $stateParams.module.student;
   $scope.add_disabled = !($stateParams.data.owner == profile.Name);
   $scope.images = $stateParams.data.images;
-  $scope.serverUrl = serverUrl.split('/attend')[0];
+  $scope.serverUrl = serverUrl;
   $scope.img_index = 0;
   $scope.previous_disabled = true;
   $scope.next_disabled = $scope.images.length < 2;
