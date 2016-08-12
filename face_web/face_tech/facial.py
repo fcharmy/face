@@ -118,7 +118,7 @@ def check_quality(request):
                     # todo check more facts
 
                     data.append({'coordinates': c, 'landmarks': None,
-                                 'occlude': str(occluder), 'illumination': illuminate, 'resolution': size})
+                                 'occlude': str(False), 'illumination': illuminate, 'resolution': size})
             result['faces'] = data
 
             if save:

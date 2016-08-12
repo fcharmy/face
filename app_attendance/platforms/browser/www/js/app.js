@@ -200,8 +200,11 @@ angular.module('attendance', ['ionic'])
   $scope.attend_records = $stateParams.module.attendance? $stateParams.module.attendance : [];
 
   for (var i = 0; i < $scope.attend_records.length; i++) {
-    var d = new Date($scope.attend_records[i].time_id/1e10, $scope.attend_records[i].time_id%1e10/1e8 - 1,
-        $scope.attend_records[i].time_id%1e8/1e6, $scope.attend_records[i].time_id%1e6/1e4, $scope.attend_records[i].time_id%1e4/1e2);
+    var d = new Date(Date.UTC(parseInt($scope.attend_records[i].time_id/1e10),
+        parseInt($scope.attend_records[i].time_id%1e10/1e8 - 1),
+        parseInt($scope.attend_records[i].time_id%1e8/1e6),
+        parseInt($scope.attend_records[i].time_id%1e6/1e4),
+        parseInt($scope.attend_records[i].time_id%1e4/1e2), 0, 0));
 
     $scope.attend_records[i].year = d.getFullYear();
     $scope.attend_records[i].date = d.toLocaleDateString("en-us",{ month: "short", day: "numeric"});

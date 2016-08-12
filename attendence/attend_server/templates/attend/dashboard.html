@@ -147,10 +147,11 @@
                   // update and show local timestamp for each class
                   $('.datetime').each(function (index) {
                       var time = parseInt($( this ).html());
-                      var d = new Date(time/1e10, time%1e10/1e8 - 1, time%1e8/1e6, time%1e6/1e4, time%1e4/1e2);
+                      var d = new Date(Date.UTC(parseInt(time/1e10), parseInt(time%1e10/1e8 - 1), parseInt(time%1e8/1e6),
+                              parseInt(time%1e6/1e4), parseInt(time%1e4/1e2), 0, 0));
 
-                      $( this ).html(d.toLocaleDateString("en-us",{ month: "short", day: "numeric", weekday: "long",
-                          hour: "2-digit", minute: "2-digit" }));
+                      $( this ).html(d.toLocaleDateString("en-us",{month: "short",
+                          day: "numeric", weekday: "long", hour: "2-digit", minute: "2-digit" }));
                       attendance[index].time = d;
                   });
 

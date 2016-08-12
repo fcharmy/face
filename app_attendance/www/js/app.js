@@ -200,8 +200,11 @@ angular.module('attendance', ['ionic'])
   $scope.attend_records = $stateParams.module.attendance? $stateParams.module.attendance : [];
 
   for (var i = 0; i < $scope.attend_records.length; i++) {
-    var d = new Date($scope.attend_records[i].time_id/1e10, $scope.attend_records[i].time_id%1e10/1e8 - 1,
-        $scope.attend_records[i].time_id%1e8/1e6, $scope.attend_records[i].time_id%1e6/1e4, $scope.attend_records[i].time_id%1e4/1e2);
+    var d = new Date(Date.UTC(parseInt($scope.attend_records[i].time_id/1e10),
+        parseInt($scope.attend_records[i].time_id%1e10/1e8 - 1),
+        parseInt($scope.attend_records[i].time_id%1e8/1e6),
+        parseInt($scope.attend_records[i].time_id%1e6/1e4),
+        parseInt($scope.attend_records[i].time_id%1e4/1e2), 0, 0));
 
     $scope.attend_records[i].year = d.getFullYear();
     $scope.attend_records[i].date = d.toLocaleDateString("en-us",{ month: "short", day: "numeric"});
@@ -376,9 +379,9 @@ angular.module('attendance', ['ionic'])
       module: $stateParams.module.ID, owner: profile.Name, time_id: $stateParams.class? $stateParams.class.time_id: null};
 
     if (!$stateParams.is_enroll && !$stateParams.class) {
-      if ('M' == $stateParams.module.Permission) {
-        requestObj.data['lt'] = false;
-      }else{  requestObj.data['lt'] = true; }
+      if (confirm('Is this a Lecture or Tutorial? Press OK for lecture, Cancel for Tutorial.')) {
+        requestObj.data['lt'] = true;
+      }else{  requestObj.data['lt'] = false; }
     }
     else if(!$stateParams.is_enroll && $stateParams.class){
       requestObj.data['lt'] = $stateParams.class.lt;
