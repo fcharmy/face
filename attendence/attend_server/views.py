@@ -217,17 +217,30 @@ def view_module(request):
 
 
 # ----------------Public Functions-------------------
+import time
+
 
 @csrf_exempt
 def face_detection(request):
     """ Send img to detect face and check quality """
+    print('entered')
+    t1 = time.time()
     form = forms.ImgForm(request.POST, request.FILES)
 
     if form.is_valid():
         try:
             img = form.cleaned_data['image']
+            t2 = time.time()
+            print("upload time", t2-t1)
+
             data = api.check_quality(image=file(img))
+            t1 = time.time()
+            print("request time", t1-t2)
+
             data['image'] = default_storage.save(img.name, ContentFile(img.read()))
+
+            t2 = time.time()
+            print("save time", t2-t1)
 
             return JsonResponse({'data': data})
         except:

@@ -66,8 +66,8 @@
                       <td>{{ item.name }}</td>
                       <td>{{ item.first_name }} {{ item.last_name }}</td>
                       <td>{{ item.email }}</td>
-                      <td id="{{ item.id }}_l"><a></a>/<span></span></td>
-                      <td id="{{ item.id }}_t"><a></a>/<span></span></td>
+                      <td id="{{ item.id }}_l"><a></a>|<span></span></td>
+                      <td id="{{ item.id }}_t"><a></a>|<span></span></td>
                       <td><div class="progress">
                               <div id="{{ item.id }}_p" class="progress-bar progress-bar-info" role="progressbar"
                                    aria-valuemin="0" aria-valuemax="100" style="width: 0"></div>
@@ -109,8 +109,8 @@
                           <td>{{ item.name }}</td>
                           <td>{{ item.first_name }} {{ item.last_name }}</td>
                           <td>{{ item.email }}</td>
-                          <td id="{{ item.id }}_detail_l"><a></a>/<span></span></td>
-                          <td id="{{ item.id }}_detail_t"><a></a>/<span></span></td>
+                          <td id="{{ item.id }}_detail_l"><a></a>|<span></span></td>
+                          <td id="{{ item.id }}_detail_t"><a></a>|<span></span></td>
                           <td id="{{ item.id }}_detail_p"></td>
                         </tr>
                     {% endfor %}

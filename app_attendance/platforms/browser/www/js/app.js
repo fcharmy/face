@@ -379,9 +379,9 @@ angular.module('attendance', ['ionic'])
       module: $stateParams.module.ID, owner: profile.Name, time_id: $stateParams.class? $stateParams.class.time_id: null};
 
     if (!$stateParams.is_enroll && !$stateParams.class) {
-      if ('M' == $stateParams.module.Permission) {
-        requestObj.data['lt'] = false;
-      }else{  requestObj.data['lt'] = true; }
+      if (confirm('Is this a Lecture or Tutorial? Press OK for lecture, Cancel for Tutorial.')) {
+        requestObj.data['lt'] = true;
+      }else{  requestObj.data['lt'] = false; }
     }
     else if(!$stateParams.is_enroll && $stateParams.class){
       requestObj.data['lt'] = $stateParams.class.lt;

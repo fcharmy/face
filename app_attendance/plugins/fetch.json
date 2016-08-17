@@ -54,5 +54,30 @@
         },
         "is_top_level": false,
         "variables": {}
+    },
+    "cordova-plugin-file-transfer": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-file-transfer"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-file": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-file"
+        },
+        "is_top_level": false,
+        "variables": {}
+    },
+    "me.tonny.cordova.plugins.multidex": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/jwall149/cordova-multidex",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

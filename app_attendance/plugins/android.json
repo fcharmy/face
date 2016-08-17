@@ -24,10 +24,19 @@
         },
         "cordova-plugin-camera": {
             "PACKAGE_NAME": "com.ionicframework.apptest357899"
+        },
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "com.ionicframework.apptest357899"
+        },
+        "me.tonny.cordova.plugins.multidex": {
+            "PACKAGE_NAME": "com.ionicframework.apptest357899"
         }
     },
     "dependent_plugins": {
         "cordova-plugin-compat": {
+            "PACKAGE_NAME": "com.ionicframework.apptest357899"
+        },
+        "cordova-plugin-file": {
             "PACKAGE_NAME": "com.ionicframework.apptest357899"
         }
     }
