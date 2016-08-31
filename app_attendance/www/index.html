@@ -32,7 +32,7 @@
 
     <script id="login-page.html" type="text/ng-template">
       <div ng-controller="loginController">
-        <ion-content scroll="false">
+        <ion-content>
           <div id="icon"></div>
 
           <button class="button button-outline button-full button-positive ion-chevron-down" 
@@ -64,6 +64,8 @@
 
             </form>
           </div>
+
+          <div><p class="i" style="font-style: normal; position: absolute; bottom: 20px; width: 100%; text-align: center;">Version 1.02</p></div>
         </ion-content>
       </div>
     </script> 
@@ -148,7 +150,7 @@
 
     <script id="enroll.html" type="text/ng-template">
       <ion-view view-title="Enrollment" cache-view="false">
-        <ion-content scroll="false">
+        <ion-content>
           <div class="flex-container">
 
             <div class="card img-container">
@@ -157,16 +159,33 @@
             </div>
 
             <div class="list-container">
-              <div class="bar bar-header bar-positive student-list-header">
+              <div class="bar bar-header bar-positive student-list-header" style="max-height: 44px;">
                 <a class="button button-icon icon ion-chevron-left" ng-click="back()"></a>
-                <h1 class="title">Students</h1>
+                <input type="search" ng-model="q" placeholder="Search Students" aria-label="search students"
+                       style="height: 90%;border-radius: 5px; width: 90%;padding-left: 5px;margin: 0 10px;"/>
+                <!--h1 class="title">Students</h1-->
                 <a class="button button-icon icon ion-checkmark" ng-click="submit_enroll()"></a>
               </div>
 
               <ul class="list student-list">
-                <li id="{{ student.id }}" class="item" ng-repeat="student in student_list" ng-click="match_face({{ student }})">
+                <ul ng-repeat="t in tutorial" ng-show="show_tutorial">
+                  <ul ng-repeat="(key, value) in t">
+                    <li class="item item-divider" ng-hide="result.length === 0" ng-click="toggle_tutorial('{{ key }}')"
+                        style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">Tutorial {{ key }}</li>
+
+                    <li ng-repeat="student in value | filter:q as result" id="{{ student.id }}" class="item" ng-click="match_face({{ student }})">
+                      {{ student.first_name }}
+                      <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
+                    </li>
+                  </ul>
+                </ul>
+
+                <li ng-hide="show_tutorial" ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}"
+                    class="item {{ student.match }}" ng-click="match_face({{ student }})">
                   {{ student.first_name }}
+                  <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                 </li>
+
               </ul>
             </div>
           </div>
@@ -207,7 +226,7 @@
           </div>
 
           <div class="flex-container detail-tab">
-            <div class="card detail-container img-container" style="text-align: center;display: flex;overflow: hidden;">
+            <div class="card detail-container" style="text-align: center;display: flex;overflow: hidden;">
               <button ng-disabled="previous_disabled" class="button button-icon icon ion-arrow-left-b" ng-click="previous()"></button>
 
                 <canvas id="detail-canvas" style="display: none;margin: auto;"></canvas>
@@ -231,7 +250,7 @@
                 </a>
               </div>
 
-              <ul class="list student-list" style="top: 0px;">
+              <ul class="list detail-student-list" style="top: 3px;">
                 <li class="item" ng-repeat="student in student_show_list" ng-click="match_face({{ student }})">
                   {{ student.first_name }}
                 </li>

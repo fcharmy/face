@@ -21,8 +21,9 @@ var serverUrl = 'http://172.26.187.110:8000/',
       ft.upload(imgURI, url, success, fail, options);
     };
 
-var option = null,
-    profile = null;
+var option = 'ivle',//null,
+    profile = {'FirstMajor': 'Nil', 'Email': 'e0013178@u.nus.edu', 'Gender': 'Female', 'MatriculationYear': '2015', 'Name': 'SIVASANKARAN DIVYA', 'authToken': 'D41A734885A38795EDBC371AA5C3E6B318AB563B3C161E63D742FF11D777D5C9563E9A47B373CFF2A6E7D322974D119667BFD63027E5182A28DA7740F4BC1390E105007DEC08BAB9841220A111262F5C547DB72EB6F8CD3D4DF7E5893442882F1DC4FA918A6CFDBD15BE67BA7CF3FB409C7B1E60259CFA26C19480F8552E37108A8A27F2390ABF5349FBDCD737EEDD320711F1052527556FE2CC6B6927D67CF7E909549D5951EF653F0D36B84C9B351379B57C4497DC3EBEA07711C385D640A3435B7DDCA5E6D72EBF90683FC4925366AE9C74C59EE21FD39F18792364502AF8E4207808653D0A145BE864E8EF5DFE4D', 'Modules': [{'ID': '73efbd67-772e-4de3-b743-8e4f574378c0', 'face_group_id': 5, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'CS1231', 'Permission': 'M', 'CourseName': 'DISCRETE STRUCTURES'}, {'ID': '8f248169-99fd-412c-a499-9308571befc5', 'face_group_id': 6, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'NM3216', 'Permission': 'R', 'CourseName': 'GAME DESIGN'}], 'SecondMajor': '', 'UserID': 'e0013178', 'Faculty': 'School of Computing', 'Photo': ''};
+//null;
 
 // Ionic attendance App
 angular.module('attendance', ['ionic'])
@@ -104,11 +105,11 @@ angular.module('attendance', ['ionic'])
 
 
 .controller('loginController', function($scope, $http, $state){
-
   // $scope.hideList = true;
   $scope.submitDisable = false;
   $scope.loginOptions = [['ivle', "NUS Login"], ['attend', "Default"]];
   $scope.login_option = $scope.loginOptions[0];
+  // ionic.Platform.isFullScreen = true;
 
   $scope.click_login_list = function(){
     // $scope.hideList = !$scope.hideList;
@@ -215,7 +216,7 @@ angular.module('attendance', ['ionic'])
     if($scope.min_week == undefined || $scope.min_week > $scope.attend_records[i].week){
       $scope.min_week = $scope.attend_records[i].week;
     }
-  };
+  }
 
   $scope.$on("$ionicView.afterEnter", function(event, data) {
     for (var i = 0; i < $scope.attend_records.length; i++) {
@@ -227,18 +228,16 @@ angular.module('attendance', ['ionic'])
 
   $scope.detail = function(index){
     $state.go('detail', {data: $scope.attend_records[index], module: $stateParams.module});
-  }
+  };
 
   $scope.range = function(len){
     var list = [];
-    for (var i = 0; i < len; i++) {
-      list.push(i);
-    };
+    for (var i = 0; i < len; i++) { list.push(i); }
     return list;
   };
 })
 
-.controller('attendController', function($scope, $stateParams, $state, $ionicModal, $ionicHistory){
+.controller('attendController', function($scope, $stateParams, $state, $ionicModal){
   $scope.$on("$ionicView.enter", function(event, data){
 
     // initial confirm modal and destory when hide
@@ -253,6 +252,7 @@ angular.module('attendance', ['ionic'])
       // this will sperate into two conditions
       $state.go('enroll', {is_enroll: $scope.is_enroll, img: $scope.img, data: $scope.response_data, module: $stateParams.module});
       $scope.confirmModal.remove();
+      // window.removeEventListener("orientationchange", getEventListeners(window, "orientationchange"));
     };
 
     $scope.cancel = function() {
@@ -299,7 +299,7 @@ angular.module('attendance', ['ionic'])
       $scope.confirmModal.hide();
       $('#spinner').hide();
     },{
-      quality: 40,
+      quality: 60,
       correctOrientation: true,
       encodingType: Camera.EncodingType.JPEG
     });
@@ -341,19 +341,125 @@ angular.module('attendance', ['ionic'])
 
 })
 
-.controller('enrollController', function($scope, $stateParams, $state, $ionicHistory){
-  highlight = null, curPointer = null;  // initial
+.controller('enrollController', function($scope, $stateParams, $state, $ionicHistory, $ionicPlatform){
+  highlight = null; curPointer = null;  // initial
   $scope.img = $stateParams.img;
-  $scope.student_list = $stateParams.module.student;
   $scope.data = $stateParams.data;
+  $scope.student_list = $.extend(true, [], $stateParams.module.student);
+  $scope.show_tutorial = $stateParams.module.tutorial != undefined;
 
-  if ($scope.data.hasOwnProperty('faces')) {
-    facesList = $scope.data.faces;
-    drawRects('img-canvas', 'enroll-img', true);
+  // To fix when keyboard show, rearrange orientation in css
+  ionic.Platform.isFullScreen = true;
+  $scope.orientationChange = function () {
+    if (window.screen.orientation.type == 'portrait-primary') {
+      // set image height, delay to wait for rotation
+      setTimeout(function() { $('#enroll-img').height($(window).height()*0.48); }, 200);
+
+      // add or remove class for each rotate
+      $('.img-container').removeClass('img-container-landscape');
+      $('.img-container').addClass('img-container-portrait');
+      $('.student-list').removeClass('student-list-landscape');
+      $('.student-list').addClass('student-list-portrait');
+      $('.list-container').addClass('list-container-portrait');
+      $('.list-container').removeClass('list-container-landscape');
+    }
+    else if (window.screen.orientation.type == 'landscape-primary'){
+      // set image height, delay to wait for rotation
+      setTimeout(function() { $('#enroll-img').height($(window).height()*0.93); }, 200);
+
+      // add or remove class for each rotate
+      $('.img-container').addClass('img-container-landscape');
+      $('.img-container').removeClass('img-container-portrait');
+      $('.student-list').removeClass('student-list-portrait');
+      $('.student-list').addClass('student-list-landscape');
+      $('.list-container').removeClass('list-container-portrait');
+      $('.list-container').addClass('list-container-landscape');
+    }
+    else{
+      alert("Unknown orientation.");
+    }
+  };
+
+  $ionicPlatform.ready(function() {
+    window.addEventListener("orientationchange", function(){$scope.orientationChange();}, false);
+  });
+
+  $scope.$on("$ionicView.enter", function(event, data){
+    $scope.orientationChange();
+
+    if ($scope.data.hasOwnProperty('faces')) {
+      facesList = $scope.data.faces;
+      drawRects('img-canvas', 'enroll-img', true);
+    }
+  });
+
+  if ($scope.show_tutorial) {
+      $scope.tutorial = $stateParams.module.tutorial;
+      for (var i = 0; i < $scope.tutorial.length; i++) {
+          var k = Object.keys($scope.tutorial[i])[0];
+          for (var j = 0; j < $scope.tutorial[i][k].length; j++) {
+              $scope.tutorial[i][k][j] = $scope.student_list[$scope.tutorial[i][k][j]]
+          }
+      }
   }
 
+  $scope.toggle_tutorial = function(tkey){
+    for (var i = 0; i < $scope.tutorial.length; i++) {
+      var k = Object.keys($scope.tutorial[i])[0];
+      if(Object.keys($scope.tutorial[i])[0] == tkey){
+        for(var j = 0; j < $scope.tutorial[i][k].length; j++){
+          $('#' + $scope.tutorial[i][k][j].id).animate({height: 'toggle'}, 'fast');
+        }
+      }
+    }
+  };
+
   $scope.match_face = function(person){
-    matching('img-canvas', 'enroll-img', person);
+    if (curPointer != null && facesList) {
+      if (facesList[curPointer].hasOwnProperty('id')) {
+
+        if (confirm('This face already match to student '
+          + facesList[curPointer].first_name + ' (' + facesList[curPointer].name
+          + '), are you sure to change to ' + person.first_name + ' (' + person.name + ')?')) {
+
+          var flindex = $.map($scope.student_list, function(obj, index) { if(obj.id == facesList[curPointer].id) { return index; }})[0];
+          delete $scope.student_list[flindex]['match'];
+        }
+        else{  return ; }
+      }
+
+      var index = $.map($scope.student_list, function(obj, index) { if(obj.id == person.id) { return index; }})[0];
+      if ($scope.student_list[index].hasOwnProperty('match') && $scope.student_list[index].match == 'occupied') {
+        if (confirm('This student already match to a face, are you sure to delete previous one?')){
+          for (var i = 0; i < facesList.length; i++) {
+            if (facesList[i].hasOwnProperty('id') && facesList[i].id == person.id) {
+              delete facesList[i]['id']; delete facesList[i]['name']; delete facesList[i]['first_name']; delete facesList[i]['alter'];
+            }
+          }
+        }
+        else{  return ; }
+      }
+
+      facesList[curPointer]['id'] = person.id;
+      facesList[curPointer]['name'] = person.name;
+      facesList[curPointer]['first_name'] = person.first_name;
+      facesList[curPointer]['alter'] = true;
+      $scope.student_list[index]['match'] = 'occupied';
+
+      highlight = curPointer;
+      curPointer = null;
+      drawRects('img-canvas', 'enroll-img', true);
+  }
+  else if (curPointer == null && facesList) {
+    for (var n = 0; n < facesList.length; n++) {
+      if (facesList[n].hasOwnProperty('id') && facesList[n].id == person.id) {
+        highlight = n;
+        drawRects('img-canvas', 'enroll-img', true);
+        break;
+      }
+    }
+  }
+
   };
 
   $scope.back = function(){
@@ -368,8 +474,8 @@ angular.module('attendance', ['ionic'])
 
       if (!$stateParams.is_enroll && facesList[i].hasOwnProperty('alter') && facesList[i].alter) {
         alter_list.push({'coordinates': facesList[i].coordinates, 'id': facesList[i].id});
-      };
-    };
+      }
+    }
     $scope.data.faces = cleaned_data;
     $scope.data['enroll'] = alter_list;
 
@@ -379,9 +485,7 @@ angular.module('attendance', ['ionic'])
       module: $stateParams.module.ID, owner: profile.Name, time_id: $stateParams.class? $stateParams.class.time_id: null};
 
     if (!$stateParams.is_enroll && !$stateParams.class) {
-      if (confirm('Is this a Lecture or Tutorial? Press OK for lecture, Cancel for Tutorial.')) {
-        requestObj.data['lt'] = true;
-      }else{  requestObj.data['lt'] = false; }
+      requestObj.data['lt'] = confirm('Is this a Lecture or Tutorial? Press OK for lecture, Cancel for Tutorial.');
     }
     else if(!$stateParams.is_enroll && $stateParams.class){
       requestObj.data['lt'] = $stateParams.class.lt;
@@ -449,7 +553,7 @@ angular.module('attendance', ['ionic'])
   $scope.subtitle = ($stateParams.data.lt? 'Lecture': 'Tutorial') +' on '+ $stateParams.data.day +' '+ $stateParams.data.time +' by '+ $stateParams.data.owner;
 
   // calculate the attend and abcent student list
-  $scope.student_attend = [], $scope.student_absence = [];
+  $scope.student_attend = []; $scope.student_absence = [];
   for (var i = 0; i < $scope.student_list.length; i++) {
     if ($.inArray($scope.student_list[i].id, $stateParams.data.students) < 0) {
       $scope.student_absence.push($scope.student_list[i]);
@@ -457,7 +561,7 @@ angular.module('attendance', ['ionic'])
     else{
       $scope.student_attend.push($scope.student_list[i]);
     }
-  };
+  }
 
   $scope.$on("$ionicView.enter", function(event, data){
     $scope.change_list(true); // show attend list when entered
@@ -466,14 +570,22 @@ angular.module('attendance', ['ionic'])
 
   $scope.draw = function(){
     if ($scope.images[$scope.img_index].hasOwnProperty('data')) {
-      highlight = null, curPointer = null;  // initial
+      highlight = null; curPointer = null;  // initial
       facesList = $scope.images[$scope.img_index].data;
       drawRects('detail-canvas', 'detail-img', false);
     }
   };
 
   $scope.match_face = function(person){
-    matching('detail-canvas', 'detail-img', person);
+    if (facesList) {
+      for (var n = 0; n < facesList.length; n++) {
+        if (facesList[n].hasOwnProperty('id') && facesList[n].id == person.id) {
+          highlight = n;
+          drawRects('detail-canvas', 'detail-img', false);
+          break;
+        }
+      }
+    }
   };
 
   $scope.back = function(){
@@ -534,6 +646,7 @@ angular.module('attendance', ['ionic'])
 });
 
 
+
 /* 
   For drawing rectangles on image and specify current face
 */
@@ -552,111 +665,122 @@ var normal = 'green',   // faces with identification
 // set facesList first before call this function
 function drawRects(canvasId, imgId, clickable){
   var reloadRects = function(){
-    // replace old canvas with new one to clear event lisener
-    var canvas = document.getElementById(canvasId);
-    var newc = canvas.cloneNode(true);
-    canvas.parentNode.replaceChild(newc, canvas);
+    if(document.getElementById(canvasId) != null) {
+      // replace old canvas with new one to clear event lisener
+      var canvas = document.getElementById(canvasId);
+      var newc = canvas.cloneNode(true);
+      canvas.parentNode.replaceChild(newc, canvas);
 
-    var c = document.getElementById(canvasId),
-      ctx = c.getContext("2d"),
-      img = document.getElementById(imgId);
+      var c = document.getElementById(canvasId),
+          ctx = c.getContext("2d"),
+          img = document.getElementById(imgId);
 
-    // get actula img size which show in page
-    document.getElementById(imgId).style.display = 'block';
-    var actualimgWidth = img.width,
-        actualimgHeight = img.height;
+      // get actula img size which show in page
+      document.getElementById(imgId).style.display = 'block';
+      var actualimgWidth = img.width,
+          actualimgHeight = img.height;
 
-    // get original size of img and calculate their ratio
-    document.getElementById(imgId).style.display = 'none';
-    var imgWidth = img.width,
-        imgHeight = img.height,
-        ratio = actualimgWidth/imgWidth;
+      // get original size of img and calculate their ratio
+      document.getElementById(imgId).style.display = 'none';
+      var imgWidth = img.width,
+          imgHeight = img.height,
+          ratio = actualimgWidth / imgWidth;
 
-    // set canvas size and draw image in it
-    c.width = actualimgWidth;
-    c.height = actualimgHeight;
-    ctx.drawImage(img, 0, 0, actualimgWidth, actualimgHeight);
+      // set canvas size and draw image in it
+      c.width = actualimgWidth;
+      c.height = actualimgHeight;
+      ctx.drawImage(img, 0, 0, actualimgWidth, actualimgHeight);
 
-    for (var i = 0; i < facesList.length; i++) {
-      if (facesList[i].hasOwnProperty('coordinates')){
-        coordinates = facesList[i].coordinates;
+      for (var i = 0; i < facesList.length; i++) {
+        if (facesList[i].hasOwnProperty('coordinates')) {
+          coordinates = facesList[i].coordinates;
 
-        var color = regular;
-        if (facesList[i].hasOwnProperty('id') && facesList[i].id != 'None'){
-          color = normal;
-          $('#'+facesList[i].id).addClass('occupied');
-        }
-        else if (facesList[i].hasOwnProperty('id') && facesList[i].id == 'None'){
-          color = error;
-        }
-        else if((facesList[i].hasOwnProperty('resolution') && facesList[i].resolution == 0) 
-          || (facesList[i].hasOwnProperty('illumination') && facesList[i].illumination != 0)
-          || (facesList[i].hasOwnProperty('occlude') && facesList[i].occlude == 'True')){
-          color = warning;
-        }
+          var color = regular;
+          if (facesList[i].hasOwnProperty('id') && facesList[i].id != 'None') {
+            color = normal;
+            $('#' + facesList[i].id).addClass('occupied');
+          }
+          else if (facesList[i].hasOwnProperty('id') && facesList[i].id == 'None') {
+            color = error;
+          }
+          else if ((facesList[i].hasOwnProperty('resolution') && facesList[i].resolution == 0)
+              || (facesList[i].hasOwnProperty('illumination') && facesList[i].illumination != 0)
+              || (facesList[i].hasOwnProperty('occlude') && facesList[i].occlude == 'True')) {
+            color = warning;
+          }
 
-        ctx.beginPath();
-        if (i == curPointer){
-          ctx.rect(coordinates[2] * ratio - 5, coordinates[0] * ratio - 5, 
-                  (coordinates[3] - coordinates[2]) * ratio + 10, (coordinates[1] - coordinates[0]) * ratio + 10);
-          ctx.lineWidth = 8;
+          ctx.beginPath();
+          if (i == curPointer) {
+            ctx.rect(coordinates[2] * ratio - 5, coordinates[0] * ratio - 5,
+                (coordinates[3] - coordinates[2]) * ratio + 10, (coordinates[1] - coordinates[0]) * ratio + 10);
+            ctx.lineWidth = 8;
 
-          // show person name under rectangle if has name
-          if (facesList[i].hasOwnProperty('id') && facesList[i].id != 'None'){
-            ctx.font = "15px Arial";
-            ctx.fillStyle = normal;
-            ctx.fillText(facesList[i].first_name, coordinates[2] * ratio - 5, coordinates[1] * ratio + 20); 
+            // show person name under rectangle if has name
+            if (facesList[i].hasOwnProperty('id') && facesList[i].id != 'None') {
+              ctx.font = "15px Arial";
+              ctx.fillStyle = normal;
+              ctx.fillText(facesList[i].first_name, coordinates[2] * ratio - 5, coordinates[1] * ratio + 20);
+            }
+          }
+          else {
+            ctx.rect(coordinates[2] * ratio, coordinates[0] * ratio,
+                (coordinates[3] - coordinates[2]) * ratio, (coordinates[1] - coordinates[0]) * ratio);
+            ctx.lineWidth = 2;
+          }
+          ctx.strokeStyle = color;
+          ctx.stroke();
+
+          if (i == highlight) {
+            ctx.beginPath();
+            ctx.rect(coordinates[2] * ratio - 3, coordinates[0] * ratio - 3,
+                (coordinates[3] - coordinates[2]) * ratio + 6, (coordinates[1] - coordinates[0]) * ratio + 6);
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = 'white';
+            ctx.stroke();
           }
         }
-        else{
-          ctx.rect(coordinates[2] * ratio, coordinates[0] * ratio, 
-            (coordinates[3] - coordinates[2]) * ratio, (coordinates[1] - coordinates[0]) * ratio);
-          ctx.lineWidth = 2;
-        }
-        ctx.strokeStyle = color;
-        ctx.stroke();
+      }
 
-        if (i == highlight) {
-          ctx.beginPath();
-          ctx.rect(coordinates[2] * ratio - 3, coordinates[0] * ratio - 3, 
-                  (coordinates[3] - coordinates[2]) * ratio + 6, (coordinates[1] - coordinates[0]) * ratio + 6);
-          ctx.lineWidth = 5;
-          ctx.strokeStyle = 'white';
-          ctx.stroke();
+      if (clickable) {
+        c.onclick = function (e) {
+          var dbclick = ($.now() - ctime < 500);
+          ctime = new Date($.now());
+
+          for (var i = 0; i < facesList.length; i++) {
+            if (e.offsetX >= facesList[i].coordinates[2] * ratio && e.offsetY >= facesList[i].coordinates[0] * ratio
+                && e.offsetX <= facesList[i].coordinates[3] * ratio && e.offsetY <= facesList[i].coordinates[1] * ratio) {
+              if (!dbclick) {
+                highlight = null;
+                curPointer = i;
+                drawRects(canvasId, imgId, clickable);
+                return;
+              } else {
+                $('#' + facesList[i].id).removeClass('occupied');
+                delete facesList[i]['id'];
+                delete facesList[i]['name'];
+                delete facesList[i]['first_name'];
+                delete facesList[i]['alter'];
+              }
+            }
+          }
+
+          highlight = null;
+          curPointer = null;
+          drawRects(canvasId, imgId, clickable);
         };
       }
     }
+  };
 
-    if (clickable) {
-      c.onclick = function(e) {
-        var dbclick = ($.now() - ctime < 500);
-        ctime = new Date($.now());
-
-        for (var i = 0; i < facesList.length; i++) {
-          if (e.offsetX >= facesList[i].coordinates[2]*ratio && e.offsetY >= facesList[i].coordinates[0]*ratio
-            && e.offsetX <= facesList[i].coordinates[3]*ratio && e.offsetY <= facesList[i].coordinates[1]*ratio) {
-            if(!dbclick){
-              highlight = null;
-              curPointer = i;
-              drawRects(canvasId, imgId, clickable);
-              return;
-            }else{
-              $('#'+facesList[i].id).removeClass('occupied');
-              delete facesList[i]['id']; delete facesList[i]['name']; delete facesList[i]['first_name']; delete facesList[i]['alter'];
-            }
-          }
-        };
-
-        highlight = null;
-        curPointer = null;
-        drawRects(canvasId, imgId, clickable);
-      };
-    }
-
-  }
   reloadRects();
   document.getElementById(canvasId).style.display = 'initial';
-  document.getElementById(imgId).onload = window.onresize = reloadRects;
+  document.getElementById(imgId).onload = reloadRects;//window.onresize =
+
+  window.addEventListener("orientationchange", function(){
+    setTimeout(function() {
+        reloadRects();
+    }, 200);
+  });
 }
 
 
@@ -670,7 +794,7 @@ function matching(canvasId, imgId, person){
 
         $('#'+facesList[curPointer].id).removeClass('occupied');
       }
-      else{  return; }
+      else{  return ; }
     }
 
     if ($('#'+person.id).hasClass('occupied')) {
@@ -678,11 +802,11 @@ function matching(canvasId, imgId, person){
         for (var i = 0; i < facesList.length; i++) {
           if (facesList[i].hasOwnProperty('id') && facesList[i].id == person.id) {
             delete facesList[i]['id']; delete facesList[i]['name']; delete facesList[i]['first_name']; delete facesList[i]['alter'];
-          };
+          }
         }
       }
-      else{  return; }
-    };
+      else{  return ; }
+    }
 
     facesList[curPointer]['id'] = person.id;
     facesList[curPointer]['name'] = person.name;
@@ -695,14 +819,14 @@ function matching(canvasId, imgId, person){
     drawRects(canvasId, imgId, true);
   }
   else if (curPointer == null && facesList) {
-    for (var i = 0; i < facesList.length; i++) {
-      if (facesList[i].hasOwnProperty('id') && facesList[i].id == person.id) {
-        highlight = i;
+    for (var n = 0; n < facesList.length; n++) {
+      if (facesList[n].hasOwnProperty('id') && facesList[n].id == person.id) {
+        highlight = n;
         drawRects(canvasId, imgId, true);
         break;
-      };
-    };
-  };
+      }
+    }
+  }
 }
 
 

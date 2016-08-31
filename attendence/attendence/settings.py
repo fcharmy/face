@@ -171,7 +171,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'face_tech': {
+        'attend_server': {
             'handlers': ['console', 'logfile'],
             'level': 'DEBUG',
         },

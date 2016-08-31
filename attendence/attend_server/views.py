@@ -2,9 +2,9 @@ from . import models
 from shutil import copyfile
 from .face_tech import file
 from django.shortcuts import render
-import logging, traceback, json, os
 from .apps import api, error_response
 from django.contrib.auth import logout
+import logging, traceback, json, os, time
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from . import forms, ivle_views, attend_views
@@ -217,30 +217,21 @@ def view_module(request):
 
 
 # ----------------Public Functions-------------------
-import time
-
 
 @csrf_exempt
 def face_detection(request):
     """ Send img to detect face and check quality """
-    print('entered')
     t1 = time.time()
     form = forms.ImgForm(request.POST, request.FILES)
 
     if form.is_valid():
         try:
             img = form.cleaned_data['image']
-            t2 = time.time()
-            print("upload time", t2-t1)
-
             data = api.check_quality(image=file(img))
-            t1 = time.time()
-            print("request time", t1-t2)
-
             data['image'] = default_storage.save(img.name, ContentFile(img.read()))
 
             t2 = time.time()
-            print("save time", t2-t1)
+            log.info("face_detection: {}".format(t2 - t1))
 
             return JsonResponse({'data': data})
         except:
@@ -252,6 +243,7 @@ def face_detection(request):
 @csrf_exempt
 def verify(request):
     """ verify faces with person ids"""
+    t1 = time.time()
     form = forms.ImgForm(request.POST, request.FILES)
 
     if form.is_valid():
@@ -264,6 +256,10 @@ def verify(request):
             response_data = []
 
         data = {"faces": response_data, "image": default_storage.save(img.name, ContentFile(img.read()))}
+
+        t2 = time.time()
+        log.info("verify: {}".format(t2 - t1))
+
         return JsonResponse({'data': data})
 
     return error_response(1, name='verify')
@@ -272,6 +268,7 @@ def verify(request):
 @csrf_exempt
 def enrollment(request):
     """ enroll faces with person ids"""
+    t1 = time.time()
     form = forms.DataForm(request.POST)
 
     if form.is_valid():
@@ -305,6 +302,9 @@ def enrollment(request):
             #
             #         return JsonResponse({'data': response_data, 'attend': aids})
 
+            t2 = time.time()
+            log.info("enrollment: {}".format(t2 - t1))
+
             return JsonResponse({'data': response_data})
         except:
             log.error(traceback.format_exc())
@@ -315,6 +315,7 @@ def enrollment(request):
 @csrf_exempt
 def attend(request):
     """ add attend records"""
+    t1 = time.time()
     form = forms.DataForm(request.POST)
 
     if form.is_valid():
@@ -360,6 +361,9 @@ def attend(request):
 
                     result['data'] = aids
             if result:
+                t2 = time.time()
+                log.info("attend: {}".format(t2 - t1))
+
                 return JsonResponse(result)
         except:
             log.error(traceback.format_exc())

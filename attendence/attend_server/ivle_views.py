@@ -136,6 +136,9 @@ def update_module(request):
                 data['student'] = updated_list
                 data['attendance'] = models.get_records(data.get('ID'))
 
+                if data.get('CourseCode') == 'CS1231':
+                    data['tutorial'] = get_tutorial_from_txt(updated_list)
+
             else:
                 data['student'] = []
                 data['attendance'] = []
@@ -192,7 +195,49 @@ def get_students(token, module_id):
 
     # auth if p has permission to access module todo
     # change to class_roster after testing todo
-    return p.guest_roster(module_id).get('Results')
+    return p.class_roster(module_id).get('Results')
 
 
+def get_tutorial_from_txt(students):
+    """ from txt file extract tutorial list
+        students is a sorted list
+    """
+    import os, ast
+    from django.conf import settings
+    from django.contrib.staticfiles.templatetags.staticfiles import static
 
+    file = open(os.path.join(settings.BASE_DIR, settings.INSTALLED_APPS[0] + static('CS1231_16s1.txt')))
+    data = list(ast.literal_eval(file.read()))
+    file.close()
+    data.sort()
+
+    i = 0
+    tutorials = {}
+    for s in range(len(students)):
+        if i < len(data):
+            if data[i][0].lower() == students[s].get('name').lower():
+                if data[i][1] not in tutorials.keys():
+                    tutorials[data[i][1]] = []
+
+                tutorials[data[i][1]].append(s)
+                i += 1
+            elif students[s].get('name').lower() in [d[0].lower() for d in data]:
+                i = [d[0].lower() for d in data].index(students[s].get('name').lower())
+                if data[i][1] not in tutorials.keys():
+                    tutorials[data[i][1]] = []
+
+                tutorials[data[i][1]].append(s)
+                i += 1
+            else:
+                if 'None' not in tutorials.keys():
+                    tutorials['None'] = []
+                tutorials['None'].append(s)
+
+    tutorial_list = []
+    key = list(tutorials.keys())
+    key.sort()
+
+    for k in key:
+        tutorial_list.append({k: tutorials[k]})
+
+    return tutorial_list
