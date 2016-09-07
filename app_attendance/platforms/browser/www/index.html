@@ -21,7 +21,7 @@
     <script src="cordova.js"></script>
 
   </head>
-  <body ng-app="attendance" class="platform-browser platform-cordova platform-webview">
+  <body ng-app="attendance">
     <ion-nav-view></ion-nav-view>
 
     <div id="spinner" style="display: none;height: 100%;width: 100%;position: absolute;z-index: 1000;">
@@ -65,7 +65,7 @@
             </form>
           </div>
 
-          <div><p class="i" style="font-style: normal; position: absolute; bottom: 20px; width: 100%; text-align: center;">Version 1.02</p></div>
+          <div><p class="i" style="font-style: normal; position: absolute; bottom: 20px; width: 100%; text-align: center;">Version 1.02.2</p></div>
         </ion-content>
       </div>
     </script> 
@@ -94,15 +94,15 @@
 
       <ion-tabs class="tabs-positive tabs-icon-only">
 
-        <ion-tab title="Home" icon="ion-calendar" ui-sref="tabs.home">
+        <ion-tab title="Home" icon="ion-calendar" ng-click="goState('tabs.home')">
           <ion-nav-view name="home-tab"></ion-nav-view>
         </ion-tab>
 
-        <ion-tab title="attendance" icon="ion-clipboard" ui-sref="tabs.attend">
+        <ion-tab title="attendance" icon="ion-clipboard" ng-click="goState('tabs.attend')">
           <ion-nav-view name="attend-tab"></ion-nav-view>
         </ion-tab>
 
-        <ion-tab title="About" icon="ion-university" ui-sref="tabs.about">
+        <ion-tab title="About" icon="ion-university" ng-click="goState('tabs.about')">
           <ion-nav-view name="about-tab"></ion-nav-view>
         </ion-tab>
 
@@ -110,17 +110,17 @@
     </script>
 
     <script id="attend.html" type="text/ng-template">
-      <ion-view view-title="attendance" cache-view="false">
+      <ion-view view-title="Attendance" cache-view="false">
         <ion-content>
 
           <div class="row">
-            <button class="button button-large button-block  button-outline button-positive" ng-click="newRecord(true)" style="margin: 15px 15%">
+            <button class="button button-large button-block  button-outline button-positive" ng-click="getPhoto(true)" style="margin: 15px 15%">
               <i class="icon ion-person-add"></i>&nbsp;&nbsp;Enrollment
             </button>
           </div>
 
           <div class="row">
-            <button class="button button-large button-block  button-outline button-positive" ng-click="newRecord(false)" style="margin: 10px 15%">
+            <button class="button button-large button-block  button-outline button-positive" ng-click="getPhoto(false)" style="margin: 10px 15%">
               <i class="icon ion-clock"></i>&nbsp;&nbsp;Take attendance
             </button>
           </div>
@@ -164,7 +164,7 @@
                 <input type="search" ng-model="q" placeholder="Search Students" aria-label="search students"
                        style="height: 90%;border-radius: 5px; width: 90%;padding-left: 5px;margin: 0 10px;"/>
                 <!--h1 class="title">Students</h1-->
-                <a class="button button-icon icon ion-checkmark" ng-click="submit_enroll()"></a>
+                <a class="button button-icon icon ion-checkmark" ng-click="lectureOrTutorial()"></a>
               </div>
 
               <ul class="list student-list">
@@ -262,7 +262,7 @@
     </script>
  
     <script id="about.html" type="text/ng-template">
-      <ion-view view-title="{{CourseCode}}">
+      <ion-view view-title="{{CourseCode}}" cache-view="false">
         <ion-content>
 
           <ul id="about-list" class="list">

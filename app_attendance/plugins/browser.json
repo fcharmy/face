@@ -22,13 +22,10 @@
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.ionicframework.apptest357899"
         },
-        "cordova-plugin-camera": {
-            "PACKAGE_NAME": "com.ionicframework.apptest357899"
-        },
         "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "com.ionicframework.apptest357899"
         },
-        "me.tonny.cordova.plugins.multidex": {
+        "cordova-plugin-camera": {
             "PACKAGE_NAME": "com.ionicframework.apptest357899"
         }
     },

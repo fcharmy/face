@@ -41,6 +41,10 @@ label{
 	border-radius: 5px;
 }
 
+.popup-container .popup{
+	width: 300px;
+}
+
 #confirm-img{
 	margin: 0 auto -5px auto;
 	display: block;

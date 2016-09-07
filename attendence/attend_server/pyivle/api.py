@@ -25,6 +25,7 @@ def call(method, params, obj, auth=False, verb='get'):
         jsonString = urllib2.urlopen(req).read()
     else:
         url = '%s?%s' % (baseUrl + method, urllib.urlencode(params))
+        print(url)
         jsonString = urllib2.urlopen(url).read()
 
     jsonString = jsonString.decode('UTF-8')  # From python2 to python3, string type different

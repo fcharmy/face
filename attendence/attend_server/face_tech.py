@@ -96,11 +96,11 @@ if __name__ == '__main__':
 
     # data = p.groups_by_user_and_module(courseId='73efbd67-772e-4de3-b743-8e4f574378c0', acadYear='2016/2017', semester='Semester 1').get('Results')
 
-    # data = p.groups_by_user().get('Results')
+    data = p.groups_by_user().get('Results')
     # data = p.module_class_groups('73efbd67-772e-4de3-b743-8e4f574378c0').get('Results')
     # data = p.module_class_group_users('00000000-0000-0000-0000-000000000000').get('Results')
-    data = p.module_official_group_users(courseId='73efbd67-772e-4de3-b743-8e4f574378c0',
-                                         groupName='1', groupType='Tutorial').get('Results')
+    # data = p.module_official_group_users(courseId='73efbd67-772e-4de3-b743-8e4f574378c0',
+    #                                      groupName='1', groupType='Tutorial').get('Results')
 
     print(data)
 

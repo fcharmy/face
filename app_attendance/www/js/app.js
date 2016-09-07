@@ -1,5 +1,5 @@
 // ajax request setting
-var serverUrl = 'http://172.26.187.110:8000/',
+var SERVER = 'http://172.26.187.110:8000/',
     requestObj = {
       type: "POST",
       dataType: 'json',
@@ -21,9 +21,11 @@ var serverUrl = 'http://172.26.187.110:8000/',
       ft.upload(imgURI, url, success, fail, options);
     };
 
-var option = 'ivle',//null,
-    profile = {'FirstMajor': 'Nil', 'Email': 'e0013178@u.nus.edu', 'Gender': 'Female', 'MatriculationYear': '2015', 'Name': 'SIVASANKARAN DIVYA', 'authToken': 'D41A734885A38795EDBC371AA5C3E6B318AB563B3C161E63D742FF11D777D5C9563E9A47B373CFF2A6E7D322974D119667BFD63027E5182A28DA7740F4BC1390E105007DEC08BAB9841220A111262F5C547DB72EB6F8CD3D4DF7E5893442882F1DC4FA918A6CFDBD15BE67BA7CF3FB409C7B1E60259CFA26C19480F8552E37108A8A27F2390ABF5349FBDCD737EEDD320711F1052527556FE2CC6B6927D67CF7E909549D5951EF653F0D36B84C9B351379B57C4497DC3EBEA07711C385D640A3435B7DDCA5E6D72EBF90683FC4925366AE9C74C59EE21FD39F18792364502AF8E4207808653D0A145BE864E8EF5DFE4D', 'Modules': [{'ID': '73efbd67-772e-4de3-b743-8e4f574378c0', 'face_group_id': 5, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'CS1231', 'Permission': 'M', 'CourseName': 'DISCRETE STRUCTURES'}, {'ID': '8f248169-99fd-412c-a499-9308571befc5', 'face_group_id': 6, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'NM3216', 'Permission': 'R', 'CourseName': 'GAME DESIGN'}], 'SecondMajor': '', 'UserID': 'e0013178', 'Faculty': 'School of Computing', 'Photo': ''};
-//null;
+var OPTION = null, // specify login type
+    PROFILE = null, // user profile after login
+    aMODULE = null;
+// var OPTION = 'ivle',
+//     PROFILE = {'FirstMajor': 'Nil', 'Email': 'e0013178@u.nus.edu', 'Gender': 'Female', 'MatriculationYear': '2015', 'Name': 'SIVASANKARAN DIVYA', 'authToken': 'D41A734885A38795EDBC371AA5C3E6B318AB563B3C161E63D742FF11D777D5C9563E9A47B373CFF2A6E7D322974D119667BFD63027E5182A28DA7740F4BC1390E105007DEC08BAB9841220A111262F5C547DB72EB6F8CD3D4DF7E5893442882F1DC4FA918A6CFDBD15BE67BA7CF3FB409C7B1E60259CFA26C19480F8552E37108A8A27F2390ABF5349FBDCD737EEDD320711F1052527556FE2CC6B6927D67CF7E909549D5951EF653F0D36B84C9B351379B57C4497DC3EBEA07711C385D640A3435B7DDCA5E6D72EBF90683FC4925366AE9C74C59EE21FD39F18792364502AF8E4207808653D0A145BE864E8EF5DFE4D', 'Modules': [{'ID': '73efbd67-772e-4de3-b743-8e4f574378c0', 'face_group_id': 5, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'CS1231', 'Permission': 'M', 'CourseName': 'DISCRETE STRUCTURES'}, {'ID': '8f248169-99fd-412c-a499-9308571befc5', 'face_group_id': 6, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'NM3216', 'Permission': 'R', 'CourseName': 'GAME DESIGN'}], 'SecondMajor': '', 'UserID': 'e0013178', 'Faculty': 'School of Computing', 'Photo': ''};
 
 // Ionic attendance App
 angular.module('attendance', ['ionic'])
@@ -42,9 +44,8 @@ angular.module('attendance', ['ionic'])
     .state('tabs',{
       url: "/tab",
       abstract: true,
-      cache: false,
       templateUrl: "tabs.html",
-      params: { module: null }
+      controller: 'tabController'
     })
     .state('tabs.attend', {
       url: "/attend",
@@ -81,7 +82,6 @@ angular.module('attendance', ['ionic'])
         is_enroll: null,
         img: null,
         data: null,
-        module: null,
         class: null
       },
       controller: 'enrollController'
@@ -91,8 +91,7 @@ angular.module('attendance', ['ionic'])
       templateUrl: "detail.html",
       cache: false,
       params: { 
-        data: null,
-        module: null 
+        data: null
       },
       controller: 'detailController'
     });
@@ -129,16 +128,16 @@ angular.module('attendance', ['ionic'])
   };
 
   $scope.login_submit = function(username, password){
-    option = $scope.login_option[0];
+    OPTION = $scope.login_option[0];
 
-    if (option != null){
+    if (OPTION != null){
       $scope.submit_loading(true);
-      requestObj.url = serverUrl + option + '_login';
+      requestObj.url = SERVER + OPTION + '_login';
       requestObj.data = {username: username, password: password};
 
       requestObj.success = function(data){
         $scope.submit_loading(false);
-        profile = data.data;
+        PROFILE = data.data;
         $state.go('modules', {data: data.data});
       };
 
@@ -162,15 +161,16 @@ angular.module('attendance', ['ionic'])
 })
 
 .controller('moduleController', function($scope, $state){
-  $scope.modules = profile.Modules;
+  $scope.modules = PROFILE.Modules;
 
   $scope.choose_module = function(data){
-    requestObj.url = serverUrl + option + '_module';
-    requestObj.data = {data: data, token: profile.authToken};
+    requestObj.url = SERVER + OPTION + '_module';
+    requestObj.data = {data: data, token: PROFILE.authToken};
 
     requestObj.success = function(data){
       if(data.data.student.length > 0) {
-        $state.go('tabs.attend', {module: data.data});
+        aMODULE = data.data;
+        $state.go('tabs.attend');
       }
       else{
         show_message(7, 'No Student.');
@@ -194,11 +194,17 @@ angular.module('attendance', ['ionic'])
   };
 })
 
-.controller('homeController', function($scope, $stateParams, $state){
-  $scope.stu_amount = $stateParams.module.student.length;
+.controller('tabController', function($scope, $state){
+  $scope.goState = function (state) {
+    $state.go(state);
+  };
+})
+
+.controller('homeController', function($scope, $state){
+  $scope.stu_amount = aMODULE.student.length;
 
   // for show list in home tab
-  $scope.attend_records = $stateParams.module.attendance? $stateParams.module.attendance : [];
+  $scope.attend_records = aMODULE.attendance? aMODULE.attendance : [];
 
   for (var i = 0; i < $scope.attend_records.length; i++) {
     var d = new Date(Date.UTC(parseInt($scope.attend_records[i].time_id/1e10),
@@ -219,15 +225,17 @@ angular.module('attendance', ['ionic'])
   }
 
   $scope.$on("$ionicView.afterEnter", function(event, data) {
-    for (var i = 0; i < $scope.attend_records.length; i++) {
-      if(i == 0 || $scope.attend_records[i].week != $scope.attend_records[i-1].week){
-        $('#'+$scope.attend_records[i].time_id).before('<li class="item item-divider">Week ' + ($scope.attend_records[i].week - $scope.min_week + 1) + '</li>');
+    setTimeout(function () {
+      for (var i = 0; i < $scope.attend_records.length; i++) {
+        if(i == 0 || $scope.attend_records[i].week != $scope.attend_records[i-1].week){
+          $('#'+$scope.attend_records[i].time_id).before('<li class="item item-divider">Week ' + ($scope.attend_records[i].week - $scope.min_week + 1) + '</li>');
+        }
       }
-    }
+    }, 0);
   });
 
   $scope.detail = function(index){
-    $state.go('detail', {data: $scope.attend_records[index], module: $stateParams.module});
+    $state.go('detail', {data: $scope.attend_records[index]});
   };
 
   $scope.range = function(len){
@@ -237,7 +245,7 @@ angular.module('attendance', ['ionic'])
   };
 })
 
-.controller('attendController', function($scope, $stateParams, $state, $ionicModal){
+.controller('attendController', function($scope, $state, $ionicModal){
   $scope.$on("$ionicView.enter", function(event, data){
 
     // initial confirm modal and destory when hide
@@ -250,9 +258,8 @@ angular.module('attendance', ['ionic'])
 
     $scope.confirm = function() {
       // this will sperate into two conditions
-      $state.go('enroll', {is_enroll: $scope.is_enroll, img: $scope.img, data: $scope.response_data, module: $stateParams.module});
+      $state.go('enroll', {is_enroll: $scope.is_enroll, img: $scope.img, data: $scope.response_data});
       $scope.confirmModal.remove();
-      // window.removeEventListener("orientationchange", getEventListeners(window, "orientationchange"));
     };
 
     $scope.cancel = function() {
@@ -261,79 +268,99 @@ angular.module('attendance', ['ionic'])
     };
   });
 
-  $scope.newRecord = function(ev){
-    $scope.confirmModal.show();
-    $('#confirm-canvas').hide();
-    $('#confirm-img').show();
-    $('#spinner').show();
-    $('#confirm-button').prop('disabled', true);
-
+  $scope.getPhoto = function (ev) {
     navigator.camera.getPicture(function(data){
       // take photo succeed
-      $scope.is_enroll = ev;
-      $scope.img = data;
-      document.getElementById('confirm-img').src = $scope.img;
-
-      uploadImg(serverUrl + (ev? 'detect': 'verify'), data, {group: $stateParams.module.face_group_id},
-        function(r){
-          // submit image to server succeed
-          $scope.response_data = JSON.parse(r.response).data;
-          highlight = null, curPointer = null;  // initial
-
-          $('#spinner').hide();
-          $('#confirm-button').prop('disabled', false);
-          if ($scope.response_data.hasOwnProperty('faces')) {
-                facesList = $scope.response_data.faces;
-            drawRects('confirm-canvas', 'confirm-img', false);
-          };
-        },
-        function(error){
-          show_message(6, error.code);
-          $scope.confirmModal.hide();
-          $('#spinner').hide();
-      });
+      $scope.newRecord(ev, data);
 
     },function(message){
       // take photo failed
-      show_message(7, message);
-      $scope.confirmModal.hide();
-      $('#spinner').hide();
+      navigator.camera.getPicture(function (data) {
+        // select photo succeed
+        $scope.newRecord(ev, data);
+      }, function () {
+        show_message(7, message);
+      }, {
+        quality: 60,
+        correctOrientation: true,
+        destinationType: Camera.DestinationType.FILE_URI,
+        sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+      });
+
     },{
       quality: 60,
       correctOrientation: true,
       encodingType: Camera.EncodingType.JPEG
     });
-    
-    // setTimeout(function(){
-    //   $scope.is_enroll = ev;
-    //   // $scope.img = "https://upload.wikimedia.org/wikipedia/commons/c/c7/Spencer_Davis_Group_1974.JPG";
-    //   $scope.img = Math.random() < 0.5 ? "http://web.mit.edu/chemistry/jamison/images/Group%20Photos/Group%20Photo%207.3.2012.JPG"
-    //     :"https://upload.wikimedia.org/wikipedia/commons/c/c7/Spencer_Davis_Group_1974.JPG";
-    //   $scope.response_data = {"faces": [{'id': 134, "landmarks": null, "resolution": 1, "coordinates": [353, 427, 593, 667], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [245, 320, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [237, 311, 1190, 1265], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 1057, 1132], "occlude": "False", "illumination": 0}, {'id': 135, "landmarks": null, "resolution": 1, "coordinates": [336, 411, 1878, 1953], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [701, 776, 585, 659], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 1124, 1198], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 385, 460], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [334, 424, 124, 214], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [203, 278, 1397, 1472], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [369, 444, 767, 842], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 1298, 1373], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [187, 262, 452, 526], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [71, 145, 1099, 1173], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [266, 328, 1012, 1074], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [336, 411, 1655, 1729], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [320, 394, 1489, 1563], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 949, 1024], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [228, 303, 651, 726], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 0, "coordinates": [38, 74, 1605, 1641], "occlude": "True", "illumination": 0}]};
-    //
-    //   document.getElementById('confirm-img').src = $scope.img;
-    //   $('#spinner').hide();
-    //   if ($scope.response_data.hasOwnProperty('faces')) {
-    //     facesList = $scope.response_data.faces;
-    //     drawRects('confirm-canvas', 'confirm-img', false);
-    //   }
-    //   $('#confirm-button').prop('disabled', false);
-    // }, 1000);
+  };
+
+  $scope.newRecord = function(ev, photo){
+    // $scope.confirmModal.show();
+    // $('#confirm-canvas').hide();
+    // $('#confirm-img').show();
+    $('#spinner').show();
+    // $('#confirm-button').prop('disabled', true);
+
+    $scope.is_enroll = ev;
+    $scope.img = photo;
+    // document.getElementById('confirm-img').src = $scope.img;
+
+    uploadImg(SERVER + (ev? 'detect': 'verify'), photo, {group: aMODULE.face_group_id},
+      function(r){
+        // submit image to server succeed
+        $scope.response_data = JSON.parse(r.response).data;
+        highlight = null; curPointer = null;  // initial
+
+        $('#spinner').hide();
+        // $('#confirm-button').prop('disabled', false);
+        // if ($scope.response_data.hasOwnProperty('faces')) {
+        //       facesList = $scope.response_data.faces;
+        //   drawRects('confirm-canvas', 'confirm-img', false);
+        // }
+        $state.go('enroll', {is_enroll: $scope.is_enroll, img: $scope.img, data: $scope.response_data});
+      },
+      function(error){
+        show_message(6, error.code);
+        // $scope.confirmModal.hide();
+        $('#spinner').hide();
+    });
+
+  };
+
+  $scope.test = function (ev) {
+    $('#spinner').show();
+    setTimeout(function(){
+      $scope.is_enroll = ev;
+      // $scope.img = "https://upload.wikimedia.org/wikipedia/commons/c/c7/Spencer_Davis_Group_1974.JPG";
+      $scope.img = Math.random() < 0.5 ? "http://web.mit.edu/chemistry/jamison/images/Group%20Photos/Group%20Photo%207.3.2012.JPG"
+        :"https://upload.wikimedia.org/wikipedia/commons/c/c7/Spencer_Davis_Group_1974.JPG";
+      $scope.response_data = {"faces": [{'id': 134, "landmarks": null, "resolution": 1, "coordinates": [353, 427, 593, 667], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [245, 320, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [237, 311, 1190, 1265], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 1057, 1132], "occlude": "False", "illumination": 0}, {'id': 135, "landmarks": null, "resolution": 1, "coordinates": [336, 411, 1878, 1953], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [701, 776, 585, 659], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 1124, 1198], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 385, 460], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [334, 424, 124, 214], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [203, 278, 1397, 1472], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [369, 444, 767, 842], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 1298, 1373], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [187, 262, 452, 526], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [71, 145, 1099, 1173], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [266, 328, 1012, 1074], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [336, 411, 1655, 1729], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [320, 394, 1489, 1563], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 949, 1024], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [228, 303, 651, 726], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 0, "coordinates": [38, 74, 1605, 1641], "occlude": "True", "illumination": 0}]};
+
+      // document.getElementById('confirm-img').src = $scope.img;
+      $('#spinner').hide();
+      // if ($scope.response_data.hasOwnProperty('faces')) {
+      //   facesList = $scope.response_data.faces;
+      //   drawRects('confirm-canvas', 'confirm-img', false);
+      // }
+      // $('#confirm-button').prop('disabled', false);
+      $state.go('enroll', {is_enroll: $scope.is_enroll, img: $scope.img, data: $scope.response_data});
+    }, 1000);
 
   };
 })
 
-.controller('aboutController', function($scope, $stateParams, $state){
-  // for about tab
-  $scope.ID = $stateParams.module.ID;
-  $scope.CourseCode = $stateParams.module.CourseCode;
-  $scope.CourseName = $stateParams.module.CourseName;
-  $scope.CourseAcadYear = $stateParams.module.CourseAcadYear;
-  $scope.CourseSemester = $stateParams.module.CourseSemester;
-  $scope.face_group_id = $stateParams.module.face_group_id;
+.controller('aboutController', function($scope, $state){
+  $scope.$on("$ionicView.enter", function(event, data) {
+    $scope.ID = aMODULE.ID;
+    $scope.CourseCode = aMODULE.CourseCode;
+    $scope.CourseName = aMODULE.CourseName;
+    $scope.CourseAcadYear = aMODULE.CourseAcadYear;
+    $scope.CourseSemester = aMODULE.CourseSemester;
+    $scope.face_group_id = aMODULE.face_group_id;
 
-  $scope.stu_amount = $stateParams.module.student.length;
-  $scope.Permission = $stateParams.module.Permission;
+    $scope.stu_amount = aMODULE.student.length;
+    $scope.Permission = aMODULE.Permission;
+  });
 
   $scope.back = function(){
     $state.go('modules');
@@ -341,12 +368,13 @@ angular.module('attendance', ['ionic'])
 
 })
 
-.controller('enrollController', function($scope, $stateParams, $state, $ionicHistory, $ionicPlatform){
+.controller('enrollController', function($scope, $stateParams, $state, $ionicPlatform, $ionicPopup){
   highlight = null; curPointer = null;  // initial
   $scope.img = $stateParams.img;
   $scope.data = $stateParams.data;
-  $scope.student_list = $.extend(true, [], $stateParams.module.student);
-  $scope.show_tutorial = $stateParams.module.tutorial != undefined;
+  $scope.student_list = $.extend(true, [], aMODULE.student);
+  $scope.show_tutorial = aMODULE.tutorial != undefined;
+  $scope.lt = (!$stateParams.is_enroll && $stateParams.class)? $stateParams.class.lt : null;
 
   // To fix when keyboard show, rearrange orientation in css
   ionic.Platform.isFullScreen = true;
@@ -376,7 +404,7 @@ angular.module('attendance', ['ionic'])
       $('.list-container').addClass('list-container-landscape');
     }
     else{
-      alert("Unknown orientation.");
+      console.log("Unknown orientation.");
     }
   };
 
@@ -394,7 +422,7 @@ angular.module('attendance', ['ionic'])
   });
 
   if ($scope.show_tutorial) {
-      $scope.tutorial = $stateParams.module.tutorial;
+      $scope.tutorial = $.extend(true, [], aMODULE.tutorial);
       for (var i = 0; i < $scope.tutorial.length; i++) {
           var k = Object.keys($scope.tutorial[i])[0];
           for (var j = 0; j < $scope.tutorial[i][k].length; j++) {
@@ -452,7 +480,7 @@ angular.module('attendance', ['ionic'])
   }
   else if (curPointer == null && facesList) {
     for (var n = 0; n < facesList.length; n++) {
-      if (facesList[n].hasOwnProperty('id') && facesList[n].id == person.id) {
+      if (facesList[n].hasOwnProperty('id') && facesList[n].id == pershomeon.id) {
         highlight = n;
         drawRects('img-canvas', 'enroll-img', true);
         break;
@@ -463,7 +491,45 @@ angular.module('attendance', ['ionic'])
   };
 
   $scope.back = function(){
-    $ionicHistory.goBack();
+    $state.go('tabs.attend');
+  };
+
+  $scope.lectureOrTutorial = function () {
+    if (!$stateParams.is_enroll && !$stateParams.class) {
+      $ionicPopup.show({
+        title: 'Lecture or Tutorial',
+        subTitle: 'Is this class a lecture or a tutorial? Please choose one to submit attendance.',
+        scope: $scope,
+        buttons: [
+          { text: '<small>Cancel</small>',
+            onTap: function(e) {
+              $scope.lt = null;
+            }
+          },
+          {
+            text: '<b><small>Lecture</small></b>',
+            type: 'button-positive',
+            onTap: function(e) {
+              $scope.lt = true;
+            }
+          },
+          {
+            text: '<b><small>Tutorial</small></b>',
+            type: 'button-positive',
+            onTap: function(e) {
+              $scope.lt= false;
+            }
+          }
+        ]
+      }).then(function() {
+        if($scope.lt != null){
+          $scope.submit_enroll();
+        }
+      });
+    }else{ // or other condition, directly call submit_enroll
+      $scope.submit_enroll();
+    }
+
   };
 
   $scope.submit_enroll = function(){
@@ -480,15 +546,12 @@ angular.module('attendance', ['ionic'])
     $scope.data['enroll'] = alter_list;
 
     // enroll or add attend students
-    requestObj.url = serverUrl + ($stateParams.is_enroll? 'enrollment': 'attendance');
-    requestObj.data = {data: JSON.stringify($scope.data), group: $stateParams.module.face_group_id, 
-      module: $stateParams.module.ID, owner: profile.Name, time_id: $stateParams.class? $stateParams.class.time_id: null};
+    requestObj.url = SERVER + ($stateParams.is_enroll? 'enrollment': 'attendance');
+    requestObj.data = {data: JSON.stringify($scope.data), group: aMODULE.face_group_id,
+      module: aMODULE.ID, owner: PROFILE.Name, time_id: $stateParams.class? $stateParams.class.time_id: null};
 
-    if (!$stateParams.is_enroll && !$stateParams.class) {
-      requestObj.data['lt'] = confirm('Is this a Lecture or Tutorial? Press OK for lecture, Cancel for Tutorial.');
-    }
-    else if(!$stateParams.is_enroll && $stateParams.class){
-      requestObj.data['lt'] = $stateParams.class.lt;
+    if($scope.lt != null){
+      requestObj.data['lt'] =$scope.lt;
     }
 
     requestObj.success = function(data){
@@ -497,11 +560,12 @@ angular.module('attendance', ['ionic'])
         show_message(4);
 
         // send request to update tabs info
-        requestObj.url = serverUrl + option + '_module';
-        requestObj.data = {data: JSON.stringify($stateParams.module), token: profile.authToken};
+        requestObj.url = SERVER + OPTION + '_module';
+        requestObj.data = {data: JSON.stringify(aMODULE), token: PROFILE.authToken};
 
         requestObj.success = function(data){
-          $state.go('tabs.home', {module: data.data});
+          aMODULE = data.data;
+          $state.go('tabs.home');
         };
 
         requestObj.error = function(xhr, status, error){
@@ -511,14 +575,14 @@ angular.module('attendance', ['ionic'])
           else{
             show_message(0);
           }
-          $state.go('tabs.home', {module: $stateParams.module});
+          $state.go('tabs.home');
         };
 
         $.ajax(requestObj);
 
       }else{
         show_message(5);
-        $state.go('tabs.home', {module: $stateParams.module});
+        $state.go('tabs.home');
       }
     };
 
@@ -539,11 +603,11 @@ angular.module('attendance', ['ionic'])
 
 })
 
-.controller('detailController', function($scope, $stateParams, $state, $ionicHistory){
-  $scope.student_list = $stateParams.module.student;
-  $scope.add_disabled = !($stateParams.data.owner == profile.Name);
+.controller('detailController', function($scope, $stateParams, $state){
+  $scope.student_list = aMODULE.student;
+  $scope.add_disabled = !($stateParams.data.owner == PROFILE.Name);
   $scope.images = $stateParams.data.images;
-  $scope.serverUrl = serverUrl;
+  $scope.serverUrl = SERVER;
   $scope.img_index = 0;
   $scope.previous_disabled = true;
   $scope.next_disabled = $scope.images.length < 2;
@@ -589,7 +653,7 @@ angular.module('attendance', ['ionic'])
   };
 
   $scope.back = function(){
-    $ionicHistory.goBack();
+    $state.go('tabs.home');
   };
 
   $scope.change_list = function(flag){
@@ -619,13 +683,12 @@ angular.module('attendance', ['ionic'])
       // take photo succeed
       $scope.img = data;
 
-      uploadImg(serverUrl + 'verify', data, {group: $stateParams.module.face_group_id}, 
+      uploadImg(SERVER + 'verify', data, {group: aMODULE.face_group_id}, 
         function(r){
           $('#spinner').hide();
           // submit image to server succeed
           $scope.response_data = JSON.parse(r.response).data;
-          $state.go('enroll', {is_enroll: false, img: $scope.img, data: $scope.response_data, 
-            module: $stateParams.module, class: $stateParams.data});
+          $state.go('enroll', {is_enroll: false, img: $scope.img, data: $scope.response_data, class: $stateParams.data});
         }, 
         function(error){
           $('#spinner').hide();

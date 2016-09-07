@@ -229,6 +229,8 @@ def face_detection(request):
             img = form.cleaned_data['image']
             data = api.check_quality(image=file(img))
             data['image'] = default_storage.save(img.name, ContentFile(img.read()))
+            print(type(ContentFile(img.read())))
+            print(data['image'])
 
             t2 = time.time()
             log.info("face_detection: {}".format(t2 - t1))

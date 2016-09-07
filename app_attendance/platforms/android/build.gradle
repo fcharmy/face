@@ -86,7 +86,6 @@ ext {
 }
 
 // PLUGIN GRADLE EXTENSIONS START
-apply from: "me.tonny.cordova.plugins.multidex/apptest357899-build.gradle"
 // PLUGIN GRADLE EXTENSIONS END
 
 def hasBuildExtras = file('build-extras.gradle').exists()
