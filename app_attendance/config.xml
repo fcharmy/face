@@ -41,4 +41,5 @@
         <icon density="xxxhdpi" src="resources/android/icon/drawable-xxxhdpi-icon.png" />
     </platform>
     <icon src="resources/android/icon/drawable-xhdpi-icon.png" />
+<plugin name="me.tonny.cordova.plugins.multidex" spec="https://github.com/jwall149/cordova-multidex" />
 </widget>

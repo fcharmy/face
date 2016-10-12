@@ -65,7 +65,7 @@
             </form>
           </div>
 
-          <div><p class="i" style="font-style: normal; position: absolute; bottom: 20px; width: 100%; text-align: center;">Version 1.02.2</p></div>
+          <div><p class="i" style="font-style: normal; position: absolute; bottom: 20px; width: 100%; text-align: center;">Version 1.03</p></div>
         </ion-content>
       </div>
     </script> 
@@ -135,7 +135,7 @@
 
           <div class="card confirm-container">
             <canvas id="confirm-canvas" style="display:none"></canvas>
-            <img id="confirm-img" src=""/>
+            <img id="confirm-img" src="" style="display:none"/>
           </div>
 
           <div class="bar bar-footer bar-positive">
@@ -151,11 +151,11 @@
     <script id="enroll.html" type="text/ng-template">
       <ion-view view-title="Enrollment" cache-view="false">
         <ion-content>
-          <div class="flex-container">
+          <div class="container">
 
             <div class="card img-container">
               <canvas id="img-canvas"></canvas>
-              <img id="enroll-img" class="groupImg" ng-src="{{ img }}"/>
+              <img id="enroll-img" style="display:none" ng-src="{{ img }}"/>
             </div>
 
             <div class="list-container">
@@ -173,7 +173,7 @@
                     <li class="item item-divider" ng-hide="result.length === 0" ng-click="toggle_tutorial('{{ key }}')"
                         style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">Tutorial {{ key }}</li>
 
-                    <li ng-repeat="student in value | filter:q as result" id="{{ student.id }}" class="item" ng-click="match_face({{ student }})">
+                    <li ng-repeat="student in value | filter:q as result" id="{{ student.id }}" class="item {{ student.match }}" ng-click="match_face({{ student }})">
                       {{ student.first_name }}
                       <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                     </li>
@@ -225,13 +225,11 @@
             <button class="button button-icon ion-plus-round" ng-disabled="add_disabled" ng-click="add_photo()"></button>
           </div>
 
-          <div class="flex-container detail-tab">
+          <div class="container detail-tab">
             <div class="card detail-container" style="text-align: center;display: flex;overflow: hidden;">
               <button ng-disabled="previous_disabled" class="button button-icon icon ion-arrow-left-b" ng-click="previous()"></button>
-
                 <canvas id="detail-canvas" style="display: none;margin: auto;"></canvas>
-                <img id="detail-img" ng-src="{{ serverUrl + images[img_index].url }}"/>
-
+                <img id="detail-img" ng-src="{{ serverUrl + images[img_index].url }}" style="display: none;"/>
               <button ng-disabled="next_disabled" class="button button-icon icon ion-arrow-right-b" ng-click="next()"></button>
  
               <p class="i detail-p" style="position: absolute;">{{ subtitle }}</p>

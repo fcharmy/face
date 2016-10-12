@@ -21,11 +21,15 @@ var SERVER = 'http://172.26.187.110:8000/',
       ft.upload(imgURI, url, success, fail, options);
     };
 
+// server response data hardcoded
+var notMatched = 'None'; // When face is not recognized, person id is None
+
 var OPTION = null, // specify login type
     PROFILE = null, // user profile after login
     aMODULE = null;
 // var OPTION = 'ivle',
 //     PROFILE = {'FirstMajor': 'Nil', 'Email': 'e0013178@u.nus.edu', 'Gender': 'Female', 'MatriculationYear': '2015', 'Name': 'SIVASANKARAN DIVYA', 'authToken': 'D41A734885A38795EDBC371AA5C3E6B318AB563B3C161E63D742FF11D777D5C9563E9A47B373CFF2A6E7D322974D119667BFD63027E5182A28DA7740F4BC1390E105007DEC08BAB9841220A111262F5C547DB72EB6F8CD3D4DF7E5893442882F1DC4FA918A6CFDBD15BE67BA7CF3FB409C7B1E60259CFA26C19480F8552E37108A8A27F2390ABF5349FBDCD737EEDD320711F1052527556FE2CC6B6927D67CF7E909549D5951EF653F0D36B84C9B351379B57C4497DC3EBEA07711C385D640A3435B7DDCA5E6D72EBF90683FC4925366AE9C74C59EE21FD39F18792364502AF8E4207808653D0A145BE864E8EF5DFE4D', 'Modules': [{'ID': '73efbd67-772e-4de3-b743-8e4f574378c0', 'face_group_id': 5, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'CS1231', 'Permission': 'M', 'CourseName': 'DISCRETE STRUCTURES'}, {'ID': '8f248169-99fd-412c-a499-9308571befc5', 'face_group_id': 6, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'NM3216', 'Permission': 'R', 'CourseName': 'GAME DESIGN'}], 'SecondMajor': '', 'UserID': 'e0013178', 'Faculty': 'School of Computing', 'Photo': ''};
+
 
 // Ionic attendance App
 angular.module('attendance', ['ionic'])
@@ -225,6 +229,7 @@ angular.module('attendance', ['ionic'])
   }
 
   $scope.$on("$ionicView.afterEnter", function(event, data) {
+    $('#spinner').hide();
     setTimeout(function () {
       for (var i = 0; i < $scope.attend_records.length; i++) {
         if(i == 0 || $scope.attend_records[i].week != $scope.attend_records[i-1].week){
@@ -311,7 +316,6 @@ angular.module('attendance', ['ionic'])
         $scope.response_data = JSON.parse(r.response).data;
         highlight = null; curPointer = null;  // initial
 
-        $('#spinner').hide();
         // $('#confirm-button').prop('disabled', false);
         // if ($scope.response_data.hasOwnProperty('faces')) {
         //       facesList = $scope.response_data.faces;
@@ -334,10 +338,9 @@ angular.module('attendance', ['ionic'])
       // $scope.img = "https://upload.wikimedia.org/wikipedia/commons/c/c7/Spencer_Davis_Group_1974.JPG";
       $scope.img = Math.random() < 0.5 ? "http://web.mit.edu/chemistry/jamison/images/Group%20Photos/Group%20Photo%207.3.2012.JPG"
         :"https://upload.wikimedia.org/wikipedia/commons/c/c7/Spencer_Davis_Group_1974.JPG";
-      $scope.response_data = {"faces": [{'id': 134, "landmarks": null, "resolution": 1, "coordinates": [353, 427, 593, 667], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [245, 320, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [237, 311, 1190, 1265], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 1057, 1132], "occlude": "False", "illumination": 0}, {'id': 135, "landmarks": null, "resolution": 1, "coordinates": [336, 411, 1878, 1953], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [701, 776, 585, 659], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 1124, 1198], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 385, 460], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [334, 424, 124, 214], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [203, 278, 1397, 1472], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [369, 444, 767, 842], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 1298, 1373], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [187, 262, 452, 526], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [71, 145, 1099, 1173], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [266, 328, 1012, 1074], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [336, 411, 1655, 1729], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [320, 394, 1489, 1563], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 949, 1024], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [228, 303, 651, 726], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 0, "coordinates": [38, 74, 1605, 1641], "occlude": "True", "illumination": 0}]};
+      $scope.response_data = {"faces": [{'id': 13, "landmarks": null, "resolution": 1, "coordinates": [353, 427, 593, 667], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [245, 320, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [237, 311, 1190, 1265], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 1057, 1132], "occlude": "False", "illumination": 0}, {'id': 135, "landmarks": null, "resolution": 1, "coordinates": [336, 411, 1878, 1953], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [701, 776, 585, 659], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 1124, 1198], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [353, 427, 385, 460], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [334, 424, 124, 214], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [203, 278, 1397, 1472], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [369, 444, 767, 842], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 1298, 1373], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [187, 262, 452, 526], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [71, 145, 1099, 1173], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [266, 328, 1012, 1074], "occlude": "False", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [336, 411, 1655, 1729], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [759, 834, 842, 916], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [320, 394, 1489, 1563], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [394, 469, 949, 1024], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 1, "coordinates": [228, 303, 651, 726], "occlude": "True", "illumination": 0}, {"landmarks": null, "resolution": 0, "coordinates": [38, 74, 1605, 1641], "occlude": "True", "illumination": 0}]};
 
       // document.getElementById('confirm-img').src = $scope.img;
-      $('#spinner').hide();
       // if ($scope.response_data.hasOwnProperty('faces')) {
       //   facesList = $scope.response_data.faces;
       //   drawRects('confirm-canvas', 'confirm-img', false);
@@ -376,6 +379,31 @@ angular.module('attendance', ['ionic'])
   $scope.show_tutorial = aMODULE.tutorial != undefined;
   $scope.lt = (!$stateParams.is_enroll && $stateParams.class)? $stateParams.class.lt : null;
 
+  $scope.$on("$ionicView.enter", function(event, data){
+    $scope.orientationChange();
+
+    if ($scope.data.hasOwnProperty('faces')) {
+      facesList = $scope.data.faces;
+      drawRects('img-canvas', 'enroll-img', true);
+    }
+
+    if ($scope.show_tutorial) {
+        $scope.tutorial = $.extend(true, [], aMODULE.tutorial);
+        for (var i = 0; i < $scope.tutorial.length; i++) {
+          var k = Object.keys($scope.tutorial[i])[0];
+          for (var j = 0; j < $scope.tutorial[i][k].length; j++) {
+              $scope.tutorial[i][k][j] = $scope.student_list[$scope.tutorial[i][k][j]]
+          }
+        }
+    }
+
+    $('#spinner').hide();
+  });
+
+  $ionicPlatform.ready(function() {
+    window.addEventListener("orientationchange", function(){$scope.orientationChange();}, false);
+  });
+
   // To fix when keyboard show, rearrange orientation in css
   ionic.Platform.isFullScreen = true;
   $scope.orientationChange = function () {
@@ -408,28 +436,16 @@ angular.module('attendance', ['ionic'])
     }
   };
 
-  $ionicPlatform.ready(function() {
-    window.addEventListener("orientationchange", function(){$scope.orientationChange();}, false);
-  });
-
-  $scope.$on("$ionicView.enter", function(event, data){
-    $scope.orientationChange();
-
-    if ($scope.data.hasOwnProperty('faces')) {
-      facesList = $scope.data.faces;
-      drawRects('img-canvas', 'enroll-img', true);
+  $scope.safeApply = function( fn ) {
+    var phase = this.$root.$$phase;
+    if(phase == '$apply' || phase == '$digest') {
+        if(fn) {
+            fn();
+        }
+    } else {
+        this.$apply(fn);
     }
-  });
-
-  if ($scope.show_tutorial) {
-      $scope.tutorial = $.extend(true, [], aMODULE.tutorial);
-      for (var i = 0; i < $scope.tutorial.length; i++) {
-          var k = Object.keys($scope.tutorial[i])[0];
-          for (var j = 0; j < $scope.tutorial[i][k].length; j++) {
-              $scope.tutorial[i][k][j] = $scope.student_list[$scope.tutorial[i][k][j]]
-          }
-      }
-  }
+  };
 
   $scope.toggle_tutorial = function(tkey){
     for (var i = 0; i < $scope.tutorial.length; i++) {
@@ -451,7 +467,9 @@ angular.module('attendance', ['ionic'])
           + '), are you sure to change to ' + person.first_name + ' (' + person.name + ')?')) {
 
           var flindex = $.map($scope.student_list, function(obj, index) { if(obj.id == facesList[curPointer].id) { return index; }})[0];
-          delete $scope.student_list[flindex]['match'];
+          if (flindex != undefined){
+            delete $scope.student_list[flindex]['match'];
+          }
         }
         else{  return ; }
       }
@@ -477,16 +495,16 @@ angular.module('attendance', ['ionic'])
       highlight = curPointer;
       curPointer = null;
       drawRects('img-canvas', 'enroll-img', true);
-  }
-  else if (curPointer == null && facesList) {
-    for (var n = 0; n < facesList.length; n++) {
-      if (facesList[n].hasOwnProperty('id') && facesList[n].id == pershomeon.id) {
-        highlight = n;
-        drawRects('img-canvas', 'enroll-img', true);
-        break;
+    }
+    else if (curPointer == null && facesList) {
+      for (var n = 0; n < facesList.length; n++) {
+        if (facesList[n].hasOwnProperty('id') && facesList[n].id == person.id) {
+          highlight = n;
+          drawRects('img-canvas', 'enroll-img', true);
+          break;
+        }
       }
     }
-  }
 
   };
 
@@ -523,10 +541,12 @@ angular.module('attendance', ['ionic'])
         ]
       }).then(function() {
         if($scope.lt != null){
+          $('#spinner').show();
           $scope.submit_enroll();
         }
       });
     }else{ // or other condition, directly call submit_enroll
+      $('#spinner').show();
       $scope.submit_enroll();
     }
 
@@ -555,7 +575,6 @@ angular.module('attendance', ['ionic'])
     }
 
     requestObj.success = function(data){
-      $('#spinner').hide();
       if (data.hasOwnProperty('data')) {
         show_message(4);
 
@@ -596,7 +615,6 @@ angular.module('attendance', ['ionic'])
       }
     };
 
-    $('#spinner').show();
     $.ajax(requestObj);
 
   };
@@ -685,20 +703,19 @@ angular.module('attendance', ['ionic'])
 
       uploadImg(SERVER + 'verify', data, {group: aMODULE.face_group_id}, 
         function(r){
-          $('#spinner').hide();
           // submit image to server succeed
           $scope.response_data = JSON.parse(r.response).data;
           $state.go('enroll', {is_enroll: false, img: $scope.img, data: $scope.response_data, class: $stateParams.data});
         }, 
         function(error){
-          $('#spinner').hide();
           show_message(6, error.code);
+          $('#spinner').hide();
       });
 
     },function(message){
       // take photo failed
-      $('#spinner').hide();
       show_message(7, message);
+      $('#spinner').hide();
     },{
       quality: 50, 
       correctOrientation: true, 
@@ -736,20 +753,21 @@ function drawRects(canvasId, imgId, clickable){
 
       var c = document.getElementById(canvasId),
           ctx = c.getContext("2d"),
+          div = document.getElementsByClassName('card')[0];
           img = document.getElementById(imgId);
 
       // get actula img size which show in page
-      document.getElementById(imgId).style.display = 'block';
-      var actualimgWidth = img.width,
-          actualimgHeight = img.height;
+      // document.getElementById(imgId).style.display = 'block';
+      var actualimgHeight = div.offsetHeight-6;
 
       // get original size of img and calculate their ratio
-      document.getElementById(imgId).style.display = 'none';
+      // document.getElementById(imgId).style.display = 'none';
       var imgWidth = img.width,
           imgHeight = img.height,
-          ratio = actualimgWidth / imgWidth;
+          ratio = actualimgHeight / imgHeight;
 
       // set canvas size and draw image in it
+      var actualimgWidth = actualimgHeight/imgHeight*imgWidth;
       c.width = actualimgWidth;
       c.height = actualimgHeight;
       ctx.drawImage(img, 0, 0, actualimgWidth, actualimgHeight);
@@ -759,11 +777,23 @@ function drawRects(canvasId, imgId, clickable){
           coordinates = facesList[i].coordinates;
 
           var color = regular;
-          if (facesList[i].hasOwnProperty('id') && facesList[i].id != 'None') {
+          if (facesList[i].hasOwnProperty('id') && facesList[i].id != notMatched) {
             color = normal;
-            $('#' + facesList[i].id).addClass('occupied');
+
+            // Find student id of current face, and mark it as occupied
+            // $('#' + facesList[i].id).addClass('occupied');
+            if(clickable){
+              var scope = angular.element($("#"+canvasId)).scope();
+              scope.safeApply(function(){
+                var index = $.map(scope.student_list, function(obj, index) { if(obj.id == facesList[i].id) { return index; }})[0];
+                if(index != undefined){
+                  scope.student_list[index]['match'] = 'occupied';
+                }
+              });
+            }
+
           }
-          else if (facesList[i].hasOwnProperty('id') && facesList[i].id == 'None') {
+          else if (facesList[i].hasOwnProperty('id') && facesList[i].id == notMatched) {
             color = error;
           }
           else if ((facesList[i].hasOwnProperty('resolution') && facesList[i].resolution == 0)
@@ -779,7 +809,7 @@ function drawRects(canvasId, imgId, clickable){
             ctx.lineWidth = 8;
 
             // show person name under rectangle if has name
-            if (facesList[i].hasOwnProperty('id') && facesList[i].id != 'None') {
+            if (facesList[i].hasOwnProperty('id') && facesList[i].id != notMatched) {
               ctx.font = "15px Arial";
               ctx.fillStyle = normal;
               ctx.fillText(facesList[i].first_name, coordinates[2] * ratio - 5, coordinates[1] * ratio + 20);
@@ -818,7 +848,16 @@ function drawRects(canvasId, imgId, clickable){
                 drawRects(canvasId, imgId, clickable);
                 return;
               } else {
-                $('#' + facesList[i].id).removeClass('occupied');
+                // Remove corresponding occupied marker from scope student_list
+                // $('#' + facesList[i].id).removeClass('occupied');
+                var scope = angular.element($("#"+canvasId)).scope();
+                scope.safeApply(function(){
+                  var index = $.map(scope.student_list, function(obj, index) { if(obj.id == facesList[i].id) { return index; }})[0];
+                  if(index != undefined){
+                    delete scope.student_list[index]['match'];
+                  }
+                });
+
                 delete facesList[i]['id'];
                 delete facesList[i]['name'];
                 delete facesList[i]['first_name'];
@@ -847,7 +886,7 @@ function drawRects(canvasId, imgId, clickable){
 }
 
 
-function matching(canvasId, imgId, person){
+/*function matching(canvasId, imgId, person){
   if (curPointer != null && facesList) {
     if (facesList[curPointer].hasOwnProperty('id')) {
 
@@ -890,7 +929,7 @@ function matching(canvasId, imgId, person){
       }
     }
   }
-}
+}*/
 
 
 function show_message(){

@@ -45,29 +45,28 @@ label{
 	width: 300px;
 }
 
-#confirm-img{
-	margin: 0 auto -5px auto;
-	display: block;
-}
+/*#confirm-img{*/
+	/*margin: 0 auto -5px auto;*/
+	/*display: block;*/
+/*}*/
 
 #img-canvas, #confirm-canvas{
 	margin-bottom: -5px;
 	position: relative;
 }
 
-.groupImg{
-	margin: 0 auto -5px auto;
-	display: block;
-	width: auto; 
-	height: 100%; 
-}
+/*.groupImg1{*/
+	/*margin: 0 auto -5px auto;*/
+	/*display: block;*/
+	/*width: auto; */
+	/*height: 100%; */
+/*}*/
 
 .img-container {
 	margin: 10px; 
 	padding: 3px; 
 	overflow: scroll;
 	text-align:center;
-	/*flex: 1 0 auto;*/
 	position: relative;
 }
 
@@ -76,7 +75,6 @@ label{
 	padding: 3px;
 	overflow: scroll;
 	text-align:center;
-	/*flex: 1 0 auto;*/
 	position: relative;
 }
 
@@ -104,8 +102,6 @@ label{
 .list-container, .detail-list{
 	max-height: 100%;
 	display: inline-block;
-	/*flex-flow: column;*/
-	/*display: flex;*/
 	position: relative;
 }
 
@@ -114,14 +110,13 @@ label{
 	height: 44px;
 }
 
-.flex-container{
-	/*display: flex;*/
+.container{
 	height: 100%;
 	display: inline-block;
     width: 100%;
 }
 
-.flex-container.detail-tab{
+.container.detail-tab{
 	position: absolute;
     top: 0;
     bottom: 0;
@@ -130,12 +125,12 @@ label{
     padding-top: 44px;
 }
 
-#detail-img{
-	flex: 0 0 auto;
-	max-width: 85%;
-	max-height: 100%;
-	margin: auto;
-}
+/*#detail-img1{*/
+	/*flex: 0 0 auto;*/
+	/*max-width: 85%;*/
+	/*max-height: 100%;*/
+	/*margin: auto;*/
+/*}*/
 
 .img-container-portrait {
 	width: auto;
@@ -159,7 +154,6 @@ label{
 }
 
 .list-container-portrait{
-	/*flex: 0 1 auto;*/
 	max-height: 47%;
 	min-height: 47%;
 	height: 47%;
@@ -189,15 +183,14 @@ label{
 
 	.detail-student-list {
 		width: auto;
-		/*flex: 0 1 auto;*/
 		overflow-x: hidden;
 		height: 82%;
 	}
 
-	#confirm-img{
-		height: 100%; 
-		width: auto; 
-	}
+	/*#confirm-img{*/
+		/*height: 100%; */
+		/*width: auto; */
+	/*}*/
 
 	.detail-p{
 		right: 20px;
@@ -221,13 +214,12 @@ label{
 
 	.detail-student-list {
 		height: 87%;
-		/*flex: 1 1 auto;*/
 	}
 
-	#confirm-img{
-		height: 100%; 
-		width: auto; 
-	}
+	/*#confirm-img{*/
+		/*height: 100%; */
+		/*width: auto; */
+	/*}*/
 
 	.detail-p{
 	    right: 30%;

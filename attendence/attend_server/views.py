@@ -208,8 +208,8 @@ def view_module(request):
                 data['student'] = list([dict_ for (key, dict_) in sort_list])
 
                 return render(request, 'attend/user.html', {'html': 'attend/dashboard.html', 'modules': request.session['Modules'],
-                                                     'attend_records': data['attendance'], 'module': module[0],
-                                                     'students': data['student']})
+                                                            'attend_records': data['attendance'], 'module': module[0],
+                                                            'students': data['student']})
         except:
             log.error(traceback.format_exc())
 
@@ -227,10 +227,11 @@ def face_detection(request):
     if form.is_valid():
         try:
             img = form.cleaned_data['image']
+            file_path = default_storage.save(img.name, ContentFile(img.read()))
+            print(file_path)
+
             data = api.check_quality(image=file(img))
-            data['image'] = default_storage.save(img.name, ContentFile(img.read()))
-            print(type(ContentFile(img.read())))
-            print(data['image'])
+            data['image'] = file_path
 
             t2 = time.time()
             log.info("face_detection: {}".format(t2 - t1))
@@ -238,6 +239,7 @@ def face_detection(request):
             return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
+            return error_response(0, message=traceback.format_exc().splitlines()[-1])
 
     return error_response(1, name='face_detection')
 
@@ -253,11 +255,14 @@ def verify(request):
         group = int(form.cleaned_data['group'])
 
         try:
+            file_path = default_storage.save(img.name, ContentFile(img.read()))
+            print(file_path)
             response_data = api.verification_faces(image=file(img), group=group)
         except:
             response_data = []
+            file_path = ''
 
-        data = {"faces": response_data, "image": default_storage.save(img.name, ContentFile(img.read()))}
+        data = {"faces": response_data, "image": file_path}
 
         t2 = time.time()
         log.info("verify: {}".format(t2 - t1))
@@ -310,6 +315,7 @@ def enrollment(request):
             return JsonResponse({'data': response_data})
         except:
             log.error(traceback.format_exc())
+            return error_response(0, message=traceback.format_exc().splitlines()[-1])
 
     return error_response(1, name='enrollment')
 
@@ -369,6 +375,7 @@ def attend(request):
                 return JsonResponse(result)
         except:
             log.error(traceback.format_exc())
+            return error_response(0, message=traceback.format_exc().splitlines()[-1])
 
     return error_response(1, name='attend')
 

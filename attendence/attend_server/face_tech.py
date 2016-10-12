@@ -73,11 +73,11 @@ class _APICall(object):
 
 def file(image):
     if type(image) is str:
-        if os.path.getsize(image) > 2 * 1024 * 1024:
-            raise OverflowError('{}: File size too large which exceed 2M.'.format(image))
+        if os.path.getsize(image) > 5 * 1024 * 1024:
+            raise OverflowError('{}: File size too large which exceed 2M.'.format(image.split('/')[-1]))
 
         if not os.path.isfile(image):
-            raise IOError('{}: Not a file, please provide a valid file path.'.format(image))
+            raise IOError('{}: Not a file, please provide a valid file path.'.format(image.split('/')[-1]))
 
         return os.path.basename(image), open(image, 'rb')
     else:
