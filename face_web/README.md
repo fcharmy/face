@@ -107,7 +107,7 @@ when save a face, generate a unique image path in server.
 
 # Operation Component
 ### Web Pages
- Face Tech has a user interface for users, here they can create a project. Most of these user interface pages are [forms][forms], through these forms user may submit the action like add/update/delete. Many pages also have the same version of APIs, like create a group, user may use user interface or call API to do this, for this kind of function we will cover it in APIs.  
+ Face Tech has a user interface for users, here they can create a project. Most of these user interface pages are [forms][forms], through these forms user may submit the action like add/update/delete. Many pages also have the same version of APIs, like create a group, user may use user interface or call API to do this, for this kind of function we will be cover in APIs.  
  
  [View Code](https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py)
  [forms]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/forms.py
@@ -120,18 +120,26 @@ when save a face, generate a unique image path in server.
  [login project]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py#L36
  [login form]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/forms.py#L26
  [authentication]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/operate.py#L37
+ [project info]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py#L50
+ [change password]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py#L43
+ [change password function]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/operate.py#L67
  [create a group]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py#L54
+ [create a person]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py#L66
 
  * [Home Page][index]  
  * [Get Start Page][get start]  
  * [Create a project][create a project]  
-  Use [project form][project form], then submit to [create_project][create project function] function. This will call [get_securitykey][get_securitykey] function to generate a unique security key for current project.  
+  Use [project form][project form], then submit to [create_project][create project function] function. This will call [get_securitykey][get_securitykey] function to generate a unique security key for current project.    
  * [Login project][login project]  
-  Use [login form][login form], then submit to [authentication][authentication] function.  
+  Use [login form][login form], then submit to [authentication][authentication] function.    
+ * [Project Info][project info]
+ * [Change password][change password]
+  Use Django PasswordChangeForm then submit to [change password function][change password function].    
  * [Create a group][create a group]  
+ * [Create a person][create a person]  
  
 ### APIs
- When user a project account, they may use [python wrapper][python] according to [user guide][user guide] to call all available APIs. APIs are all follow the format of [forms][forms], instead of using user interface, the request will be directly submit to resquest to the destination. Below function all can be cross site request so that they can be called in other domain.  
+ When user a project account, they may use [python wrapper][python] according to [user guide][user guide] to call all available APIs. APIs are all follow the format of [forms][forms], instead of using user interface, the request will be directly submit to resquest to the destination. All the API functions can accept cross site request so that they can be called in other domain, and every request need to submit with project id and security key due to security issue.  
   
  The following is the brief infomation about each API functions which is the destination of API request, but the real URL of each request should submit to, please according to the [mapping][mapping] code. For example,  
  > url(r'^create_group', operate.create_group, name='create_group')  
@@ -154,18 +162,25 @@ The first part is the URL, the full path should be websiteURL/create_group. Then
  [delete_person_from_group]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/operate.py#L362
  
  * [create_group][create a group]  
-  Params follow the format of [group form][group form], it has to submit with project id and security key.  
+  Params follow the format of [group form][group form].    
  * [get_groups_by_name][get_groups_by_name]  
+  Given a name, retrive all the groups which contain the name.    
  * [create_person][create_person]  
- * [create_person][create_person]  
+  Given person profile to create a peron, user may submit many persons and seperate them with ';', but we do not recommend to do this, please use create_json_person instead.    
  * [create_json_person][create_json_person]  
+  Given a json format object which contain all required information to create person(s).    
  * [relate_person_to_group][relate_person_to_group]  
+  Assign person(s) to a group, one person may belongs to many group but only one project.    
  * [get_persons_by_group][get_persons_by_group]  
+  Given a group id, retrive all the persons which belong to this group and order by person names.    
  * [get_all_persons][get_all_persons]  
+  Given a project, retrive all persons which belong to this project (not recommend to use).
  * [delete_person][delete_person]  
  * [delete_group][delete_group]  
  * [delete_person_from_group][delete_person_from_group]  
+  Delete the relation between given person and group, which means this person is no longer belongs to given group, while person will not be deleted immediately but still belongs to current project.    
  
 
-
+# Face Algorithm
+### API functions
  
