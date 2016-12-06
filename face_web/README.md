@@ -127,14 +127,16 @@ when save a face, generate a unique image path in server.
  [create a person]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py#L66
 
  * [Home Page][index]  
+  
  * [Get Start Page][get start]  
+  
  * [Create a project][create a project]  
-  Use [project form][project form], then submit to [create_project][create project function] function. This will call [get_securitykey][get_securitykey] function to generate a unique security key for current project.    
+  Use [project form][project form], then submit to [create_project][create project function] function. This will call [get_securitykey][get_securitykey] function to generate a unique security key for current project.  
  * [Login project][login project]  
-  Use [login form][login form], then submit to [authentication][authentication] function.    
+  Use [login form][login form], then submit to [authentication][authentication] function.  
  * [Project Info][project info]
- * [Change password][change password]
-  Use Django PasswordChangeForm then submit to [change password function][change password function].    
+ * [Change password][change password]  
+  Use Django PasswordChangeForm then submit to [change password function][change password function].  
  * [Create a group][create a group]  
  * [Create a person][create a person]  
  
@@ -162,23 +164,23 @@ The first part is the URL, the full path should be websiteURL/create_group. Then
  [delete_person_from_group]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/operate.py#L362
  
  * [create_group][create a group]  
-  Params follow the format of [group form][group form].    
+  Params follow the format of [group form][group form].  
  * [get_groups_by_name][get_groups_by_name]  
-  Given a name, retrive all the groups which contain the name.    
+  Given a name, retrive all the groups which contain the name.  
  * [create_person][create_person]  
-  Given person profile to create a peron, user may submit many persons and seperate them with ';', but we do not recommend to do this, please use create_json_person instead.    
+  Given person profile to create a peron, user may submit many persons and seperate them with ';', but we do not recommend to do this, please use create_json_person instead.  
  * [create_json_person][create_json_person]  
-  Given a json format object which contain all required information to create person(s).    
+  Given a json format object which contain all required information to create person(s).  
  * [relate_person_to_group][relate_person_to_group]  
-  Assign person(s) to a group, one person may belongs to many group but only one project.    
+  Assign person(s) to a group, one person may belongs to many group but only one project.  
  * [get_persons_by_group][get_persons_by_group]  
-  Given a group id, retrive all the persons which belong to this group and order by person names.    
+  Given a group id, retrive all the persons which belong to this group and order by person names.  
  * [get_all_persons][get_all_persons]  
-  Given a project, retrive all persons which belong to this project (not recommend to use).
+  Given a project, retrive all persons which belong to this project (not recommend to use). 
  * [delete_person][delete_person]  
  * [delete_group][delete_group]  
  * [delete_person_from_group][delete_person_from_group]  
-  Delete the relation between given person and group, which means this person is no longer belongs to given group, while person will not be deleted immediately but still belongs to current project.    
+  Delete the relation between given person and group, which means this person is no longer belongs to given group, while person will not be deleted immediately but still belongs to current project.  
  
 
 # Face Algorithm
