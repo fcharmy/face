@@ -149,7 +149,7 @@ when save a face, generate a unique image path in server.
 ## APIs
  When user a project account, they may use [python wrapper][python] according to [user guide][user guide] to call all available APIs. APIs are all follow the format of [forms][forms], instead of using user interface, the request will be directly submit to resquest to the destination. All the API functions can accept cross site request so that they can be called in other domain, and every request need to submit with project id and security key due to security issue.  
   
- The following is the brief infomation about each API functions which is the destination of API request, but the real URL of each request should submit to, please according to the [mapping][mapping] code. For example,  
+ The following is the brief infomation about each API functions which is the destination of API request, but the real URL of each request should submit to, please according to the [mapping][mapping] relation. For example,  
  > url(r'^create_group', operate.create_group, name='create_group')  
  
 The first part is the URL, the full path should be websiteURL/create_group. Then the second part is the function will be called when request submit to this URL, 'operate' is the python file where define create_group function, last part is a alias for convenience when use this in other functions.
@@ -198,6 +198,46 @@ The first part is the URL, the full path should be websiteURL/create_group. Then
   Delete the relation between given person and group, which means this person is no longer belongs to given group, while person will not be deleted immediately but still belongs to current project.  
  
 
-# Face Algorithm
-## API functions
+# Face Algorithm Component
+ Face algorithm related functions have no user interface page, only provide for APIs and private functions which will be called by these API functions. API functions mainly return response to cross site request, and private functions will deal with data and implement face algorithm. As mentioned above, the real url for API request, please refer to the [mapping][mapping] relation, and all the request data send to API functions must contain project id and security key due to security issue.
+ [View Code](https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py)
+ [detect]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L11
+ [landmark]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L41
+ [occluder]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L68
+ [check_quality]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L95
+ [enrollment]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L134
+ [verification]:  https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L200
+ [enroll_face]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L23
+ [get_feature_array]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L50
+ [verify_face_from_feature_array]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L71
+ [detect_faces]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L98
+ [detect_faces_cv2]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L119
+ [detect_landmark]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L144
+ [align_face]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L159
+ [check_illumination]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L205
+ [check_resolution]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L229
+ [is_occluded]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L246
+ [feature_extraction]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L251
+ [compare]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L263
+ [get_numpy_image]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/fac_pravite.py#L286
+ 
+ * #### [Face Detection][detect]  
+  Given a image of group or individual photo, detect all the face shown in the photo and return the coordinates of top, bottom, left and right corners of faces in json format.   
+  There are two method of face detetion, one is [detect_faces_cv2][detect_faces_cv2] function based on opencv, the other is [detect_faces][detect_faces] function from dlib. Currently we use detect_faces inside face detetion API.
+ 
+ * #### [landmark][landmark]  
+  Given a image of group or individual photo, detect all the face shown in the photo, then detect 68 facial landmarks, return the face coordinates and landmarks coordinates in json format.
+  
+ * #### [occluder][occluder]  
+ Given a image of group or individual photo, detect all the face shown in the photo, return True or False from [is_occluded][is_occluded] (not implement yet). 
+ 
+ * #### [check_quality][check_quality]  
+ Given a image of group or individual photo, detect all the face shown in the photo, return all the results from [check_illumination][check_illumination], [check_resolution][check_resolution] and [is_occluded][is_occluded] function in json format.
+ 
+ * #### [enrollment][enrollment]  
+ Given a image, face coordinates from face detection API and person ids whose these faces belong to, return the results from [enroll_face][enroll_face] function in json format. Before send face and id of each person to [enroll_face][enroll_face], we have to convert image to numpy array with [get_numpy_image][get_numpy_image], then align them with [align_face][align_face] function, at the end [enroll_face][enroll_face] will save the image of each person and feature which comes from [feature_extraction][feature_extraction] functioninto database.
+ 
+ * #### [verification][verification]  
+  Given a image of group or individual photo, detect all the face shown in the photo. For each face detected, retrive all persons features from database, [compare][compare] with the feature of current face, return result from [verify_face_from_feature_array][verify_face_from_feature_array] function.
+ 
  
