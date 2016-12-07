@@ -241,3 +241,5 @@ The first part is the URL, the full path should be websiteURL/create_group. Then
   Given a image of group or individual photo, detect all the face shown in the photo. For each face detected, retrive all persons features from database, [compare][compare] with the feature of current face, return result from [verify_face_from_feature_array][verify_face_from_feature_array] function.
  
  
+# Implementation
+ After upgrading, please refer to [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md) on how to implement new version.
