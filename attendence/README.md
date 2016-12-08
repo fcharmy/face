@@ -14,6 +14,12 @@
  [Modules]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L30
  [User_Module_Permission]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L43
  [Student]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L49
+ [get_image_path]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L73
+ [get_suffix]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L78
+ [get_time]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L82
+ [new_image]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L86
+ [get_records]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L95
+ [get_user_modules]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L113
  
 ## Tables
 ### [Attendance][Attendance]  
@@ -76,6 +82,29 @@ Only for regular users who creates student on Attendacne website.
 
 
 ## Private Functions
+#### [get_image_path][get_image_path]
+ * input: module_id (string), time (integer)
+ * output: unique image path in server
+
+#### [get_suffix][get_suffix]
+ * output: get a string of mins and seconds of current timesamp
+
+#### [get_time][get_time]
+ * output: get current full timesamp
+
+#### [new_image][new_image]
+ * input: path (string), attendance (object), data (string)
+ * output: image object of None if fail
+
+add a new row to image table with given image path, attendance object and data.
+
+#### [get_records][get_records]
+ * input: module id (string)
+ * output: retrive all attendance records of given module id in json format
+
+#### [get_user_modules][get_user_modules]
+ * input: user (object)
+ * output: retrive all modules which given user has permission of 'O', 'F', 'M', 'R'
 
 # Web Pages
 
