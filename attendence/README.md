@@ -1,10 +1,12 @@
 # Instruction
- This document is for Attendance Web Server, Attendance is a application based on [Face Tech][face tech], it has its own web page, server and database, but also obtain data from Face Tech. Attendance APP is the client APP in mobile, which will cover [here][app]. Currently this application is integrated with IVLE public API of NUS, which means login with NUS account will automatically create modules and students for IVLE users, but also user can create their own personal module/group in Attendance website. Attendance user interface provide statistic report for each module in real time.  
+ This document is for Attendance Web Server, Attendance is a application based on [Face Tech][face tech], it has its own web page, server and database, but also obtain data from Face Tech.   
+ Attendance APP is the client APP in mobile, which will cover [here][app]. Currently this application is integrated with IVLE public API of NUS, which means login with NUS account will automatically create modules and students for IVLE users, but also user can create their own personal module/group in Attendance website. Attendance user interface provide statistic report for each module in real time.  
  [face tech]: https://github.com/fcharmy/face/tree/master/face_web
  [app]: https://github.com/fcharmy/face/tree/master/app_attendance
  
 # Data Structure
- Attendance obtain data from Face Tech, but it also has its own database on mySQL. Except the data from other web service, there are two types of tables in Attendance, data from first type will be used for every user, eg. attend_recodes, the other type of tables only used for regular users, which means user create their account/modules/students in Attendance website, this is because we need to store their information in Attendance database, unlike IVLE users, data comes from other web service database.  
+ Attendance obtain data from Face Tech, but it also has its own database on mySQL.   
+ Except the data from other web service, there are two types of tables in Attendance, data from first type will be used for every user, eg. attend_recodes, the other type of tables only used for regular users, which means user create their account/modules/students in Attendance website, this is because we need to store their information in Attendance database, unlike IVLE users, data comes from other web service database.  
  [View Code](https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py)
  [Attendance]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L9
  [Attend_Recodes]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L17
@@ -21,7 +23,8 @@
  * lecture_or_tutorial - BooleanField. True for lecture, False for tutorial, default is True
  * owner - user name, max length is 50
  
-Attendance table save all the class information for each module. Every time user take attendance, there will be a new record of attendance. The class can be a lecture or tutorial, depends on user's choice, and owner define which user can modify current class attendance.
+Attendance table save all the class information for each module. Every time user take attendance, there will be a new record of attendance.   
+The class can be a lecture or tutorial, depends on user's choice, and owner define which user can modify current class attendance.
  
 ### [Attend_Recodes][Attend_Recodes]  
  * attendance - ForeignKey, id of attendance, if attendance was deleted, corresponding attend_recodes will also be deleted
