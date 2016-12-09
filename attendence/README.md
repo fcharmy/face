@@ -141,8 +141,7 @@ add a new row to image table with given image path, attendance object and data.
   Destination of [student_form][student_form], regular user can create new students and will submit to this page. If succeed, it will redirect to view_module, otherwise go back to student_form.
   
  * #### [view_module][view_module]
-  This page use [dashboard.html][dashboard] as template to display statistic reports/charts. Related files are in [static][static] folder.
-  User can click the export button to download tables which conbine all those shown in this page.  
+  This page use [dashboard.html][dashboard] as template to display statistic reports/charts, user can click the export button to download tables which conbine all those shown in this page. Related files are in [static][static] folder.  
   Bar chart is drawn by [Chart.bundle.js][Chart.bundle.js] which comes from [Chart.js](http://chartjs.org/).
   
 # APIs
