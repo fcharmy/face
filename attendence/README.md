@@ -120,6 +120,7 @@ add a new row to image table with given image path, attendance object and data.
  [module_form]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L107
  [create_student]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L155
  [student_form]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L144
+ [view_module]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L182
  [dashboard]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/templates/attend/dashboard.html
  [Chart.bundle.js]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/static/Chart.bundle.js
  [static]: https://github.com/fcharmy/face/tree/master/attendence/attend_server/static
