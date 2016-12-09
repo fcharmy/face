@@ -107,5 +107,42 @@ add a new row to image table with given image path, attendance object and data.
  * output: retrive all modules which given user has permission of 'O', 'F', 'M', 'R'
 
 # Web Pages
-
+ As usual, there are many regular user interface like index, sign in, login, etc, source code will be list out as following.  
+ In Attendance there are pages eg. user_index, view_module which is for all the users to review/export the statistic report, and other form pages for regular user to create module/students, all the forms used in user interface are in [forms.py][forms].
+ [View Code](https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py)
+ [forms]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/forms.py
+ [index]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L21
+ [sign_in]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L49
+ [login_form]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L34
+ [LoginForm]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/forms.py#L5
+ [user_index]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L59
+ [create_module]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L112
+ [module_form]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L107
+ [create_student]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L155
+ [student_form]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L144
+ [dashboard]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/templates/attend/dashboard.html
+ [Chart.bundle.js]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/static/Chart.bundle.js
+ [static]: https://github.com/fcharmy/face/tree/master/attendence/attend_server/static
+ 
+ * #### [Home Page][index]  
+  
+ * #### [Sign in][sign_in]  
+ 
+ * #### [Login][login_form]
+  Use [LoginForm][LoginForm] then submit to [user_index][user_index].
+  
+ * #### [user_index][user_index]  
+  Need login to show all available modules.  
+  
+ * #### [create_module][create_module]
+  Destination of [module_form][module_form], regular user can create a new module and will submit to this page. If succeed, it will redirect to user_index, otherwise go back to module_form.
+  
+ * #### [create_student][create_student]
+  Destination of [student_form][student_form], regular user can create new students and will submit to this page. If succeed, it will redirect to view_module, otherwise go back to student_form.
+  
+ * #### [view_module][view_module]
+  This page use [dashboard.html][dashboard] as template to display statistic reports/charts. Related files are in [static][static] folder.
+  User can click the export button to download tables which conbine all those shown in this page.  
+  Bar chart is drawn by [Chart.bundle.js][Chart.bundle.js] which comes from [Chart.js](http://chartjs.org/).
+  
 # APIs
