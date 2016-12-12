@@ -1,11 +1,13 @@
 # Instruction
  This document is for Attendance Web Server, Attendance is a application based on [Face Tech][face tech], it has its own web page, server and database, but also obtain data from Face Tech.   
+ 
  Attendance APP is the client APP in mobile, which will cover [here][app]. Currently this application is integrated with IVLE public API of NUS, which means login with NUS account will automatically create modules and students for IVLE users, but also user can create their own personal module/group in Attendance website. Attendance user interface provide statistic report for each module in real time.  
  [face tech]: https://github.com/fcharmy/face/tree/master/face_web
  [app]: https://github.com/fcharmy/face/tree/master/app_attendance
  
 # Data Structure
  Attendance obtain data from Face Tech, but it also has its own database on mySQL.   
+ 
  Except the data from other web service, there are two types of tables in Attendance, data from first type will be used for every user, eg. attend_recodes, the other type of tables only used for regular users, which means user create their account/modules/students in Attendance website, this is because we need to store their information in Attendance database, unlike IVLE users, data comes from other web service database.  
  [View Code](https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py)
  [Attendance]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L9
@@ -108,6 +110,7 @@ add a new row to image table with given image path, attendance object and data.
 
 # Web Pages
  As usual, there are many regular user interface like index, sign in, login, etc, source code will be list out as following.  
+ 
  In Attendance there are pages eg. user_index, view_module which is for all the users to review/export the statistic report, and other form pages for regular user to create module/students, all the forms used in user interface are in [forms.py][forms].
  [View Code](https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py)
  [forms]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/forms.py
@@ -184,17 +187,23 @@ What's more, there are two other python files with different types of API functi
  [get_students]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py#L192
  [get_tutorial_from_txt]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py#L201
 
- * #### log_in  
-  [attend log_in][attend log_in]/[ivle log_in][ivle log_in]. Authenticate user login certificates, then return user id and available modules of this user.  
+ * #### log_in ([attend][attend log_in]/[ivle][ivle log_in])  
+ 
+  Authenticate user login certificates, then return user id and available modules of this user.  
+  
   For IVLE users, if any module cannot be found in Face Tech, which means this is the first time for this user to login in Attendance or modules updated in IVLE server, send new module info to Face Tech to register, then return user id by [login_ivle][login_ivle] and all available modules by [get_teaching_modules][get_teaching_modules] and new registered modules.
   
- * #### update_module
-  [attend update_module][attend update_module]/[ivle update_module][ivle update_module]. Given a group id of one module, return all attendance records, student list and module details to client. This usually use for user select a module in app, then with response from this function user then can check module details/history and enroll/verify students in Attendance app.  
+ * #### update_module ([attend][attend update_module]/[ivle][ivle update_module])
+ 
+  Given a group id of one module, return all attendance records, student list and module details to client. This usually use for user select a module in app, then with response from this function user then can check module details/history and enroll/verify students in Attendance app.  
+  
   Remind that student list could be changed any time, so this function also update student list to database at the same time. Create new persons in Face Tech if new students added, and relate new persons to the group of current module. Detele the relation of students with the group who do not exist in this module when compare to old student list.  
+  
   For retriving tutorial list, [get_tutorial_from_txt][get_tutorial_from_txt] is used temporarily to obtain from txt file only for specific module.  
   
 # Web Service Wrapper
 Wrapper is used to call other web service easily, it is functions provided by web service itself.  
+
  **Face Tech**: [face_tech.py](https://github.com/fcharmy/face/blob/master/attendence/attend_server/face_tech.py)  
  **IVLE API**: [pyivle](https://github.com/fcharmy/face/tree/master/attendence/attend_server/pyivle)  
   
