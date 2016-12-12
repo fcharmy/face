@@ -135,14 +135,69 @@ add a new row to image table with given image path, attendance object and data.
  * #### [user_index][user_index]  
   Need login to show all available modules.  
   
+ * #### [view_module][view_module]
+  This page use [dashboard.html][dashboard] as template to display statistic reports/charts, user can click the export button to download tables which conbine all those shown in this page. Related files are in [static][static] folder.  
+  Bar chart is drawn by [Chart.bundle.js][Chart.bundle.js] which comes from [Chart.js](http://chartjs.org/).
+  
+ ** Below web pages only accessable for regular user, modules/students can not be created by IVLE user or other users, because these data will automatically retrive from other web services. **  
+ 
  * #### [create_module][create_module]
   Destination of [module_form][module_form], regular user can create a new module and will submit to this page. If succeed, it will redirect to user_index, otherwise go back to module_form.
   
  * #### [create_student][create_student]
   Destination of [student_form][student_form], regular user can create new students and will submit to this page. If succeed, it will redirect to view_module, otherwise go back to student_form.
   
- * #### [view_module][view_module]
-  This page use [dashboard.html][dashboard] as template to display statistic reports/charts, user can click the export button to download tables which conbine all those shown in this page. Related files are in [static][static] folder.  
-  Bar chart is drawn by [Chart.bundle.js][Chart.bundle.js] which comes from [Chart.js](http://chartjs.org/).
-  
 # APIs
+ These are API functions which can reply cross site request, design for Attendance APP to retirve/update data. The APP will send data to these functions to update database or communicate to other web service, mainly in 'public functions' part of [views.py][views]. 
+ [views]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py
+ [face_detection]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L222
+ [verify]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L248
+ [enrollment]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L276
+ [attend]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L324
+ [redirect_index]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L385
+ [copyimg]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L389
+ [get_content]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L403
+ 
+ * #### [face_detection][face_detection]  
+  Given a group photo send by app, save it in attendance server side and then send to Face Tech to check quality. Return the temporary image path and result from Face Tech with [get_content] by converting reponse data to json.  
+ 
+ * #### [enrollment][enrollment]  
+  Given data from face_detection and corresponding students info from user, send to enrollment_faces of Face Tech and call [copyimg][copyimg] to move temporary image to photo upload folder, then return the result from Face Tech.  
+  Usually [enrollment][enrollment] will be called after user call [face_detection][face_detection] to enroll new faces for students.
+  
+ * #### [verify][verify]  
+  Given a group photo send by app, save it in attendance server side and then send to Face Tech for verification. Return the temporary image path and result from Face Tech to client.
+ 
+ * #### [attend][attend]  
+  Given data from verify function and optional modified data from user, create a new [Attendance][Attendance] object, save temporary image to photo upload folder and create a new [Images][Images] object. For students who attended, create a new [Attend_Recodes][Attend_Recodes] object for each.   
+  Usually [attend][attend] will be called after user call [verify][verify] to register new attendance records for classes.
+   
+What's more, there are two other python files with different types of API functions, [attend_views.py][attend] and [ivle_views.py][ivle]. Functions in [attend_views.py][attend] are used to update tables we mentioned above in *Data Structure*, [ivle_views.py][ivle] has functions with similar functionality which are used for communicate with IVLE API.  
+ [ivle]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py
+ [attend]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/attend_views.py
+ [attend log_in]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/attend_views.py#L13
+ [ivle log_in]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py#L12
+ [attend update_module]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/attend_views.py#L40
+ [ivle update_module]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py#L43
+ [login_ivle]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py#L157
+ [get_teaching_modules]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py#L173
+ [get_students]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py#L192
+ [get_tutorial_from_txt]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py#L201
+
+ * #### log_in  
+  [attend log_in][attend log_in]/[ivle log_in][ivle log_in]. Authenticate user login certificates, then return user id and available modules of this user.  
+  For IVLE users, if any module cannot be found in Face Tech, which means this is the first time for this user to login in Attendance or modules updated in IVLE server, send new module info to Face Tech to register, then return user id by [login_ivle][login_ivle] and all available modules by [get_teaching_modules][get_teaching_modules] and new registered modules.
+  
+ * #### update_module
+  [attend update_module][attend update_module]/[ivle update_module][ivle update_module]. Given a group id of one module, return all attendance records, student list and module details to client. This usually use for user select a module in app, then with response from this function user then can check module details/history and enroll/verify students in Attendance app.  
+  Remind that student list could be changed any time, so this function also update student list to database at the same time. Create new persons in Face Tech if new students added, and relate new persons to the group of current module. Detele the relation of students with the group who do not exist in this module when compare to old student list.  
+  For retriving tutorial list, [get_tutorial_from_txt][get_tutorial_from_txt] is used temporarily to obtain from txt file only for specific module.  
+  
+# Web Service Wrapper
+Wrapper is used to call other web service easily, it is functions provided by web service itself.  
+ **Face Tech**: [face_tech.py](https://github.com/fcharmy/face/blob/master/attendence/attend_server/face_tech.py)  
+ **IVLE API**: [pyivle](https://github.com/fcharmy/face/tree/master/attendence/attend_server/pyivle)  
+  
+# Implementation
+ After upgrading, please refer to [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md) of Face Tech on how to implement new version.
+  
