@@ -5,6 +5,8 @@
  [face tech]: https://github.com/fcharmy/face/tree/master/face_web
  [app]: https://github.com/fcharmy/face/tree/master/app_attendance
  
+ ![](https://github.com/fcharmy/face/blob/master/img/api%20relation.png)
+ 
 # Data Structure
  Attendance obtain data from Face Tech, but it also has its own database on mySQL.   
  
