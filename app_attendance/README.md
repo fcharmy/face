@@ -32,7 +32,7 @@
 * ## [Login View][login]
  There is a select list when login, user can choose to login by using IVLE account or regular account which created in Attendance website, this will change the url when login request submit as defined in [login controller][login controller].
  
- ![login image](https://github.com/fcharmy/face/blob/master/img/login.png =250x250)
+ ![login image](https://github.com/fcharmy/face/blob/master/img/login.png | width=48)
  
 * ## [Module View][modules]
  Modules view list out all available modules after login. When user click one, [modules controller][modules controller] will submit a request of update modules to server, update student list of current module, retrive and return all data will used in later views.
