@@ -3,6 +3,8 @@
    [More Details](https://github.com/fcharmy/face/blob/master/face_web/README.md)  
    [How to use Face API?](https://github.com/fcharmy/face/blob/master/face_web/face_tech/templates/mkdocs/docs/getstart.md)
     
+   ![](https://github.com/fcharmy/face/blob/master/img/relation.PNG)
+   
 # Attendance  
 ## Attendance Website
    A website designed for Attendance APP. Here you can create modules, students, and check real time statistic reports of your class attendance.  
