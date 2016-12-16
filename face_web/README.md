@@ -105,9 +105,7 @@ given person id(s) to retrive person(s) from project and return.
 
 when save a face, generate a unique image path in server.
 
-
-# Operation Component
-## Web Pages
+# Web Pages
  Face Tech has a user interface for users, here they can create a project. Most of these user interface pages are [forms][forms], through these forms user may submit the action like add/update/delete. Many pages also have the same version of APIs, like create a group, user may use user interface or call API to do this, for this kind of function we will be cover in APIs.
 
  [View Code](https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py)
@@ -146,7 +144,10 @@ when save a face, generate a unique image path in server.
   
  * #### [Create a person][create a person]  
  
-## APIs
+# APIs
+
+## Operation Component
+
  When user a project account, they may use [python wrapper][python] according to [user guide][user guide] to call all available APIs. APIs are all follow the format of [forms][forms], instead of using user interface, the request will be directly submit to resquest to the destination. All the API functions can accept cross site request so that they can be called in other domain, and every request need to submit with project id and security key due to security issue.  
   
  The following is the brief infomation about each API functions which is the destination of API request, but the real URL of each request should submit to, please according to the [mapping][mapping] relation. For example,  
@@ -198,7 +199,7 @@ The first part is the URL, the full path should be websiteURL/create_group. Then
   Delete the relation between given person and group, which means this person is no longer belongs to given group, while person will not be deleted immediately but still belongs to current project.  
  
 
-# Face Algorithm Component
+## Face Algorithm Component
  Face algorithm related functions have no user interface page, only provide for APIs and private functions which will be called by these API functions. API functions mainly return response to cross site request, and private functions will deal with data and implement face algorithm. As mentioned above, the real url for API request, please refer to the [mapping][mapping] relation, and all the request data send to API functions must contain project id and security key due to security issue.
  [View Code](https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py)
  [detect]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L11
