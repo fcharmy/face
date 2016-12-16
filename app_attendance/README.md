@@ -54,4 +54,6 @@
 * ## [Detail View][detail]
  There are list of group images and two student lists in this view, attendee and absence list. Notice the owner name in the corner of this view, if the owner matches the current user, there is a '+' button on the right top. By clicking the button, just like click the 'Take Attendance' button, the only difference is that this will not create a new attendance record, instead [detail controller][detail controller] will add a new group photo into current attendance record, so there will be one more image in the images list after submission.
  
+ # Implementation
+  When APP is updated, please refer [UPDATE.md](https://github.com/fcharmy/face/blob/master/app_attendance/UPDATE.md) to release a new version.
  
