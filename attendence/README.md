@@ -142,6 +142,11 @@ add a new row to image table with given image path, attendance object and data.
   This page use [dashboard.html][dashboard] as template to display statistic reports/charts, user can click the export button to download tables which conbine all those shown in this page. Related files are in [static][static] folder.  
   Bar chart is drawn by [Chart.bundle.js][Chart.bundle.js] which comes from [Chart.js](http://chartjs.org/).
   
+  ![](https://github.com/fcharmy/face/blob/master/img/web1.png)
+  ![](https://github.com/fcharmy/face/blob/master/img/web2.png)
+  ![](https://github.com/fcharmy/face/blob/master/img/web3.png)
+  ![](https://github.com/fcharmy/face/blob/master/img/web4.png)
+
 **Below web pages only accessable for regular user, modules/students can not be created by IVLE user or other users, because these data will automatically retrive from other web services.**  
  
  * #### [create_module][create_module]
