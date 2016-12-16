@@ -32,31 +32,42 @@
 * ## [Login View][login]
  There is a select list when login, user can choose to login by using IVLE account or regular account which created in Attendance website, this will change the url when login request submit as defined in [login controller][login controller].
  
- ![login image](https://github.com/fcharmy/face/blob/master/img/login.png | width=48)
+ ![](https://github.com/fcharmy/face/blob/master/img/login.png)
  
 * ## [Module View][modules]
  Modules view list out all available modules after login. When user click one, [modules controller][modules controller] will submit a request of update modules to server, update student list of current module, retrive and return all data will used in later views.
+
+ ![](https://github.com/fcharmy/face/blob/master/img/modules.png)
 
 * ## [Attend View][attend]
  There are two button in attend view, 'Enrollment' and 'Take Attendance'. When user click one of them, [attend controller][attend controller] will open local camera to let user take a group photo. User can also choose a photo from phone Gallery, this function will be called when click 'back'.  
  
  After a photo is taken, controller will send a request with this photo to server, then switch current view to [Enrollment View][enroll].
- 
+
+ ![](https://github.com/fcharmy/face/blob/master/img/attend.png)
+
 * ## [Enrollment View][enroll]
  We have to mention here is that after clicking take attendance, current view will also switch to enrollment view, only difference is that the parameter is_enroll will be False, and when click submit, this will triger a dialog in [lectureOrTutorial][lectureOrTutorial]for user to choose whether it is a Lecture or a Tutorial.  
  
  [drawRects][drawRects] is a function not in any controller but it will be called in enrollment and detail view. It uses canvas tag to construct a image with rectangles on faces. When user choose a face displayed in the image, the rectangle will have thicker border, then choose a student in the list, this will call [match_face][match_face] in controller, this will match the choosen face with student info. 
 
+ ![](https://github.com/fcharmy/face/blob/master/img/enroll.png)
+
 * ## [Module Info view][about]
  [About Controller][about Controller] of module info view will show detail information about current module, and provide a back button for user to go back to choose another module.  
 
+ ![](https://github.com/fcharmy/face/blob/master/img/about.png)
+
 * ## [History View][home]
  When user choose a module in modules view, app retrive all history data of current module from server and display in this view. When list out attendance records, [home controller][home controller] will rearrange them into weeks. The week of first attendance record will the week 1. After clicking any attendance record, current view will switch to Detail view.
- 
+
+ ![](https://github.com/fcharmy/face/blob/master/img/history.png)
+
 * ## [Detail View][detail]
  There are list of group images and two student lists in this view, attendee and absence list. Notice the owner name in the corner of this view, if the owner matches the current user, there is a '+' button on the right top. By clicking the button, just like click the 'Take Attendance' button, the only difference is that this will not create a new attendance record, instead [detail controller][detail controller] will add a new group photo into current attendance record, so there will be one more image in the images list after submission.
  
- 
+  ![](https://github.com/fcharmy/face/blob/master/img/detail.png)
+
 # Implementation
  When APP is updated, please refer [UPDATE.md](https://github.com/fcharmy/face/blob/master/app_attendance/UPDATE.md) to release a new version.
  
