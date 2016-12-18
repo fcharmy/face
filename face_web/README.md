@@ -242,7 +242,7 @@ The first part is the URL, the full path should be websiteURL/create_group. Then
   Given a image of group or individual photo, detect all the face shown in the photo. For each face detected, retrive all persons features from database, [compare][compare] with the feature of current face, return result from [verify_face_from_feature_array][verify_face_from_feature_array] function.
  
 # Python Wrapper
- We provide a python wrapper [face_tech.py][py] for Face Tech user to easily use APIs mentioned above, please refer to [getstart.md][guide] to learn more about how to use this.
+ We provide a python wrapper [face_tech.py][py] for Face Tech user to easily use APIs mentioned above, please refer to [getstart.md][guide] to learn more about how to use this. What's more, please remind that if any API updated or domain changed, modify this python wrapper as well.
  
  User may just download this file to their project, this python code can use APIs in Face Tech by just simply call function with the same name.
  
