@@ -251,4 +251,4 @@ The first part is the URL, the full path should be websiteURL/create_group. Then
  
 # Implementation
  After upgrading, please refer to [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md) on how to implement new version.  
- To start server when reboot, make sure Nginx is working, then execute step 10 in [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md).
+ To start face_web server when reboot, make sure Nginx is working, then execute step 10 in [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md).
