@@ -1,4 +1,4 @@
-1. cd to face_web folder in Terminal,   
+1. cd to current project folder in Terminal,   
  update path in nginx.conf and uwsgi.ini, and make sure there is 'log' folder in current folder
 
 2. link conf file to nginx. if existed, open it to check if it works
@@ -25,5 +25,5 @@
 
 9. kill port and restart nginx
 
-10. cd to face_web folder and run server
+10. cd to current project folder and run server
 > uwsgi --ini uwsgi.ini
