@@ -1,4 +1,4 @@
-1. cd to face_web folder,   
+1. cd to face_web folder in Terminal,   
  update path in nginx.conf and uwsgi.ini, and make sure there is 'log' folder in current folder
 
 2. link conf file to nginx. if existed, open it to check if it works
