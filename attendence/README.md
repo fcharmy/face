@@ -215,5 +215,6 @@ Wrapper is used to call other web service easily, it is functions provided by we
  **IVLE API**: [pyivle](https://github.com/fcharmy/face/tree/master/attendence/attend_server/pyivle)  
   
 # Implementation
- After upgrading, please refer to [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md) of Face Tech on how to implement new version.    
+ After upgrading, please refer to [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md) of Face Tech on how to implement new version.  
+ 
  To start attendance server when reboot, make sure Nginx is working, and face_web server is also runing, otherwise some functions will not work at all. Then execute step 10 in [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md).
