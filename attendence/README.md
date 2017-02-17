@@ -216,4 +216,4 @@ Wrapper is used to call other web service easily, it is functions provided by we
   
 # Implementation
  After upgrading, please refer to [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md) of Face Tech on how to implement new version.
-  
+ To start server when reboot, make sure Nginx is working, then execute step 10 in [IMPLEMENT.md](https://github.com/fcharmy/face/blob/master/face_web/IMPLEMENT.md).
