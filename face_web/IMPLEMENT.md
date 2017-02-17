@@ -7,7 +7,7 @@
 > /etc/nginx/sites-enabled/default
 
 4. kill existed port and restart nginx, then see if nginx works in new port
-> sudo fuser -k 80/tcp
+> sudo fuser -k 80/tcp  
 > sudo /etc/init.d/nginx restart
 
 5. make migrations of each app
