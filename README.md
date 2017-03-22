@@ -3,7 +3,7 @@
    [More Details](https://github.com/fcharmy/face/blob/master/face_web/README.md)  
    [How to use Face API?](https://github.com/fcharmy/face/blob/master/face_web/face_tech/templates/mkdocs/docs/getstart.md)
     
-   ![](https://github.com/fcharmy/face/blob/master/img/relation.PNG)
+   ![](img/relation.PNG)
    
 # Attendance  
 ## Attendance Website
