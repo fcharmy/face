@@ -110,6 +110,7 @@ when save a face, generate a unique image path in server.
  Face Tech has a user interface for users, here they can create a project. Most of these user interface pages are [forms][forms], through these forms user may submit the action like add/update/delete. Many pages also have the same version of APIs, like create a group, user may use user interface or call API to do this, for this kind of function we will be cover in APIs.
 
  [View Code](https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py)
+ 
  [forms]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/forms.py
  [index]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py#L9
  [get start]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/views.py#L17
@@ -203,6 +204,7 @@ The first part is the URL, the full path should be websiteURL/create_group. Then
 ## Face Algorithm Component
  Face algorithm related functions have no user interface page, only provide for APIs and private functions which will be called by these API functions. API functions mainly return response to cross site request, and private functions will deal with data and implement face algorithm. As mentioned above, the real url for API request, please refer to the [mapping][mapping] relation, and all the request data send to API functions must contain project id and security key due to security issue.
  [View Code](https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py)
+ 
  [detect]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L11
  [landmark]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L41
  [occluder]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/facial.py#L68
