@@ -2,6 +2,7 @@
  This document is for Attendance Web Server, Attendance is a application based on [Face Tech][face tech], it has its own web page, server and database, but also obtain data from Face Tech.   
  
  Attendance APP is the client APP in mobile, which will cover [here][app]. Currently this application is integrated with IVLE public API of NUS, which means login with NUS account will automatically create modules and students for IVLE users, but also user can create their own personal module/group in Attendance website. Attendance user interface provide statistic report for each module in real time.  
+ 
  [face tech]: https://github.com/fcharmy/face/tree/master/face_web
  [app]: https://github.com/fcharmy/face/tree/master/app_attendance
  
@@ -12,6 +13,7 @@
  
  Except the data from other web service, there are two types of tables in Attendance, data from first type will be used for every user, eg. attend_recodes, the other type of tables only used for regular users, which means user create their account/modules/students in Attendance website, this is because we need to store their information in Attendance database, unlike IVLE users, data comes from other web service database.  
  [View Code](https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py)
+ 
  [Attendance]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L9
  [Attend_Recodes]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L17
  [Images]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/models.py#L23
@@ -115,6 +117,7 @@ add a new row to image table with given image path, attendance object and data.
  
  In Attendance there are pages eg. user_index, view_module which is for all the users to review/export the statistic report, and other form pages for regular user to create module/students, all the forms used in user interface are in [forms.py][forms].
  [View Code](https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py)
+ 
  [forms]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/forms.py
  [index]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L21
  [sign_in]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L49
@@ -159,6 +162,7 @@ add a new row to image table with given image path, attendance object and data.
   
 # APIs
  These are API functions which can reply cross site request, design for Attendance APP to retirve/update data. The APP will send data to these functions to update database or communicate to other web service, mainly in 'public functions' part of [views.py][views]. 
+ 
  [views]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py
  [face_detection]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L222
  [verify]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/views.py#L248
@@ -183,6 +187,7 @@ add a new row to image table with given image path, attendance object and data.
   Usually [attend][attend] will be called after user call [verify][verify] to register new attendance records for classes.
    
 What's more, there are two other python files with different types of API functions, [attend_views.py][attend] and [ivle_views.py][ivle]. Functions in [attend_views.py][attend] are used to update tables we mentioned above in *Data Structure*, [ivle_views.py][ivle] has functions with similar functionality which are used for communicate with IVLE API.  
+
  [ivle]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/ivle_views.py
  [attend]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/attend_views.py
  [attend log_in]: https://github.com/fcharmy/face/blob/master/attendence/attend_server/attend_views.py#L13
