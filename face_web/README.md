@@ -9,8 +9,8 @@
 # Data Structure
  Data is stored in mySQL database, and use Models component of Django to retrive/update data from database, so you may check data via websiteURL/admin as well.
 
- [View Code](https://github.com/fcharmy/face/blob/master/face_web/face_tech/models.py) 
- [attendance]: https://github.com/fcharmy/face/tree/master/attendence 
+ [View Code](https://github.com/fcharmy/face/blob/master/face_web/face_tech/models.py)  
+
  [Group]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/models.py#L8
  [Person]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/models.py#L26
  [Person_To_Group]: https://github.com/fcharmy/face/blob/master/face_web/face_tech/models.py#L47
