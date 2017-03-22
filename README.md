@@ -1,7 +1,7 @@
 # Face_Web
    Face algorithm API, provide face recognition, enrollment, verification function, and profile management. Attendance below is one application based on this.  
-   [More Details](face_web/README.md)  
-   [How to use Face API?](face_web/face_tech/templates/mkdocs/docs/getstart.md)
+   [More Details](face_web)  
+   [How to use Face API?](face_web/face_tech/templates/mkdocs/docs)
     
    ![](img/relation.PNG)
    
