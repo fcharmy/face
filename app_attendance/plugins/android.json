@@ -7,10 +7,16 @@
         "files": {}
     },
     "installed_plugins": {
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "com.ionicframework.apptest357899"
+        },
         "cordova-plugin-console": {
             "PACKAGE_NAME": "com.ionicframework.apptest357899"
         },
         "cordova-plugin-device": {
+            "PACKAGE_NAME": "com.ionicframework.apptest357899"
+        },
+        "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "com.ionicframework.apptest357899"
         },
         "cordova-plugin-splashscreen": {
@@ -20,12 +26,6 @@
             "PACKAGE_NAME": "com.ionicframework.apptest357899"
         },
         "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.ionicframework.apptest357899"
-        },
-        "cordova-plugin-file-transfer": {
-            "PACKAGE_NAME": "com.ionicframework.apptest357899"
-        },
-        "cordova-plugin-camera": {
             "PACKAGE_NAME": "com.ionicframework.apptest357899"
         },
         "me.tonny.cordova.plugins.multidex": {
