@@ -29,4 +29,4 @@
 > uwsgi --ini uwsgi.ini
 
 See [this](http://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html) website for help.
-And make SURE the python environment is congruous to the environment you develop Django project, especially you are using conda or virtualenv.
+And make SURE the python environment triggered by `uwsgi` is congruous to the environment you develop Django project, especially you are using conda or virtualenv.
