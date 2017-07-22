@@ -162,7 +162,7 @@ def add_tutor(request):
             print('find tutor!', tutor[0].username)
             if module:
                 if tutor:
-                    ump, is_exist = models.User_Module_Permission.objects.get_or_create(user=tutor[0], module=module[0], permission='M')
+                    ump, is_exist = models.User_Module_Permission.objects.get_or_create(user=tutor[0], module=module[0], defaults={'permission':'M'})
                     print('permission added.')
                     return HttpResponseRedirect(reverse('attend:view_module') + '?id=' + str(module[0].id))
                 else:
@@ -244,9 +244,12 @@ def view_module(request):
                 sort_list.sort()
                 data['student'] = list([dict_ for (key, dict_) in sort_list])
 
+                #perm = (models.get_user_module_perm(user=request.user, module=module[0]))[0].permission
+                perm = module[0]['Permission']
+
                 return render(request, 'attend/user.html', {'html': 'attend/dashboard.html', 'modules': request.session['Modules'],
                                                             'attend_records': data['attendance'], 'module': module[0],
-                                                            'students': data['student'], 'tutors': data['tutors']})
+                                                            'students': data['student'], 'tutors': data['tutors'], 'is_owner': perm=='F'})
         except:
             log.error(traceback.format_exc())
 

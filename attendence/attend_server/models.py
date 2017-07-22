@@ -116,3 +116,5 @@ def get_user_modules(user):
 def get_user(name):
     return User.objects.filter(username=name)
 
+# def get_user_module_perm(user, module):
+#     return User_Module_Permission.objects.filter(user=user, module__id=module.id)

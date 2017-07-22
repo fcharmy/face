@@ -1,5 +1,5 @@
           <h2 class="page-header">{{ module.CourseCode }} {{ module.CourseName }}
-              {% if user.is_authenticated %}
+              {% if user.is_authenticated and is_owner %}
                   <small><a href="{% url 'attend:student_form' %}?module={{ module.ID }}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add students</a></small>
                   <small><a href="{% url 'attend:tutor_form' %}?module={{ module.ID }}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add tutor</a></small>
               {% endif %}

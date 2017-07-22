@@ -139,13 +139,13 @@ def update_module(request):
 
                 del exist_list, new_list, add_list, tutors_list
                 data['student'] = updated_list
-                data['tutors'] = new_tutors_list
                 data['attendance'] = models.get_records(data.get('ID'))
 
             else:
                 data['student'] = []
                 data['attendance'] = []
 
+            data['tutors'] = new_tutors_list
             return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
