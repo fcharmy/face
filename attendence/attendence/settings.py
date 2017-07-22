@@ -25,7 +25,7 @@ SECRET_KEY = 'z+k2o238n8xbbo$cec=^u2e1afqzz*g0s7e$cg0+l5^*_s0zk#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['172.29.34.77', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -79,7 +79,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'attendance',
-        'USER': 'root',
+        'USER': 'lzt',
         'PASSWORD': 'as60502',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',

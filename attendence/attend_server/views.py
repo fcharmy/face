@@ -108,11 +108,11 @@ def module_form(request):
     form = forms.ModuleForm()
     return render(request, 'attend/form_csrf.html', {'url': 'attend:create_module', 'title': 'Create Module', 'form': form})
 
-
 def create_module(request):
     form = forms.ModuleForm(request.POST)
 
     if form.is_valid() and request.user.is_authenticated():
+        print("creating module...")
         try:
             code = form.cleaned_data['code']
             group = api.get_groups_by_name(name=code)
@@ -127,7 +127,7 @@ def create_module(request):
             m = models.Modules(code=code, group_id=group_id, name=form.cleaned_data['name'],
                                academic_year=form.cleaned_data['year'], semester=form.cleaned_data['semester'])
             m.save()
-
+            
             ump, is_exist = models.User_Module_Permission.objects.get_or_create(user=request.user, module=m, permission='F')
 
             m = m.to_dict()
@@ -140,6 +140,43 @@ def create_module(request):
 
     return render(request, 'attend/form_csrf.html', {'url': 'attend:create_module', 'title': 'Create Module', 'form': form})
 
+def tutor_form(request):
+    """ Create student form """
+    if request.user.is_authenticated() and 'module' in request.GET:
+        # choice = tuple([(m.module.id, m.module.code + ' ' + m.module.name) for m in models.get_user_modules(request)])
+        form = forms.TutorForm(request.GET)
+
+        return render(request, 'attend/form_csrf.html', {'url': 'attend:add_tutor', 'title': 'Add Tutor', 'form': form})
+
+    return HttpResponseRedirect(reverse('attend:user_index'))
+
+def add_tutor(request):
+    form = forms.TutorForm(request.POST)
+    print('adding tutor...')
+    if form.is_valid() and request.user.is_authenticated():
+        try:
+            module = [m.module for m in models.get_user_modules(request.user)
+                      if m.module.id == form.cleaned_data['module']]
+
+            tutor = models.get_user(form.cleaned_data['name'])
+            print('find tutor!', tutor[0].username)
+            if module:
+                if tutor:
+                    ump, is_exist = models.User_Module_Permission.objects.get_or_create(user=tutor[0], module=module[0], permission='M')
+                    print('permission added.')
+                    return HttpResponseRedirect(reverse('attend:view_module') + '?id=' + str(module[0].id))
+                else:
+                    message = 'Unknown Tutor.'
+            else:
+                message = 'Unknown Module.'
+        except:
+            log.error(traceback.format_exc())
+            message = 'This student name is already exist.'
+
+        return render(request, 'attend/form_csrf.html', {'url': 'attend:add_tutor', 'title': 'Add tutor', 'form': form,
+                                                  'message': message})
+    else:
+        return HttpResponseRedirect(reverse('attend:user_index'))
 
 def student_form(request):
     """ Create student form """
@@ -209,7 +246,7 @@ def view_module(request):
 
                 return render(request, 'attend/user.html', {'html': 'attend/dashboard.html', 'modules': request.session['Modules'],
                                                             'attend_records': data['attendance'], 'module': module[0],
-                                                            'students': data['student']})
+                                                            'students': data['student'], 'tutors': data['tutors']})
         except:
             log.error(traceback.format_exc())
 

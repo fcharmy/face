@@ -112,3 +112,7 @@ def get_records(module):
 
 def get_user_modules(user):
     return User_Module_Permission.objects.filter(user=user, permission__in=['O', 'F', 'M', 'R'])
+
+def get_user(name):
+    return User.objects.filter(username=name)
+

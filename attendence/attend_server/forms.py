@@ -37,7 +37,11 @@ class ModuleForm(forms.Form):
     year = forms.CharField(label='Academic Year', max_length=20, required=False)
     semester = forms.CharField(label='Semester', max_length=100, required=False)
 
-
+class TutorForm(forms.Form):
+    """ add a tutor to a module """
+    module = forms.IntegerField(widget=forms.HiddenInput())
+    name = forms.CharField(label='Tutor Name', max_length=50, validators=[RegexValidator(r'^[\w.@+-]+$')])
+    
 class StudentForm(forms.Form):
     """ add student form """
     module = forms.IntegerField(widget=forms.HiddenInput())
