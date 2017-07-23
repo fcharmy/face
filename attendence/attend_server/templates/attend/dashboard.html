@@ -1,7 +1,7 @@
           <h2 class="page-header">{{ module.CourseCode }} {{ module.CourseName }}
               {% if user.is_authenticated and is_owner %}
-                  <small><a href="{% url 'attend:student_form' %}?module={{ module.ID }}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add students</a></small>
-                  <small><a href="{% url 'attend:tutor_form' %}?module={{ module.ID }}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add tutor</a></small>
+                  <small><a href="{% url 'attend:student_form' %}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add students</a></small>
+                  <small><a href="{% url 'attend:tutor_form' %}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add tutor</a></small>
               {% endif %}
             <div class="btn-group" style="float: right">
                 <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Table</button>
