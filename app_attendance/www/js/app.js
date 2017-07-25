@@ -1,7 +1,8 @@
 // ajax request setting
-var SERVER = 'http://172.26.187.110:8000/',
+var SERVER = 'http://172.29.33.44:8000/',
     requestObj = {
       type: "POST",
+      crossDomain: true,
       dataType: 'json',
       headers: {},
       xhrFields: {
@@ -146,6 +147,7 @@ angular.module('attendance', ['ionic'])
       };
 
       requestObj.error = function(xhr, status, error){
+        alert(xhr.readyState)
         if ('Not Acceptable' == error) {
           show_message(7, xhr.responseText);
         }
@@ -174,6 +176,7 @@ angular.module('attendance', ['ionic'])
     requestObj.success = function(data){
       if(data.data.student.length > 0) {
         aMODULE = data.data;
+        alert(aMODULE);
         $state.go('tabs.attend');
       }
       else{
@@ -461,6 +464,9 @@ angular.module('attendance', ['ionic'])
   $scope.match_face = function(person){
     if (curPointer != null && facesList) {
       if (facesList[curPointer].hasOwnProperty('id')) {
+
+        if(faceList[curPoint].name == person.name)
+              return;
 
         if (confirm('This face already match to student '
           + facesList[curPointer].first_name + ' (' + facesList[curPointer].name
