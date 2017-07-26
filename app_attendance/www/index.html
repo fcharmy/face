@@ -7,6 +7,7 @@
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <!--link href="me-pageloading-master/me-pageloading.min.css" rel="stylesheet"-->
 
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
     <link href="css/ionic.app.css" rel="stylesheet">
@@ -19,6 +20,8 @@
 
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
+    <script src="me-pageloading-master/bower_components/Snap.svg/dist/snap.svg-min.js"></script>
+    <script src="me-pageloading-master/me-pageloading.min.js"></script>
 
   </head>
   <body ng-app="attendance">
@@ -30,13 +33,29 @@
       </div>
     </div>
 
+    <script id="cover.html" type="text/ng-template">
+      <div ng-controller="coverController" style="background: #f2f2f2">
+          <ion-content>
+              <p style="padding-top: 25%"></p>
+              <div id="cover-icon"></div>
+              <div id="cover-nav-wrap" style="text-align:center;margin-top:100px;opacity:0"><div id="cover-nav">
+                  <p style="font-size:20px">I am</p>
+                  <button class="button button-large button-positive" style="margin-right:20px;" ng-click="login(true)">NUS</button>
+                  <button class="button button-large button-positive" style="margin-left:20px;" ng-click="login(false)">Regular</button>
+              </div></div>
+              <div><p class="i" style="font-style: normal; position: absolute; bottom: 20px; width: 100%; text-align: center;">Version 1.03</p></div>
+          </ion-content>
+      </div>
+    </script>
+
     <script id="login-page.html" type="text/ng-template">
       <div ng-controller="loginController">
         <ion-content>
+          <i class="icon ion-android-arrow-dropleft-circle" style="font-size:30px; margin-top:10px; margin-left:10px" ng-click="choose_login()"></i>
           <div id="icon"></div>
 
-          <button class="button button-outline button-full button-positive ion-chevron-down" 
-              ng-click="click_login_list()" style="margin-bottom: 0px;">
+          <button class="button button-outline button-full button-positive" 
+              style="margin-bottom: 0px;">
             {{login_option[1]}}
           </button>
 

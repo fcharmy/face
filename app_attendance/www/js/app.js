@@ -1,5 +1,5 @@
 // ajax request setting
-var SERVER = 'http://172.29.33.44:8000/',
+var SERVER = 'http://172.29.34.77:8000/',
     requestObj = {
       type: "POST",
       crossDomain: true,
@@ -33,13 +33,21 @@ var OPTION = null, // specify login type
 
 
 // Ionic attendance App
-angular.module('attendance', ['ionic'])
-.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider){
+angular.module('attendance', ['ionic', 'me-pageloading'])
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, mePageLoadingProvider){
   $stateProvider
+    .state('cover', {
+       url:"/cover",
+       templateUrl: "cover.html",
+       controller: "coverController"
+    })
     .state('login',{
       url: "/login",
       templateUrl: "login-page.html",
-      controller: "loginController"
+      controller: "loginController",
+      params: {
+          is_NUS: null
+      }
     })
     .state('modules',{
       url: "/modules",
@@ -101,30 +109,47 @@ angular.module('attendance', ['ionic'])
       controller: 'detailController'
     });
 
-  $urlRouterProvider.otherwise("/login");
+  $urlRouterProvider.otherwise("/cover");
   $ionicConfigProvider.tabs.position('bottom');
   $ionicConfigProvider.navBar.alignTitle('center');
 
 })
 
-
-.controller('loginController', function($scope, $http, $state){
+.controller('coverController', ['$scope', '$state', 'mePageLoading', function($scope, $state, mePageLoading){
+    $scope.login = function(is_NUS){
+         /**mePageLoading.show('random');
+         setTimeout(function(){
+             mePageLoading.hide();
+             $state.go("login", {is_NUS: is_NUS});
+         }, 1000);**/
+         $state.go("login", {is_NUS: is_NUS});
+    }
+    setTimeout(function(){
+        $("#cover-nav-wrap").animate({
+                 opacity: 1
+            },1500);
+    }, 500);
+}])
+.controller('loginController', function($scope, $http, $state, $stateParams, mePageLoading){
   // $scope.hideList = true;
   $scope.submitDisable = false;
   $scope.loginOptions = [['ivle', "NUS Login"], ['attend', "Default"]];
-  $scope.login_option = $scope.loginOptions[0];
+  $scope.login_option = $stateParams.is_NUS?$scope.loginOptions[0]:$scope.loginOptions[1];
   // ionic.Platform.isFullScreen = true;
 
+  $scope.$on('')
   $scope.click_login_list = function(){
     // $scope.hideList = !$scope.hideList;
     $('#login-list').toggle(500);
   };
 
 
- $scope.choose_login = function(option){
+ $scope.choose_login = function(){
     // $scope.hideList = true;
-    $('#login-list').hide(500);
-    $scope.login_option = option;
+    //$('#login-list').hide(500);
+    //$scope.login_option = option;
+    mePageLoading.hide();
+    $state.go("cover");
   };
 
   $scope.submit_loading = function(bool){

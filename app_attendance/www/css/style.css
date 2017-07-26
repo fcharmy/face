@@ -1,4 +1,16 @@
 /* Empty. Add your own CSS if you like */
+html, body{
+    background: #bdbdbd;
+}
+
+#cover-icon{
+   	background-size: contain;
+	background-image: url('../img/icon_color.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	width: 100%;
+	height: 180px;
+}
 #icon{
 	background-size: contain;
 	background-image: url('../img/icon.png');
