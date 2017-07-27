@@ -122,13 +122,22 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
              mePageLoading.hide();
              $state.go("login", {is_NUS: is_NUS});
          }, 1000);**/
-         $state.go("login", {is_NUS: is_NUS});
+         setTimeout(function(){
+              $("#cover-nav-wrap").animate({
+                 opacity: 0,
+                 top:20
+              },800);
+         }, 0);
+         setTimeout(function(){$state.go("login", {is_NUS: is_NUS});},1500);
     }
-    setTimeout(function(){
-        $("#cover-nav-wrap").animate({
-                 opacity: 1
+    $scope.$on('$ionicView.enter', function(event, data){
+      setTimeout(function(){
+         $("#cover-nav-wrap").animate({
+                 opacity: 1,
+                 top:0
             },1500);
-    }, 500);
+       }, 600);
+    });
 }])
 .controller('loginController', function($scope, $http, $state, $stateParams, mePageLoading){
   // $scope.hideList = true;
@@ -168,6 +177,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
       requestObj.success = function(data){
         $scope.submit_loading(false);
         PROFILE = data.data;
+        $scope.password = "";
         $state.go('modules', {data: data.data});
       };
 
@@ -201,7 +211,6 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
     requestObj.success = function(data){
       if(data.data.student.length > 0) {
         aMODULE = data.data;
-        alert(aMODULE);
         $state.go('tabs.attend');
       }
       else{
@@ -224,6 +233,10 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
     $('#spinner').show();
     $.ajax(requestObj);
   };
+
+  $scope.logout = function(){
+      $state.go('cover');
+  }
 })
 
 .controller('tabController', function($scope, $state){
@@ -276,9 +289,16 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
     for (var i = 0; i < len; i++) { list.push(i); }
     return list;
   };
+
+  $scope.back = function(){
+    $state.go('modules');
+  };
+  $scope.logout = function(){
+     $state.go('cover');
+  };
 })
 
-.controller('attendController', function($scope, $state, $ionicModal){
+.controller('attendController', function($scope, $state, $ionicModal, $ionicPopup){
   $scope.$on("$ionicView.enter", function(event, data){
 
     // initial confirm modal and destory when hide
@@ -299,32 +319,78 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
       $('#spinner').hide();
       $scope.confirmModal.hide();
     };
+ 
+    $scope.back = function(){
+        $state.go('modules');
+    };
+    $scope.logout = function(){
+        $state.go('cover');
+    };
   });
 
-  $scope.getPhoto = function (ev) {
-    navigator.camera.getPicture(function(data){
-      // take photo succeed
-      $scope.newRecord(ev, data);
 
-    },function(message){
-      // take photo failed
-      navigator.camera.getPicture(function (data) {
-        // select photo succeed
-        $scope.newRecord(ev, data);
-      }, function () {
-        show_message(7, message);
-      }, {
-        quality: 60,
-        correctOrientation: true,
-        destinationType: Camera.DestinationType.FILE_URI,
-        sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+  $scope.choosePhoto = function(ev){
+   $ionicPopup.show({
+        title: 'Choose Photo: ',
+        scope: $scope,
+        buttons: [
+          { text: '<small>Cancel</small>',
+            onTap: function(e) {
+              $scope.cg = null;
+            }
+          },
+          {
+            text: '<b><small>From Camera</small></b>',
+            type: 'button-positive',
+            onTap: function(e) {
+              $scope.cg = true;
+            }
+          },
+          {
+            text: '<b><small>From Gallery</small></b>',
+            type: 'button-positive',
+            onTap: function(e) {
+              $scope.cg= false;
+            }
+          }
+        ]
+      }).then(function() {
+         if($scope.cg != null){
+            $scope.getPhoto(ev, $scope.cg);
+         }
       });
+  
+  }
 
-    },{
-      quality: 60,
-      correctOrientation: true,
-      encodingType: Camera.EncodingType.JPEG
-    });
+  $scope.getPhoto = function (ev, cg) {
+
+    if(cg){
+    	navigator.camera.getPicture(function(data){
+      		// take photo succeed
+      		$scope.newRecord(ev, data);
+
+    	},function(message){
+             show_message(7, message);
+         },{
+              quality: 60,
+              correctOrientation: true,
+              encodingType: Camera.EncodingType.JPEG
+         });
+    }else{
+        // take photo failed
+        navigator.camera.getPicture(function (data) {
+            // select photo succeed
+           $scope.newRecord(ev, data);
+        }, function () {
+            show_message(7, message);
+        }, {
+            quality: 60,
+            correctOrientation: true,
+            destinationType: Camera.DestinationType.FILE_URI,
+       	    sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+        });
+
+     }
   };
 
   $scope.newRecord = function(ev, photo){
@@ -395,6 +461,10 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
   $scope.back = function(){
     $state.go('modules');
+  };
+
+  $scope.logout = function(){
+     $state.go('cover');
   };
 
 })

@@ -38,11 +38,12 @@
           <ion-content>
               <p style="padding-top: 25%"></p>
               <div id="cover-icon"></div>
-              <div id="cover-nav-wrap" style="text-align:center;margin-top:100px;opacity:0"><div id="cover-nav">
+              <div id="cover-nav-wrap" style="text-align:center;margin-top:100px;position:relative;top:10px;opacity:0"><div id="cover-nav">
                   <p style="font-size:20px">I am</p>
                   <button class="button button-large button-positive" style="margin-right:20px;" ng-click="login(true)">NUS</button>
                   <button class="button button-large button-positive" style="margin-left:20px;" ng-click="login(false)">Regular</button>
               </div></div>
+              <div><a  style="font-style: normal; position: absolute; bottom: 60px; width: 100%; text-align: center;" herf="#" onclick="window.open('http://172.29.34.77:8000/','_system', 'location=yes');return false;">Sign in On Our Website</a></div>
               <div><p class="i" style="font-style: normal; position: absolute; bottom: 20px; width: 100%; text-align: center;">Version 1.03</p></div>
           </ion-content>
       </div>
@@ -51,7 +52,7 @@
     <script id="login-page.html" type="text/ng-template">
       <div ng-controller="loginController">
         <ion-content>
-          <i class="icon ion-android-arrow-dropleft-circle" style="font-size:30px; margin-top:10px; margin-left:10px" ng-click="choose_login()"></i>
+          <i class="icon ion-android-arrow-dropleft-circle" style="font-size:40px; margin-top:10px;position:relative;top:10px; margin-left:20px" ng-click="choose_login()"></i>
           <div id="icon"></div>
 
           <button class="button button-outline button-full button-positive" 
@@ -93,12 +94,20 @@
       <ion-content>
         <div class="bar bar-header bar-positive" style="position: relative">
           <h1 class="title">Modules</h1>
+          <div class="button" ng-click="logout()">
+             <i class="icon ion-log-out"></i>
+          </div>
         </div>
 
         <ul id="module-list" class="list">
             <a class="item" ng-repeat="module in modules" ng-click="choose_module('{{module}}')">
-              <i class="icon ion-android-bookmark orange"></i>&nbsp;&nbsp;
-              {{ module.CourseCode +' '+ module.CourseName }}
+              <p style="float:left">
+			<i class="icon ion-android-bookmark orange"></i>&nbsp;&nbsp;
+              		{{ module.CourseCode +' '+ module.CourseName }}
+              </p>
+              <p style="float:right">
+                       {{module.Permission=='F'?"Owner":"Tutor"}}
+              </p>
             </a>
         </ul>
 
@@ -130,16 +139,29 @@
 
     <script id="attend.html" type="text/ng-template">
       <ion-view view-title="Attendance" cache-view="false">
+         <ion-nav-buttons side="left">
+	    <div class="buttons" ng-click="back()">
+                <button class="button icon-left ion-chevron-left white">
+                     Back to Modules
+                </button>
+            </div>
+        </ion-nav-buttons>
+
+        <ion-nav-buttons side="right">
+            <div class="buttons" ng-click="logout()">
+                <button class="button icon-right white" ><i class="icon ion-log-out" style="font-size:20px"></i></button>
+            </div>
+        </ion-nav-buttons>
         <ion-content>
 
           <div class="row">
-            <button class="button button-large button-block  button-outline button-positive" ng-click="getPhoto(true)" style="margin: 15px 15%">
+            <button class="button button-large button-block  button-outline button-positive" ng-click="choosePhoto(true)" style="margin: 15px 15%">
               <i class="icon ion-person-add"></i>&nbsp;&nbsp;Enrollment
             </button>
           </div>
 
           <div class="row">
-            <button class="button button-large button-block  button-outline button-positive" ng-click="getPhoto(false)" style="margin: 10px 15%">
+            <button class="button button-large button-block  button-outline button-positive" ng-click="choosePhoto(false)" style="margin: 10px 15%">
               <i class="icon ion-clock"></i>&nbsp;&nbsp;Take attendance
             </button>
           </div>
@@ -192,14 +214,14 @@
                     <li class="item item-divider" ng-hide="result.length === 0" ng-click="toggle_tutorial('{{ key }}')"
                         style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">Tutorial {{ key }}</li>
 
-                    <li ng-repeat="student in value | filter:q as result" id="{{ student.id }}" class="item {{ student.match }}" ng-click="match_face({{ student }})">
+                    <li ng-repeat="student in value | filter:q:false as result" id="{{ student.id }}" class="item {{ student.match }}" ng-click="match_face({{ student }})">
                       {{ student.first_name }}
                       <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                     </li>
                   </ul>
                 </ul>
 
-                <li ng-hide="show_tutorial" ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}"
+                <li ng-hide="show_tutorial" ng-repeat="student in student_list | filter:q:false as result" id="{{ student.id }}"
                     class="item {{ student.match }}" ng-click="match_face({{ student }})">
                   {{ student.first_name }}
                   <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
@@ -215,11 +237,19 @@
 
     <script id="home.html" type="text/ng-template">
       <ion-view view-title="History" cache-view="false">
+        <ion-nav-buttons side="left">
+	    <div class="buttons" ng-click="back()">
+                <button class="button icon-left ion-chevron-left white">
+                     Back to Modules
+                </button>
+            </div>
+        </ion-nav-buttons>
 
-        <!--ion-nav-buttons side="primary">
-          <button class="button icon button-icon ion-navicon"></button>
-        </ion-nav-buttons -->
-
+        <ion-nav-buttons side="right">
+            <div class="buttons" ng-click="logout()">
+                <button class="button icon-right white" ><i class="icon ion-log-out" style="font-size:20px"></i></button>
+            </div>
+        </ion-nav-buttons>
         <ion-content>
           <ul id="record-list" class="list">
               <li id="{{ attend_records[index].time_id}}" class="item" ng-repeat="index in range(attend_records.length)" ng-click="detail({{ index }})">
@@ -280,6 +310,19 @@
  
     <script id="about.html" type="text/ng-template">
       <ion-view view-title="{{CourseCode}}" cache-view="false">
+        <ion-nav-buttons side="left">
+	    <div class="buttons" ng-click="back()">
+                <button class="button icon-left ion-chevron-left white">
+                     Back to Modules
+                </button>
+            </div>
+        </ion-nav-buttons>
+
+        <ion-nav-buttons side="right">
+            <div class="buttons" ng-click="logout()">
+                <button class="button icon-right white" ><i class="icon ion-log-out" style="font-size:20px"></i></button>
+            </div>
+        </ion-nav-buttons>
         <ion-content>
 
           <ul id="about-list" class="list">
@@ -304,10 +347,6 @@
                 {{ Permission }}
               </li>
           </ul>    
-
-          <a class="button icon-left ion-chevron-left orange" style="float:right;right:10px" ng-click="back()">
-            Back to Modules
-          </a>
         </ion-content>
       </ion-view>
     </script>
