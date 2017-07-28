@@ -214,14 +214,14 @@
                     <li class="item item-divider" ng-hide="result.length === 0" ng-click="toggle_tutorial('{{ key }}')"
                         style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">Tutorial {{ key }}</li>
 
-                    <li ng-repeat="student in value | filter:q:false as result" id="{{ student.id }}" class="item {{ student.match }}" ng-click="match_face({{ student }})">
-                      {{ student.first_name }}
+                    <li ng-repeat="student in value | filter:q as result" id="{{ student.id }}" class="item {{ student.match }}" ng-click="match_face({{ student }})">
+                      {{ student.first_name}}
                       <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                     </li>
                   </ul>
                 </ul>
 
-                <li ng-hide="show_tutorial" ng-repeat="student in student_list | filter:q:false as result" id="{{ student.id }}"
+                <li ng-hide="show_tutorial" ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}"
                     class="item {{ student.match }}" ng-click="match_face({{ student }})">
                   {{ student.first_name }}
                   <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
