@@ -950,7 +950,7 @@ function drawRects(canvasId, imgId, clickable){
                 curPointer = i;
                 drawRects(canvasId, imgId, clickable);
                 return;
-              } else{
+              } else if (curPointer == i){
                 // Remove corresponding occupied marker from scope student_list
                 // $('#' + facesList[i].id).removeClass('occupied');
                 var scope = angular.element($("#"+canvasId)).scope();
