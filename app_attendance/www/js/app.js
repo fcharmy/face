@@ -208,7 +208,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
     $scope.choose_module = function(data){
         requestObj.url = SERVER + OPTION + '_module';
-        requestObj.data = {data: data, token: PROFILE.authToken};
+        requestObj.data = {data: data, token: PROFILE.authToken, owner: PROFILE.UserID};
 
         requestObj.success = function(data){
             if(data.data.student.length > 0) {
@@ -474,13 +474,13 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
 .controller('enrollController', function($scope, $stateParams, $state, $ionicPlatform, $ionicPopup){
     highlight = null; curPointer = null;  // initial
-    $scope.img = $stateParams.img;
-    $scope.data = $stateParams.data;
-    $scope.student_list = $.extend(true, [], aMODULE.student);
-    $scope.show_tutorial = aMODULE.tutorial != undefined;
-    $scope.lt = (!$stateParams.is_enroll && $stateParams.class)? $stateParams.class.lt : null;
-
+    
     $scope.$on("$ionicView.enter", function(event, data){
+        $scope.img = $stateParams.img;
+        $scope.data = $stateParams.data;
+        $scope.student_list = $.extend(true, [], aMODULE.student);
+        $scope.show_tutorial = aMODULE.tutorial != undefined;
+        $scope.lt = (!$stateParams.is_enroll && $stateParams.class)? $stateParams.class.lt : null;
         $scope.orientationChange();
 
         if ($scope.data.hasOwnProperty('faces')) {
@@ -489,13 +489,28 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         }
 
         if ($scope.show_tutorial) {
-            $scope.tutorial = $.extend(true, [], aMODULE.tutorial);
+            my_students = $.extend(true, [], aMODULE.tutorial);
+
+            for( var i = 0; i<$scope.student_list.length; i++){
+                var cur_student = $scope.student_list[i];
+                cur_student.tutored = false;
+
+                for (var j = 0; j<my_students.length; j++){
+                    if(cur_student.first_name == my_students[j].name){
+                        cur_student.tutored = true;
+                        my_students.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+            
+            /**$scope.tutorial = $.extend(true, [], aMODULE.tutorial);
             for (var i = 0; i < $scope.tutorial.length; i++) {
                 var k = Object.keys($scope.tutorial[i])[0];
                 for (var j = 0; j < $scope.tutorial[i][k].length; j++) {
                     $scope.tutorial[i][k][j] = $scope.student_list[$scope.tutorial[i][k][j]]
                 }
-            }
+            }**/
         }
 
         $('#spinner').hide();
@@ -682,7 +697,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
                 // send request to update tabs info
                 requestObj.url = SERVER + OPTION + '_module';
-                requestObj.data = {data: JSON.stringify(aMODULE), token: PROFILE.authToken};
+                requestObj.data = {data: JSON.stringify(aMODULE), token: PROFILE.authToken, owner: PROFILE.UserID};
 
                 requestObj.success = function(data){
                     aMODULE = data.data;
@@ -902,21 +917,20 @@ function drawRects(canvasId, imgId, clickable){
           }
 
           ctx.beginPath();
+          // show person name under rectangle if has name
+          if (facesList[i].hasOwnProperty('id') && facesList[i].id != notMatched) {
+            ctx.font = "15px Arial";
+            var measure = ctx.measureText(facesList[i].first_name);
+            ctx.fillStyle = 'white';
+            ctx.fillRect((coordinates[2]+coordinates[3]) * ratio / 2 - measure.width/2, coordinates[1] * ratio+10, measure.width, 15);
+            ctx.fillStyle = normal;
+            ctx.fillText(facesList[i].first_name, (coordinates[2]+coordinates[3]) * ratio / 2 - measure.width/2, coordinates[1] * ratio + 22);
+          }
           if (i == curPointer) {
             ctx.rect(coordinates[2] * ratio - 5, coordinates[0] * ratio - 5,
                 (coordinates[3] - coordinates[2]) * ratio + 10, (coordinates[1] - coordinates[0]) * ratio + 10);
             ctx.lineWidth = 8;
 
-            // show person name under rectangle if has name
-            if (facesList[i].hasOwnProperty('id') && facesList[i].id != notMatched) {
-              ctx.font = "15px Arial";
-              var measure = ctx.measureText(facesList[i].first_name);
-              ctx.fillStyle = 'white';
-              ctx.fillRect(coordinates[2] * ratio - 5, coordinates[1] * ratio+10, measure.width, 15);
-              ctx.fillStyle = normal;
-              ctx.fillText(facesList[i].first_name, coordinates[2] * ratio - 5, coordinates[1] * ratio + 22);
-              
-            }
           }
           else {
             ctx.rect(coordinates[2] * ratio, coordinates[0] * ratio,

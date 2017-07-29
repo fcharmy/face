@@ -209,7 +209,7 @@
               </div>
 
               <ul class="list student-list">
-                <ul ng-repeat="t in tutorial" ng-show="show_tutorial">
+                <!--ul ng-repeat="t in tutorial" ng-show="show_tutorial">
                   <ul ng-repeat="(key, value) in t">
                     <li class="item item-divider" ng-hide="result.length === 0" ng-click="toggle_tutorial('{{ key }}')"
                         style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">Tutorial {{ key }}</li>
@@ -219,13 +219,38 @@
                       <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                     </li>
                   </ul>
-                </ul>
+                </ul-->
 
-                <li ng-hide="show_tutorial" ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}"
-                    class="item {{ student.match }}" ng-click="match_face({{ student }})">
+                  <li class="item item-divider"
+                        style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">My Tutorial's Students</li>
+
+                    <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}" class="item {{ student.match }}" ng-click="match_face({{ student }})" ng-if="student.tutored && student.match">
+                      {{ student.first_name}}
+                      <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
+                    </li>
+                    <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}" class="item {{ student.match }}" ng-click="match_face({{ student }})" ng-if="student.tutored && !student.match">
+                      {{ student.first_name}}
+                      <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
+                    </li>
+
+                <li class="item item-divider"
+                        style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">Other Students</li>
+
+                <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}"
+                    class="item {{ student.match }}" ng-click="match_face({{ student }})" ng-if="!student.tutored && student.match">
                   {{ student.first_name }}
                   <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                 </li>
+                <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}"
+                    class="item {{ student.match }}" ng-click="match_face({{ student }})" ng-if="!student.tutored && !student.match">
+                  {{ student.first_name }}
+                  <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
+                </li>
+                <!--li ng-hide="show_tutorial" ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}"
+                    class="item {{ student.match }}" ng-click="match_face({{ student }})" ng-if="student.match">
+                  {{ student.first_name }}
+                  <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
+                </li-->
 
               </ul>
             </div>

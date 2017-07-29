@@ -44,12 +44,14 @@
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Students</th>
                 </tr>
               </thead>
               <tbody>
                 {% for item in tutors %}
                     <tr>
                       <td>{{ item.username }}</td>
+                      <td>{{ item.myss_len }}&nbsp;&nbsp;{% if item.username == user.username %}<a href="{% url 'attend:form_tutor_add_student' %}">Add</a>{% endif %}</td>
                     </tr>
                 {% empty %}
                     <tr>

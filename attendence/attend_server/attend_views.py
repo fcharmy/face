@@ -47,16 +47,20 @@ def update_module(request):
     if form.is_valid():
         try:
             data = json.loads(form.cleaned_data['data'])
+            print('owner:',form.cleaned_data['owner'])
 
             # return person profile order by person name
             exist_list = api.get_persons_by_group(group=data.get('face_group_id'))
             new_list = models.Student.objects.filter(module_id=data.get('ID'))
             tutors_list = [ump.user for ump in models.User_Module_Permission.objects.filter(module__id=data.get('ID'), permission='M')]
+            tutored_students = [s.student.to_dict() for s in models.get_my_student_in_module(tutor=form.cleaned_data['owner'], module_id=data.get('ID'))]
 
             new_tutors_list = []
             for i in range(len(tutors_list)):
+                myss = [ts.student.to_dict() for ts in models.get_my_student_in_module(tutors_list[i],data.get('ID'))];
                 new_tutors_list.append({
-                    'username': tutors_list[i].username
+                    'username': tutors_list[i].username,
+                    'myss_len': len(myss)
                 })
 
             # Relationship with data between face and ivle:
@@ -146,6 +150,7 @@ def update_module(request):
                 data['attendance'] = []
 
             data['tutors'] = new_tutors_list
+            data['tutorial'] = tutored_students
             return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())

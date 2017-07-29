@@ -7,7 +7,7 @@ from django.http import HttpResponse
 API_KEY = "f14zzwlfh5fxiXWS2U3hU"
 
 project_key = '1'
-security_key = 'oARHTlWl'
+security_key = 'XJ7Yx5U0'
 api = FaceAPI(project_key, security_key, server='http://localhost/')
 
 IMG_FOLDER_NAME = 'img_upload'
