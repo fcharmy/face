@@ -328,17 +328,23 @@ def face_detection(request):
 @csrf_exempt
 def verify(request):
     """ verify faces with person ids"""
+
     t1 = time.time()
     form = forms.ImgForm(request.POST, request.FILES)
 
     if form.is_valid():
         img = form.cleaned_data['image']
         group = int(form.cleaned_data['group'])
+        owner = form.cleaned_data['owner']
+
+        module = models.Modules.objects.filter(group_id = group)[0]
+        my_students = [ts.student.id for ts in models.get_my_student_in_module(owner, module.id)]
+
 
         try:
             file_path = default_storage.save(img.name, ContentFile(img.read()))
             print(file_path)
-            response_data = api.verification_faces(image=file(img), group=group)
+            response_data = api.verification_faces(image=file(img), group=group, prioritized_persons={'ids':my_students})
         except:
             response_data = []
             file_path = ''

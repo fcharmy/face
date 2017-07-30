@@ -95,6 +95,8 @@ def update_module(request):
                 # Add new item to face database
                 updated_list, add_list = [], []
 
+                #print([p.get('id') for p in new_list], [p.get('name') for p in exist_list])
+
                 for i in range(len(new)):
                     if new[i] is False:
                         add_list.append({'name': new_list[i].get('id'),

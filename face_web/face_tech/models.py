@@ -43,6 +43,9 @@ class Person(models.Model):
 
         return _dict
 
+    def __str__(self):
+        return str(self.id)
+
 
 class Person_To_Group(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)

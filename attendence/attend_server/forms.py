@@ -28,6 +28,7 @@ class ImgForm(forms.Form):
     group = forms.IntegerField(label='Group ID', required=False)
     module = forms.CharField(label='Module ID', required=False)
     lt = forms.BooleanField(label='lecture or tutorial', required=False)
+    owner = forms.IntegerField(widget = forms.HiddenInput())
 
 
 class ModuleForm(forms.Form):

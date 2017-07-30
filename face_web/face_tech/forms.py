@@ -101,4 +101,5 @@ class VerificationForm(forms.Form):
     seckey = forms.CharField(max_length=30, label='Security Key')
     image = forms.ImageField()
     group = forms.IntegerField(label='Group ID (optional)', required=False)
+    prioritized_persons = forms.CharField(required=False)
 

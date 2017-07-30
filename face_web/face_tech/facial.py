@@ -23,9 +23,10 @@ def detect(request):
 
             # Show Result#
             # import cv2
-            # for (y, h, x, w) in faces:
+            # for (y, h, x, w) in coordinates:
             #     cv2.rectangle(image, (x, y), (w, h), (0, 255, 0), 2)
             #     tem_face = image[y:h, x:w]
+            # cv2.imwrite("result.jpeg", image)
             # cv2.imshow("Faces found", image)
             # cv2.waitKey(0)
 
@@ -200,15 +201,21 @@ def enrollment(request):
 def verification(request):
     """
     Verification in project or group
-    :param Group/project Name, seckey, image
+    :param Group/project Name, seckey, image, 'prioritized person id': {'ids': [...]}
     :return: {'data':[{'id':id, 'person_name','email'..
             'coordinates':[], 'occlude':bool..},{},.]}
     """
     form = forms.VerificationForm(request.POST, request.FILES)
+    #print('here')
 
     if form.is_valid():
         project = models.auth_project_seckey(form.cleaned_data['project'], form.cleaned_data['seckey'])
         group = form.cleaned_data["group"]
+        prior_ids = form.cleaned_data.get("prioritized_persons")
+        if prior_ids is not '':
+            prior_ids = json.loads(prior_ids).get('ids')
+
+        #print('received', prior_ids)
 
         if project:
             if group:
@@ -223,12 +230,29 @@ def verification(request):
             persons = None
 
             if project is not None and not group:
-                persons = models.Person.objects.filter(project=project)
+                persons = [p for p in models.Person.objects.filter(project=project)]
             elif group:
                 persons = [ptp.person for ptp in models.Person_To_Group.objects.filter(group_id=group).distinct()]
 
+            #print('all persons', [p.id for p in persons])
+
+            prioritized_persons = []
+            ptr = 0
+            if prior_ids is not '':
+                for p in persons:
+                    if p.id in prior_ids:
+                        prioritized_persons.insert(ptr, p)
+                        ptr = ptr + 1
+                        prior_ids.remove(p.id)
+                    else:
+                        prioritized_persons.append(p)
+            else:
+                prioritized_persons = persons
+
+            print('prioritized', [p.id for p in prioritized_persons])
+
             if coords and persons is not None:
-                persons_feature_array = fac_pravite.get_feature_array(persons)
+                persons_feature_array = fac_pravite.get_feature_array(prioritized_persons)
 
                 for c in coords:
                     result = {'id': 'None'}

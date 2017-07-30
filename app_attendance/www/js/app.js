@@ -410,7 +410,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         $scope.img = photo;
         // document.getElementById('confirm-img').src = $scope.img;
 
-        uploadImg(SERVER + (ev? 'detect': 'verify'), photo, {group: aMODULE.face_group_id},
+        uploadImg(SERVER + (ev? 'detect': 'verify'), photo, {group: aMODULE.face_group_id, owner: PROFILE.UserID},
             function(r){
                 // submit image to server succeed
                 $scope.response_data = JSON.parse(r.response).data;
@@ -701,7 +701,10 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
                 requestObj.success = function(data){
                     aMODULE = data.data;
-                    $state.go('tabs.home');
+                    if($stateParams.is_enroll)
+		        $state.go('tabs.attend');
+                    else 
+                        $state.go('tabs.home');
                 };
 
                 requestObj.error = function(xhr, status, error){
