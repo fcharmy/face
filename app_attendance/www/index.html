@@ -276,6 +276,7 @@
             </div>
         </ion-nav-buttons>
         <ion-content>
+          <div class="i" style="text-align:center;width:100% !important;position:relative;top:20px" ng-show="attend_records.length==0">no history</div>
           <ul id="record-list" class="list">
               <li id="{{ attend_records[index].time_id}}" class="item" ng-repeat="index in range(attend_records.length)" ng-click="detail({{ index }})">
 

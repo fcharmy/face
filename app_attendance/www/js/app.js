@@ -772,6 +772,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         if ($scope.images[$scope.img_index].hasOwnProperty('data')) {
             highlight = null; curPointer = null;  // initial
             facesList = $scope.images[$scope.img_index].data;
+            students_list = $.extend(true, [], aMODULE.student)
             drawRects('detail-canvas', 'detail-img', false);
         }
     };
@@ -849,6 +850,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 */
 
 var facesList = [],     // copy of face list
+    students_list=[],
     highlight = null,   // highlight a face
     curPointer = null,  // point to the index of current face
     ctime = new Date(); // for save last single click time 
@@ -922,12 +924,25 @@ function drawRects(canvasId, imgId, clickable){
           ctx.beginPath();
           // show person name under rectangle if has name
           if (facesList[i].hasOwnProperty('id') && facesList[i].id != notMatched) {
+            var name = " ";
+
+            if(facesList[i].hasOwnProperty('first_name')){
+                name = facesList[i].first_name;
+            }else {
+
+                for(var ptr = 0; ptr<students_list.length; ptr++)
+                    if(students_list[ptr].id == facesList[i].id){
+                        name = students_list[ptr].first_name;
+                        break;
+                    }
+            }
+
             ctx.font = "15px Arial";
-            var measure = ctx.measureText(facesList[i].first_name);
+            var measure = ctx.measureText(name);
             ctx.fillStyle = 'white';
             ctx.fillRect((coordinates[2]+coordinates[3]) * ratio / 2 - measure.width/2, coordinates[1] * ratio+10, measure.width, 15);
             ctx.fillStyle = normal;
-            ctx.fillText(facesList[i].first_name, (coordinates[2]+coordinates[3]) * ratio / 2 - measure.width/2, coordinates[1] * ratio + 22);
+            ctx.fillText(name, (coordinates[2]+coordinates[3]) * ratio / 2 - measure.width/2, coordinates[1] * ratio + 22);
           }
           if (i == curPointer) {
             ctx.rect(coordinates[2] * ratio - 5, coordinates[0] * ratio - 5,
