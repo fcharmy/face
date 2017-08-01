@@ -68,15 +68,15 @@
 
 
           <div class="responsive-lg padding">
-            <form ng-submit="login_submit(username, password)">
+            <form ng-submit="login_submit()">
               <label class="item item-input">
                 <span class="input-label">Username</span>
-                <input type="text" ng-model="username">
+                <input type="text" ng-model="formData.username">
               </label>
 
               <label class="item item-input">
                 <span class="input-label">Password</span>
-                <input type="password" ng-model="password">
+                <input type="password" ng-model="formData.password">
               </label>
 
               <input id="submit-button" class="button button-full button-block button-positive" type="submit" value="Submit">
@@ -224,11 +224,11 @@
                   <li class="item item-divider"
                         style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">My Tutorial's Students</li>
 
-                    <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}" class="item {{ student.match }}" ng-click="match_face({{ student }})" ng-if="student.tutored && student.match">
+                    <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}" class="item {{ student.match }}" ng-class = "{'disabled': is_enroll && student.enrolled}" ng-click="match_face({{ student }})" ng-if="student.tutored && (student.match || (is_enroll && student.enrolled) ) ">
                       {{ student.first_name}}
                       <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                     </li>
-                    <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}" class="item {{ student.match }}" ng-click="match_face({{ student }})" ng-if="student.tutored && !student.match">
+                    <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}" class="item {{ student.match }}" ng-class = "{'disabled': is_enroll && student.enrolled}" ng-click="match_face({{ student }})" ng-if="student.tutored && !student.match && !(is_enroll && student.enrolled)">
                       {{ student.first_name}}
                       <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                     </li>
@@ -237,12 +237,12 @@
                         style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">Other Students</li>
 
                 <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}"
-                    class="item {{ student.match }}" ng-click="match_face({{ student }})" ng-if="!student.tutored && student.match">
+                    class="item {{ student.match }}" ng-class = "{'disabled': is_enroll && student.enrolled}" ng-click="match_face({{ student }})" ng-if="!student.tutored && (student.match || (is_enroll && student.enrolled) ) " >
                   {{ student.first_name }}
                   <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                 </li>
                 <li ng-repeat="student in student_list | filter:q as result" id="{{ student.id }}"
-                    class="item {{ student.match }}" ng-click="match_face({{ student }})" ng-if="!student.tutored && !student.match">
+                    class="item {{ student.match }}" ng-class = "{'disabled': is_enroll && student.enrolled}" ng-click="match_face({{ student }})" ng-if="!student.tutored && !student.match && !(is_enroll && student.enrolled)" >
                   {{ student.first_name }}
                   <small class="i" style="text-align: right;float: right;">{{ student.name }}</small>
                 </li>
@@ -278,10 +278,12 @@
         <ion-content>
           <div class="i" style="text-align:center;width:100% !important;position:relative;top:20px" ng-show="attend_records.length==0">no history</div>
           <ul id="record-list" class="list">
-              <li id="{{ attend_records[index].time_id}}" class="item" ng-repeat="index in range(attend_records.length)" ng-click="detail({{ index }})">
+              <li id="{{ attend_records[index].time_id}}" class="item" ng-repeat="index in range(attend_records.length)">
 
                 <span>{{ attend_records[index].day}}</span>
                 <small class="i">&nbsp;{{attend_records[index].date}},&nbsp;{{attend_records[index].time}}</small>
+                <button class="button icon ion-eye button-small" style="float:right;margin-top:-6px;margin-left:10px" ng-click="detail({{ index }})"></button>
+                <button class="button icon ion-plus-round button-small" style="float:right;margin-top:-6px;margin-left:10px" ng-click="add_photo({{ index }})" ng-disabled="!attend_records[index].addable"></button>
                 <small class="i" style="text-align: right;float: right;min-width: 55px;">{{ attend_records[index].lt? 'Lecture': 'Tutorial' }}</small>
                 <p style="float: right;">&nbsp;&nbsp;<i class="orange">{{ attend_records[index].students.length}}</i>/{{stu_amount}}</p>
               </li>

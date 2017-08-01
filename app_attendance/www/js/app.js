@@ -60,6 +60,10 @@ var OPTION = null, // login type: 'ivle' or 'attend'
      *     {
      *         id, name (person id?), first_name (name?), last_name, email, project, create_date
      *     }*
+     *     attendance: all attendance record
+     *     {
+     *         students, owner, time_id, lt, images: {url, data: {coordinates, id}*}
+     *     }*
      *     
      */
     aMODULE = null;
@@ -178,12 +182,13 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 .controller('loginController', function($scope, $http, $state, $stateParams, mePageLoading){
     // $scope.hideList = true;
     $scope.submitDisable = false;
+    $scope.formData = {};
     $scope.loginOptions = [['ivle', "NUS Login"], ['attend', "Default"]];
     $scope.login_option = $stateParams.is_NUS?$scope.loginOptions[0]:$scope.loginOptions[1];
     // ionic.Platform.isFullScreen = true;
 
     $scope.$on('$ionicView.enter', function(event, data){
-         $('input:password').val(' ');  // erase the input password
+         $scope.formData.password = "";
     });
 
     /***********************************decaprated********************************************/
@@ -205,13 +210,14 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         $('#submit-spinner').css( "display", (bool? 'block': 'none'));
     };
 
-    $scope.login_submit = function(username, password){
+    $scope.login_submit = function(){
         OPTION = $scope.login_option[0];
 
         if (OPTION != null){
             $scope.submit_loading(true);
             requestObj.url = SERVER + OPTION + '_login';
-            requestObj.data = {username: username, password: password};
+
+            requestObj.data = {username: $scope.formData.username, password: $scope.formData.password};
 
             requestObj.success = function(data){
                 // succeed in loging in and then extract the detail of the module
@@ -299,7 +305,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
     };
 })
 
-.controller('homeController', function($scope, $state){
+.controller('homeController', function($scope, $state, $ionicPopup){
 
     $scope.$on('$ionicView.enter', function(){
         $scope.stu_amount = aMODULE.student.length;
@@ -319,12 +325,14 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
             $scope.attend_records[i].time = d.toLocaleTimeString("en-us",{ hour: "2-digit", minute: "2-digit"});
             $scope.attend_records[i].day = d.toLocaleDateString("en-us",{ weekday: "long" });
             $scope.attend_records[i].week = d.getWeekNumber();
+            $scope.attend_records[i].addable = ($scope.attend_records[i].owner == PROFILE.Name)
 
             if($scope.min_week == undefined || $scope.min_week > $scope.attend_records[i].week){
                 $scope.min_week = $scope.attend_records[i].week;
             }
         }
-    });
+    }); 
+
 
     $scope.$on("$ionicView.afterEnter", function(event, data) {
         $('#spinner').hide();
@@ -345,6 +353,88 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         var list = [];
         for (var i = 0; i < len; i++) { list.push(i); }
         return list;
+    };
+
+    $scope.add_photo = function(index){
+
+        $ionicPopup.show({
+            title: 'Choose Photo: ',
+            scope: $scope,
+            buttons: [
+                {   
+                    text: '<small>Cancel</small>',
+                    onTap: function(e) {
+                        $scope.cg = null;
+                    }
+                },
+                {
+                    text: '<b><small>From Camera</small></b>',
+                    type: 'button-positive',
+                    onTap: function(e) {
+                        $scope.cg = true;
+                    }
+                },
+                {
+                    text: '<b><small>From Gallery</small></b>',
+                    type: 'button-positive',
+                    onTap: function(e) {
+                        $scope.cg= false;
+                    }
+                }   
+            ]
+        }).then(function() {
+            if($scope.cg != null){
+                $scope.getPhoto(index, $scope.cg);
+            }
+        });
+    }
+ 
+    $scope.getPhoto = function (index, cg) {
+        var process_photo = function(data){
+            // take photo succeed
+            $scope.img = data;
+            
+            $('#spinner').show();
+            uploadImg(SERVER + 'verify', data, {group: aMODULE.face_group_id, owner: PROFILE.UserID}, 
+                function(r){
+                    // submit image to server succeed
+                    $scope.response_data = JSON.parse(r.response).data;
+                    $('#spinner').hide();
+                    $state.go('enroll', {is_enroll: false, img: $scope.img, data: $scope.response_data, class: $scope.attend_records[index]});
+                }, 
+                function(error){
+                    show_message(6, error.code);
+                    $('#spinner').hide();
+                });
+        }
+
+        if(cg){
+    	    navigator.camera.getPicture(function(data){
+                process_photo(data);
+            },function(message){
+                // take photo failed
+                show_message(7, message);
+                $('#spinner').hide();
+            },{
+                quality: 50, 
+                correctOrientation: true, 
+                encodingType: Camera.EncodingType.JPEG
+            });
+        }else{
+            // take photo failed
+            navigator.camera.getPicture(function (data) {
+                // select photo succeed
+                process_photo(data);
+            }, function () {
+                show_message(7, message);
+                $('#spinner').hide();
+            }, {
+                quality: 60,
+                correctOrientation: true,
+                destinationType: Camera.DestinationType.FILE_URI,
+       	        sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+            });
+        }
     };
 
     $scope.back = function(){
@@ -534,6 +624,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         $scope.show_tutorial = aMODULE.tutorial != undefined;
         $scope.lt = (!$stateParams.is_enroll && $stateParams.class)? $stateParams.class.lt : null;
         $scope.orientationChange();
+        $scope.is_enroll = $stateParams.is_enroll;
 
         if ($scope.data.hasOwnProperty('faces')) {
             facesList = $scope.data.faces;
@@ -604,6 +695,9 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
     $scope.match_face = function(person){
         if (curPointer != null && facesList) {
+            if(person.enrolled && $scope.is_enroll && !confirm('Student '+person.first_name+' has been enrolled, are you sure to enroll again?')){
+                return;
+            }
             if (facesList[curPointer].hasOwnProperty('id') && facesList[curPointer].id != notMatched) {
 
                 if(facesList[curPointer].name == person.name)
@@ -730,6 +824,21 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
                 requestObj.success = function(data){
                     aMODULE = data.data;
+                    // mark if the student is tutored on the student list
+                    my_students = $.extend(true, [], aMODULE.tutorial);
+
+                    for( var i = 0; i<aMODULE.student.length; i++){
+                        var cur_student = aMODULE.student[i];
+                        cur_student.tutored = false;
+
+                        for (var j = 0; j<my_students.length; j++){
+                            if(cur_student.first_name == my_students[j].name){
+                                cur_student.tutored = true;
+                                my_students.splice(j, 1);
+                                break;
+                            }
+                         }
+                    }
                     if($stateParams.is_enroll)
 		        $state.go('tabs.attend');
                     else 

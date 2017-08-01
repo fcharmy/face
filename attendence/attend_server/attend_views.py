@@ -30,6 +30,7 @@ def log_in(request):
                         dict_['Permission'] = m.permission
 
                         data['Modules'].append(dict_)
+                        print(data)
                     return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
@@ -146,6 +147,7 @@ def update_module(request):
                 del exist_list, new_list, add_list, tutors_list
                 data['student'] = updated_list
                 data['attendance'] = models.get_records(data.get('ID'))
+ 
 
             else:
                 data['student'] = []
@@ -153,6 +155,7 @@ def update_module(request):
 
             data['tutors'] = new_tutors_list
             data['tutorial'] = tutored_students
+
             return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())

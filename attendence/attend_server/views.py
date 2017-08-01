@@ -316,7 +316,6 @@ def face_detection(request):
 
             t2 = time.time()
             log.info("face_detection: {}".format(t2 - t1))
-
             return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
