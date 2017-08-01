@@ -43,7 +43,7 @@
                   <button class="button button-large button-positive" style="margin-right:20px;" ng-click="login(true)">NUS</button>
                   <button class="button button-large button-positive" style="margin-left:20px;" ng-click="login(false)">Regular</button>
               </div></div>
-              <div><a  style="font-style: normal; position: absolute; bottom: 60px; width: 100%; text-align: center;" herf="#" onclick="window.open('http://172.29.34.77:8000/','_system', 'location=yes');return false;">Sign in On Our Website</a></div>
+              <div><a  style="font-style: normal; position: absolute; bottom: 60px; width: 100%; text-align: center;" herf="#" onclick="window.open('http://172.29.33.44:8000/','_system', 'location=yes');return false;">Sign in On Our Website</a></div>
               <div><p class="i" style="font-style: normal; position: absolute; bottom: 20px; width: 100%; text-align: center;">Version 1.03</p></div>
           </ion-content>
       </div>
@@ -193,7 +193,7 @@
       <ion-view view-title="Enrollment" cache-view="false">
         <ion-content>
           <div class="container">
-
+            <div class="i" style="text-align:center"><p id="enroll-msg" style="position:relative; top:3px; left:3px">#Message#</p></div>
             <div class="card img-container">
               <canvas id="img-canvas"></canvas>
               <img id="enroll-img" style="display:none" ng-src="{{ img }}"/>
@@ -299,9 +299,8 @@
             <div class="h1 title">{{ title }}</div>
             <button class="button button-icon ion-plus-round" ng-disabled="add_disabled" ng-click="add_photo()"></button>
           </div>
-
           <div class="container detail-tab">
-            <div class="card detail-container" style="text-align: center;display: flex;overflow: hidden;">
+            <div class="card detail-container" style="text-align: center;display: flex;overflow: scroll;">
               <button ng-disabled="previous_disabled" class="button button-icon icon ion-arrow-left-b" ng-click="previous()"></button>
                 <canvas id="detail-canvas" style="display: none;margin: auto;"></canvas>
                 <img id="detail-img" ng-src="{{ serverUrl + images[img_index].url }}" style="display: none;"/>
@@ -324,7 +323,14 @@
               </div>
 
               <ul class="list detail-student-list" style="top: 3px;">
-                <li class="item" ng-repeat="student in student_show_list" ng-click="match_face({{ student }})">
+                <li class="item item-divider"
+                        style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">My Tutorial's Students</li>
+                <li ng-repeat="student in student_show_list" ng-click="match_face({{ student }})" class="item" ng-if="student.tutored">
+                  {{ student.first_name }}
+                </li>
+                <li class="item item-divider"
+                        style="background-color: grey;color: white;font-weight: bold;border-width: 0 0 2px 0;">Other Students</li>
+                <li ng-repeat="student in student_show_list" ng-click="match_face({{ student }})" class="item" ng-if="!student.tutored">
                   {{ student.first_name }}
                 </li>
               </ul>

@@ -1,5 +1,11 @@
-// ajax request setting
-var SERVER = 'http://172.29.34.77:8000/',
+/** request setting for ajax when rendering:
+ **   server: the address of attendance server
+ **   requestObj: with default settings of 'type', 'crossDomain', 
+ **       'dataType': response data type
+ **       'header', 'xhrFields'
+ **   uploadImg: the function to send a image
+ **/
+var SERVER = 'http://172.29.33.44:8000/',
     requestObj = {
       type: "POST",
       crossDomain: true,
@@ -22,12 +28,43 @@ var SERVER = 'http://172.29.34.77:8000/',
       ft.upload(imgURI, url, success, fail, options);
     };
 
-// server response data hardcoded
+// Default response from server
 var notMatched = 'None'; // When face is not recognized, person id is None
 
-var OPTION = null, // specify login type
-    PROFILE = null, // user profile after login
+
+/** global present variable **/
+var OPTION = null, // login type: 'ivle' or 'attend'
+    /** user profile after loging in (dict)
+     **    1) Regular:
+     **       UserID: use's id in django.contrib.auth.models.User
+     **       name: username in django.contrib.auth.models.User
+     **       modules: {
+     **            CourseAcadYear, ID, courseName, permission, courseCode, face_group_id, courseSemester
+     **       }*
+     **/
+    PROFILE = null, 
+    /* Then chosen module details
+     *     ID: module id in models.Modules
+     *     CourseAcadYear
+     *     CourseSemester
+     *     CourseName
+     *     CourseCode
+     *     tutors: {
+     *     	myss_len: the number of students in tutor's tutorial
+     *          username: tutor's name
+     *     }
+     *     tutorial: {student}*
+     *     permission: user's permission on this module. 'F' for professor, 'M' for tutor
+     *     face_group_id: the id of group on face_web server corresponding to this module
+     *     student: all the student in this module
+     *     {
+     *         id, name (person id?), first_name (name?), last_name, email, project, create_date
+     *     }*
+     *     
+     */
     aMODULE = null;
+
+var time = 0;
 // var OPTION = 'ivle',
 //     PROFILE = {'FirstMajor': 'Nil', 'Email': 'e0013178@u.nus.edu', 'Gender': 'Female', 'MatriculationYear': '2015', 'Name': 'SIVASANKARAN DIVYA', 'authToken': 'D41A734885A38795EDBC371AA5C3E6B318AB563B3C161E63D742FF11D777D5C9563E9A47B373CFF2A6E7D322974D119667BFD63027E5182A28DA7740F4BC1390E105007DEC08BAB9841220A111262F5C547DB72EB6F8CD3D4DF7E5893442882F1DC4FA918A6CFDBD15BE67BA7CF3FB409C7B1E60259CFA26C19480F8552E37108A8A27F2390ABF5349FBDCD737EEDD320711F1052527556FE2CC6B6927D67CF7E909549D5951EF653F0D36B84C9B351379B57C4497DC3EBEA07711C385D640A3435B7DDCA5E6D72EBF90683FC4925366AE9C74C59EE21FD39F18792364502AF8E4207808653D0A145BE864E8EF5DFE4D', 'Modules': [{'ID': '73efbd67-772e-4de3-b743-8e4f574378c0', 'face_group_id': 5, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'CS1231', 'Permission': 'M', 'CourseName': 'DISCRETE STRUCTURES'}, {'ID': '8f248169-99fd-412c-a499-9308571befc5', 'face_group_id': 6, 'CourseSemester': 'Semester 1', 'CourseAcadYear': '2016/2017', 'CourseCode': 'NM3216', 'Permission': 'R', 'CourseName': 'GAME DESIGN'}], 'SecondMajor': '', 'UserID': 'e0013178', 'Faculty': 'School of Computing', 'Photo': ''};
 
@@ -45,7 +82,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         templateUrl: "login-page.html",
         controller: "loginController",
         params: {
-            is_NUS: null
+            is_NUS: null	// pass user's choice on the cover page
         }
     })
     .state('modules',{
@@ -91,10 +128,10 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         templateUrl: "enroll.html",
         cache: false,
         params: { 
-            is_enroll: null,
-            img: null,
-            data: null,
-            class: null
+            is_enroll: null,	// specify whether it is used to enroll or verify
+            img: null,          // the image data got from Gallery or Camera
+            data: null,         // TODO
+            class: null         // TODO
         },
         controller: 'enrollController'
     })    
@@ -103,24 +140,20 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         templateUrl: "detail.html",
         cache: false,
         params: { 
-            data: null
+            data: null          // TODO
         },
         controller: 'detailController'
     });
 
-    $urlRouterProvider.otherwise("/cover");
+    $urlRouterProvider.otherwise("/cover");	// jump to cover for default 
     $ionicConfigProvider.tabs.position('bottom');
     $ionicConfigProvider.navBar.alignTitle('center');
 
 })
 
 .controller('coverController', ['$scope', '$state', 'mePageLoading', function($scope, $state, mePageLoading){
+    // when choosing some choice, fade out the 2 login choice, and jump to login page
     $scope.login = function(is_NUS){
-         /**mePageLoading.show('random');
-         setTimeout(function(){
-             mePageLoading.hide();
-             $state.go("login", {is_NUS: is_NUS});
-         }, 1000);**/
          setTimeout(function(){
               $("#cover-nav-wrap").animate({
                  opacity: 0,
@@ -129,6 +162,8 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
          }, 0);
          setTimeout(function(){$state.go("login", {is_NUS: is_NUS});},1500);
     }
+
+    // when entering the page, fade in the 2 login choice
     $scope.$on('$ionicView.enter', function(event, data){
       setTimeout(function(){
          $("#cover-nav-wrap").animate({
@@ -138,6 +173,8 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
        }, 600);
     });
 }])
+
+
 .controller('loginController', function($scope, $http, $state, $stateParams, mePageLoading){
     // $scope.hideList = true;
     $scope.submitDisable = false;
@@ -145,15 +182,15 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
     $scope.login_option = $stateParams.is_NUS?$scope.loginOptions[0]:$scope.loginOptions[1];
     // ionic.Platform.isFullScreen = true;
 
-    $scope.$on('')
+    $scope.$on('$ionicView.enter', function(event, data){
+         $('input:password').val(' ');  // erase the input password
+    });
 
-    /**decaprated**/
+    /***********************************decaprated********************************************/
     $scope.click_login_list = function(){
         // $scope.hideList = !$scope.hideList;
         $('#login-list').toggle(500);
     };
-
-
     $scope.choose_login = function(){
         // $scope.hideList = true;
         //$('#login-list').hide(500);
@@ -161,6 +198,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         mePageLoading.hide();
         $state.go("cover");
     };
+    /*****************************************************************************************/
 
     $scope.submit_loading = function(bool){
         $('#submit-button').prop( "disabled", bool );
@@ -176,14 +214,13 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
             requestObj.data = {username: username, password: password};
 
             requestObj.success = function(data){
+                // succeed in loging in and then extract the detail of the module
                 $scope.submit_loading(false);
                 PROFILE = data.data;
-                $scope.password = "";
                 $state.go('modules', {data: data.data});
             };
 
             requestObj.error = function(xhr, status, error){
-                alert(xhr.readyState)
                 if ('Not Acceptable' == error) {
                     show_message(7, xhr.responseText);
                 }else{
@@ -213,6 +250,21 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         requestObj.success = function(data){
             if(data.data.student.length > 0) {
                 aMODULE = data.data;
+                // mark if the student is tutored on the student list
+                my_students = $.extend(true, [], aMODULE.tutorial);
+
+                for( var i = 0; i<aMODULE.student.length; i++){
+                    var cur_student = aMODULE.student[i];
+                    cur_student.tutored = false;
+
+                    for (var j = 0; j<my_students.length; j++){
+                        if(cur_student.first_name == my_students[j].name){
+                             cur_student.tutored = true;
+                             my_students.splice(j, 1);
+                             break;
+                        }
+                     }
+                }
                 $state.go('tabs.attend');
             }
             else{
@@ -252,7 +304,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
     $scope.$on('$ionicView.enter', function(){
         $scope.stu_amount = aMODULE.student.length;
 
-        // for show list in home tab
+        // for show list in home tab: the detail of attendance history 
         $scope.attend_records = aMODULE.attendance? aMODULE.attendance : [];
 
         for (var i = 0; i < $scope.attend_records.length; i++) {
@@ -387,6 +439,10 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
             // take photo failed
             navigator.camera.getPicture(function (data) {
                 // select photo succeed
+                /******** track the compute time ******/
+                alert((new Date()).getTime());
+                time = (new Date()).getTime();
+                /**************************************/
                 $scope.newRecord(ev, data);
             }, function () {
                 show_message(7, message);
@@ -416,11 +472,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
                 $scope.response_data = JSON.parse(r.response).data;
                 highlight = null; curPointer = null;  // initial
 
-                // $('#confirm-button').prop('disabled', false);
-                // if ($scope.response_data.hasOwnProperty('faces')) {
-                //       facesList = $scope.response_data.faces;
-                //   drawRects('confirm-canvas', 'confirm-img', false);
-                // }
+                $('#spinner').hide();
                 $state.go('enroll', {is_enroll: $scope.is_enroll, img: $scope.img, data: $scope.response_data});
             },
             function(error){
@@ -485,38 +537,14 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
         if ($scope.data.hasOwnProperty('faces')) {
             facesList = $scope.data.faces;
-            drawRects('img-canvas', 'enroll-img', true);
+            drawRects('img-canvas', 'enroll-img', true, true);
         }
-
-        if ($scope.show_tutorial) {
-            my_students = $.extend(true, [], aMODULE.tutorial);
-
-            for( var i = 0; i<$scope.student_list.length; i++){
-                var cur_student = $scope.student_list[i];
-                cur_student.tutored = false;
-
-                for (var j = 0; j<my_students.length; j++){
-                    if(cur_student.first_name == my_students[j].name){
-                        cur_student.tutored = true;
-                        my_students.splice(j, 1);
-                        break;
-                    }
-                }
-            }
-            
-            /**$scope.tutorial = $.extend(true, [], aMODULE.tutorial);
-            for (var i = 0; i < $scope.tutorial.length; i++) {
-                var k = Object.keys($scope.tutorial[i])[0];
-                for (var j = 0; j < $scope.tutorial[i][k].length; j++) {
-                    $scope.tutorial[i][k][j] = $scope.student_list[$scope.tutorial[i][k][j]]
-                }
-            }**/
-        }
-
         $('#spinner').hide();
     });
 
     $ionicPlatform.ready(function() {
+        // show the elapsed time for enrolling or verifying
+        alert((new Date()).getTime() - time);
         window.addEventListener("orientationchange", function(){$scope.orientationChange();}, false);
     });
 
@@ -576,7 +604,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
     $scope.match_face = function(person){
         if (curPointer != null && facesList) {
-            if (facesList[curPointer].hasOwnProperty('id')) {
+            if (facesList[curPointer].hasOwnProperty('id') && facesList[curPointer].id != notMatched) {
 
                 if(facesList[curPointer].name == person.name)
                     return;
@@ -595,7 +623,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
             var index = $.map($scope.student_list, function(obj, index) { if(obj.id == person.id) { return index; }})[0];
             if ($scope.student_list[index].hasOwnProperty('match') && $scope.student_list[index].match == 'occupied') {
-                if (confirm('This student already match to a face, are you sure to delete previous one?')){
+                if (confirm('Student '+person.first_name+' ('+person.id+')'+' already match to a face, are you sure to delete previous one?')){
                     for (var i = 0; i < facesList.length; i++) {
                         if (facesList[i].hasOwnProperty('id') && facesList[i].id == person.id) {
                             delete facesList[i]['id']; delete facesList[i]['name']; delete facesList[i]['first_name']; delete facesList[i]['alter'];
@@ -613,13 +641,13 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
             highlight = curPointer;
             curPointer = null;
-            drawRects('img-canvas', 'enroll-img', true);
+            drawRects('img-canvas', 'enroll-img', true, true);
         }
         else if (curPointer == null && facesList) {
             for (var n = 0; n < facesList.length; n++) {
                 if (facesList[n].hasOwnProperty('id') && facesList[n].id == person.id) {
                     highlight = n;
-                    drawRects('img-canvas', 'enroll-img', true);
+                    drawRects('img-canvas', 'enroll-img', true, true);
                     break;
                 }
             }
@@ -692,6 +720,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         }
 
         requestObj.success = function(data){
+            $('#spinner').hide();
             if (data.hasOwnProperty('data')) {
                 show_message(4);
 
@@ -739,12 +768,13 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
     };
 })
 
-.controller('detailController', function($scope, $stateParams, $state){
+.controller('detailController', function($scope, $stateParams, $state, $ionicPopup){
     $scope.student_list = aMODULE.student;
     $scope.add_disabled = !($stateParams.data.owner == PROFILE.Name);
     $scope.images = $stateParams.data.images;
     $scope.serverUrl = SERVER;
     $scope.img_index = 0;
+    $scope.show_tutorial = aMODULE.tutorial != undefined;
     $scope.previous_disabled = true;
     $scope.next_disabled = $scope.images.length < 2;
 
@@ -773,7 +803,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
             highlight = null; curPointer = null;  // initial
             facesList = $scope.images[$scope.img_index].data;
             students_list = $.extend(true, [], aMODULE.student)
-            drawRects('detail-canvas', 'detail-img', false);
+            drawRects('detail-canvas', 'detail-img', false, false);
         }
     };
 
@@ -782,7 +812,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
             for (var n = 0; n < facesList.length; n++) {
                 if (facesList[n].hasOwnProperty('id') && facesList[n].id == person.id) {
                     highlight = n;
-                    drawRects('detail-canvas', 'detail-img', false);
+                    drawRects('detail-canvas', 'detail-img', false, false);
                     break;
                 }
             }
@@ -815,31 +845,85 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
     };
 
     $scope.add_photo = function(){
-        $('#spinner').show();
-        navigator.camera.getPicture(function(data){
-        // take photo succeed
-        $scope.img = data;
-
-        uploadImg(SERVER + 'verify', data, {group: aMODULE.face_group_id}, 
-            function(r){
-                // submit image to server succeed
-                $scope.response_data = JSON.parse(r.response).data;
-                $state.go('enroll', {is_enroll: false, img: $scope.img, data: $scope.response_data, class: $stateParams.data});
-            }, 
-            function(error){
-                show_message(6, error.code);
-                $('#spinner').hide();
-            });
-
-        },function(message){
-            // take photo failed
-            show_message(7, message);
-            $('#spinner').hide();
-        },{
-            quality: 50, 
-            correctOrientation: true, 
-            encodingType: Camera.EncodingType.JPEG
+        $ionicPopup.show({
+            title: 'Choose Photo: ',
+            scope: $scope,
+            buttons: [
+                {   
+                    text: '<small>Cancel</small>',
+                    onTap: function(e) {
+                        $scope.cg = null;
+                    }
+                },
+                {
+                    text: '<b><small>From Camera</small></b>',
+                    type: 'button-positive',
+                    onTap: function(e) {
+                        $scope.cg = true;
+                    }
+                },
+                {
+                    text: '<b><small>From Gallery</small></b>',
+                    type: 'button-positive',
+                    onTap: function(e) {
+                        $scope.cg= false;
+                    }
+                }   
+            ]
+        }).then(function() {
+            if($scope.cg != null){
+                $scope.getPhoto($scope.cg);
+            }
         });
+
+    }
+
+    $scope.getPhoto = function (cg) {
+        var process_photo = function(data){
+            // take photo succeed
+            $scope.img = data;
+            
+            $('#spinner').show();
+            uploadImg(SERVER + 'verify', data, {group: aMODULE.face_group_id, owner: PROFILE.UserID}, 
+                function(r){
+                    // submit image to server succeed
+                    $scope.response_data = JSON.parse(r.response).data;
+                    $('#spinner').hide();
+                    $state.go('enroll', {is_enroll: false, img: $scope.img, data: $scope.response_data, class: $stateParams.data});
+                }, 
+                function(error){
+                    show_message(6, error.code);
+                    $('#spinner').hide();
+                });
+        }
+
+        if(cg){
+    	    navigator.camera.getPicture(function(data){
+                process_photo(data);
+            },function(message){
+                // take photo failed
+                show_message(7, message);
+                $('#spinner').hide();
+            },{
+                quality: 50, 
+                correctOrientation: true, 
+                encodingType: Camera.EncodingType.JPEG
+            });
+        }else{
+            // take photo failed
+            navigator.camera.getPicture(function (data) {
+                // select photo succeed
+                process_photo(data);
+            }, function () {
+                show_message(7, message);
+                $('#spinner').hide();
+            }, {
+                quality: 60,
+                correctOrientation: true,
+                destinationType: Camera.DestinationType.FILE_URI,
+       	        sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+            });
+        }
     };
 });
 
@@ -862,7 +946,14 @@ var normal = 'green',   // faces with identification
 
 // Draw rectangles on image to highlight faces, 
 // set facesList first before call this function
-function drawRects(canvasId, imgId, clickable){
+function drawRects(canvasId, imgId, isEnroll, clickable){
+
+  var msg_bar = null;
+  if (isEnroll){
+     msg_bar = document.getElementById('enroll-msg');
+     msg_bar.innerHTML="Click the face!";
+   }
+
   var reloadRects = function(){
     if(document.getElementById(canvasId) != null) {
       // replace old canvas with new one to clear event lisener
@@ -948,7 +1039,13 @@ function drawRects(canvasId, imgId, clickable){
             ctx.rect(coordinates[2] * ratio - 5, coordinates[0] * ratio - 5,
                 (coordinates[3] - coordinates[2]) * ratio + 10, (coordinates[1] - coordinates[0]) * ratio + 10);
             ctx.lineWidth = 8;
-
+            if(isEnroll){
+                if (facesList[curPointer].hasOwnProperty('id') && facesList[curPointer].id != notMatched){
+                    msg_bar.innerHTML = "Double click to delete its identity!";
+                }else{
+                    msg_bar.innerHTML = "Click the list to assign identity!";
+                }
+            } 
           }
           else {
             ctx.rect(coordinates[2] * ratio, coordinates[0] * ratio,
@@ -980,7 +1077,7 @@ function drawRects(canvasId, imgId, clickable){
               if (!dbclick) {
                 highlight = null;
                 curPointer = i;
-                drawRects(canvasId, imgId, clickable);
+                drawRects(canvasId, imgId, isEnroll, clickable);
                 return;
               } else if (curPointer == i){
                 // Remove corresponding occupied marker from scope student_list
@@ -1003,7 +1100,7 @@ function drawRects(canvasId, imgId, clickable){
 
           highlight = null;
           curPointer = null;
-          drawRects(canvasId, imgId, clickable);
+          drawRects(canvasId, imgId, isEnroll, clickable);
         };
       }
     }
