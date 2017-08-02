@@ -5,7 +5,7 @@
  **       'header', 'xhrFields'
  **   uploadImg: the function to send a image
  **/
-var SERVER = 'http://172.29.33.44:8000/',
+var SERVER = 'http://172.29.34.77:8000/',
     requestObj = {
       type: "POST",
       crossDomain: true,

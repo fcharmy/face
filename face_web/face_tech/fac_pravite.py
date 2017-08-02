@@ -88,11 +88,11 @@ def verify_face_from_feature_array(face, feature_array):
                     max_match = compare_score
 
         if max_match > 0 and person_index is not None:
-            return person_index
+            return person_index, max_match
 
     except:
         log.error(traceback.format_exc())
-    return False
+    return False, 0.0
 
 
 def detect_faces(image):
