@@ -273,8 +273,8 @@ def verification(request):
 
                 print("initial results: ", results)
                 
-                results = np.asarray(results)
-                scores = np.asarray(scores)
+                results = np.asarray(results, dtype=str)
+                scores = np.asarray(scores, dtype=str)
 
                 for i in range(len(results)):
                     cur_id = results[i]

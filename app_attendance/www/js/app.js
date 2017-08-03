@@ -134,7 +134,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
         params: { 
             is_enroll: null,	// specify whether it is used to enroll or verify
             img: null,          // the image data got from Gallery or Camera
-            data: null,         // TODO
+            data: null,         // the response of enrollment or verification
             class: null         // TODO
         },
         controller: 'enrollController'
@@ -530,8 +530,8 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
             navigator.camera.getPicture(function (data) {
                 // select photo succeed
                 /******** track the compute time ******/
-                alert((new Date()).getTime());
-                time = (new Date()).getTime();
+                //alert((new Date()).getTime());
+                //time = (new Date()).getTime();
                 /**************************************/
                 $scope.newRecord(ev, data);
             }, function () {
@@ -635,7 +635,7 @@ angular.module('attendance', ['ionic', 'me-pageloading'])
 
     $ionicPlatform.ready(function() {
         // show the elapsed time for enrolling or verifying
-        alert((new Date()).getTime() - time);
+        //alert((new Date()).getTime() - time);
         window.addEventListener("orientationchange", function(){$scope.orientationChange();}, false);
     });
 
