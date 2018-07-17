@@ -30,6 +30,7 @@ def log_in(request):
                         dict_['Permission'] = m.permission
 
                         data['Modules'].append(dict_)
+                        print(data)
                     return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
@@ -47,16 +48,20 @@ def update_module(request):
     if form.is_valid():
         try:
             data = json.loads(form.cleaned_data['data'])
+            print('owner:',form.cleaned_data['owner'])
 
             # return person profile order by person name
             exist_list = api.get_persons_by_group(group=data.get('face_group_id'))
             new_list = models.Student.objects.filter(module_id=data.get('ID'))
             tutors_list = [ump.user for ump in models.User_Module_Permission.objects.filter(module__id=data.get('ID'), permission='M')]
+            tutored_students = [s.student.to_dict() for s in models.get_my_student_in_module(tutor=form.cleaned_data['owner'], module_id=data.get('ID'))]
 
             new_tutors_list = []
             for i in range(len(tutors_list)):
+                myss = [ts.student.to_dict() for ts in models.get_my_student_in_module(tutors_list[i],data.get('ID'))];
                 new_tutors_list.append({
-                    'username': tutors_list[i].username
+                    'username': tutors_list[i].username,
+                    'myss_len': len(myss)
                 })
 
             # Relationship with data between face and ivle:
@@ -90,6 +95,8 @@ def update_module(request):
 
                 # Add new item to face database
                 updated_list, add_list = [], []
+
+                #print([p.get('id') for p in new_list], [p.get('name') for p in exist_list])
 
                 for i in range(len(new)):
                     if new[i] is False:
@@ -140,12 +147,15 @@ def update_module(request):
                 del exist_list, new_list, add_list, tutors_list
                 data['student'] = updated_list
                 data['attendance'] = models.get_records(data.get('ID'))
+ 
 
             else:
                 data['student'] = []
                 data['attendance'] = []
 
             data['tutors'] = new_tutors_list
+            data['tutorial'] = tutored_students
+
             return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())

@@ -74,6 +74,9 @@ class Tutor_Students(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     module = models.ForeignKey(Modules, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.tutor.username+":"+self.student.name
+
 def get_image_path(module_id, time):
     return '{0}/{1}/{2}_{3}.jpg'.format(IMG_FOLDER, module_id, time,
                                         datetime.datetime.now().strftime("%M%S"))
@@ -118,6 +121,14 @@ def get_user_modules(user):
 
 def get_user(name):
     return User.objects.filter(username=name)
+
+def get_my_student_in_module(tutor, module_id):
+    if type(tutor)==type(0):
+        return Tutor_Students.objects.filter(tutor__id=tutor, module__id=module_id)
+    return Tutor_Students.objects.filter(tutor=tutor, module__id=module_id)
+
+def get_all_students_in_module(module_id):
+    return Student.objects.filter(module__id=module_id)
 
 # def get_user_module_perm(user, module):
 #     return User_Module_Permission.objects.filter(user=user, module__id=module.id)

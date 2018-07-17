@@ -94,6 +94,12 @@ def user_index(request):
                                                   'message': message, 'form': form})
 
 
+def user_logout(request):
+    print("logging out")
+    if request.user.is_authenticated():
+        logout(request)
+    return JsonResponse({'data': 'success'})
+
 def log_out(request):
     if request.user.is_authenticated():
         logout(request)
@@ -112,7 +118,7 @@ def create_module(request):
     form = forms.ModuleForm(request.POST)
 
     if form.is_valid() and request.user.is_authenticated():
-        print("creating module...")
+        print("login");
         try:
             code = form.cleaned_data['code']
             group = api.get_groups_by_name(name=code)
@@ -141,7 +147,7 @@ def create_module(request):
     return render(request, 'attend/form_csrf.html', {'url': 'attend:create_module', 'title': 'Create Module', 'form': form})
 
 def tutor_form(request):
-    """ Create student form """
+    """ Create tutor form """
     if request.user.is_authenticated():
         # choice = tuple([(m.module.id, m.module.code + ' ' + m.module.name) for m in models.get_user_modules(request)])
         form = forms.TutorForm({'module':request.session['cur_module_id']})
@@ -175,6 +181,41 @@ def add_tutor(request):
                                                   'message': message})
     else:
         return HttpResponseRedirect(reverse('attend:user_index'))
+
+def tutor_add_student_form(request):
+    if request.user.is_authenticated():
+        my_ss = [ts.student.name for ts in models.get_my_student_in_module(request.user, request.session['cur_module_id'])]
+        all_ss = [s.to_dict() for s in models.get_all_students_in_module(request.session['cur_module_id'])]
+        initial_val = [all_ss[i]['name'] for i in range(len(all_ss)) if all_ss[i]['name'] in my_ss]
+
+        form = forms.TutorStudentForm({'module':request.session['cur_module_id'], 'checklist': initial_val}, student_list=all_ss)
+
+        return render(request, 'attend/form_csrf.html', {'url': 'attend:tutor_add_student', 'title': 'Add My Students', 'form': form, 'message': 'Search name or Check name'})
+
+def tutor_add_student(request):
+    if request.user.is_authenticated():
+        my_st = [st for st in models.get_my_student_in_module(request.user, request.session['cur_module_id'])]
+        all_ss = [s for s in models.get_all_students_in_module(request.session['cur_module_id'])]
+
+        form = forms.TutorStudentForm(request.POST, student_list=[s.to_dict() for s in all_ss])
+
+        if form.is_valid():
+            module = models.Modules.objects.filter(id=form.cleaned_data['module'])
+            new_student_list = [s for s in models.Student.objects.filter(name=form.cleaned_data['search_name'])]
+            [new_student_list.append(s) for s in models.Student.objects.filter(name__in=form.cleaned_data['checklist'])]
+            
+            # add the relation with minimal overhead
+            # delete ones not in the new student list
+            for s in new_student_list:
+                st, is_new = models.Tutor_Students.objects.get_or_create(tutor=request.user, student=s, module=module[0])
+                if st in my_st:
+                    my_st.remove(st)
+            if my_st:
+                [st.delete() for st in my_st]
+
+            return HttpResponseRedirect(reverse('attend:view_module') + '?id=' + str(module[0].id))
+            
+    return HttpResponseRedirect(reverse('attend:user_index'))
 
 def student_form(request):
     """ Create student form """
@@ -223,6 +264,7 @@ def view_module(request):
             new_request.POST = {'data': json.dumps(module[0])}
 
             if module and request.user.is_authenticated():
+                new_request.POST['owner'] = request.user.id
                 response = attend_views.update_module(new_request)
 
             elif module and 'ivle_user' in request.session:
@@ -274,7 +316,6 @@ def face_detection(request):
 
             t2 = time.time()
             log.info("face_detection: {}".format(t2 - t1))
-
             return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
@@ -286,17 +327,23 @@ def face_detection(request):
 @csrf_exempt
 def verify(request):
     """ verify faces with person ids"""
+
     t1 = time.time()
     form = forms.ImgForm(request.POST, request.FILES)
 
     if form.is_valid():
         img = form.cleaned_data['image']
         group = int(form.cleaned_data['group'])
+        owner = form.cleaned_data['owner']
+
+        module = models.Modules.objects.filter(group_id = group)[0]
+        my_students = [ts.student.id for ts in models.get_my_student_in_module(owner, module.id)]
+
 
         try:
             file_path = default_storage.save(img.name, ContentFile(img.read()))
             print(file_path)
-            response_data = api.verification_faces(image=file(img), group=group)
+            response_data = api.verification_faces(image=file(img), group=group, prioritized_persons={'ids':my_students})
         except:
             response_data = []
             file_path = ''

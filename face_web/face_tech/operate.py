@@ -254,6 +254,7 @@ def get_persons_by_group(request):
     """
     Return persons by group id
     """
+    print("get person by group")
     form = forms.PersonByGroupForm(request.POST)
 
     if form.is_valid():
@@ -268,7 +269,9 @@ def get_persons_by_group(request):
                 data = []
 
                 for p in persons:
-                    data.append(p.to_dict())
+                    p_dict = p.to_dict()
+                    p_dict['enrolled'] = len(models.Face.objects.filter(person=p)) > 0
+                    data.append(p_dict)
 
                 return JsonResponse({'data': data})
 

@@ -88,11 +88,11 @@ def verify_face_from_feature_array(face, feature_array):
                     max_match = compare_score
 
         if max_match > 0 and person_index is not None:
-            return person_index
+            return person_index, max_match
 
     except:
         log.error(traceback.format_exc())
-    return False
+    return False, 0.0
 
 
 def detect_faces(image):
@@ -193,7 +193,7 @@ def align_face(image, coordinates):
         angle = math.atan2(float(right_eye[1] - left_eye[1]), float(eye_dist))
         rotate_mat = cv2.getRotationMatrix2D(centroid, angle / math.pi * 180, 1.0)
         rotate_img = cv2.warpAffine(image, rotate_mat, (image.shape[1], image.shape[0]), flags=cv2.INTER_LINEAR)
-        rotate_face = rotate_img[top if top > 0 else 0: bottom, left if left >0 else 0: right]
+        rotate_face = rotate_img[int(top) if top > 0 else 0: int(bottom), int(left) if left >0 else 0: int(right)]
 
         landmarks = [[s.x, s.y] for s in shape.parts()]
         return rotate_face, landmarks

@@ -34,7 +34,7 @@
               {% endfor %}
           </div>
 
-          <h3 id="weekly_chart" class="sub-header">Weekly Attendance</h3>
+          <h3 id="weekly_chart" class="sub-header">Weekly Attendance (Appeared Students #)</h3>
           <canvas id="canvas" height="100"></canvas>
           <br/>
 
@@ -44,12 +44,14 @@
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Students</th>
                 </tr>
               </thead>
               <tbody>
                 {% for item in tutors %}
                     <tr>
                       <td>{{ item.username }}</td>
+                      <td>{{ item.myss_len }}&nbsp;&nbsp;{% if item.username == user.username %}<a href="{% url 'attend:form_tutor_add_student' %}">Add</a>{% endif %}</td>
                     </tr>
                 {% empty %}
                     <tr>
@@ -214,7 +216,6 @@
 
                     }
                   });
-
                   // count student amount in each week
                   var l_week_data = [], t_week_data = [],                   // all student attendance per week
                       min_week = Math.min.apply(null, week_numbers) - 1,    // min week number
@@ -228,7 +229,6 @@
                       // set first week as Week 1 and update week numbers
                       week_display[index] = 'Week ' + (w - min_week).toString();
                   });
-
                   // update thumbnails' week number
                   $('.datetime_week').each(function (index) {
                       $( this ).html('Week ' + (attendance[index].time.getWeekNumber() - min_week) +', '+$( this ).html());

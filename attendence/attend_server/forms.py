@@ -28,6 +28,7 @@ class ImgForm(forms.Form):
     group = forms.IntegerField(label='Group ID', required=False)
     module = forms.CharField(label='Module ID', required=False)
     lt = forms.BooleanField(label='lecture or tutorial', required=False)
+    owner = forms.IntegerField(widget = forms.HiddenInput())
 
 
 class ModuleForm(forms.Form):
@@ -55,3 +56,26 @@ class StudentForm(forms.Form):
     #     super(StudentForm, self).__init__(*args, **kwargs)
     #     if custom_choices:
     #         self.fields['module'].choices = custom_choices
+
+class TutorStudentForm(forms.Form):
+    """ tutor add student form """
+    module = forms.IntegerField(widget=forms.HiddenInput())
+    search_name = forms.CharField(label='Search', max_length=50, required=False)
+
+    def __init__(self, *args, **kwargs):
+        student_list = kwargs.pop('student_list')
+        super(TutorStudentForm, self).__init__(*args, **kwargs)
+        CHOICES = ()
+        for s in student_list:
+            if len(CHOICES)>0:
+                CHOICES = CHOICES + ((s['name'], s['first_name']), )
+            else:
+                CHOICES = ((s['name'], s['first_name']), )
+
+        self.fields['checklist'] = forms.MultipleChoiceField(
+            required=False, 
+            widget=forms.CheckboxSelectMultiple(), 
+            choices=CHOICES,
+         )
+
+        

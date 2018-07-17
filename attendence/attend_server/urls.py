@@ -14,8 +14,10 @@ urlpatterns = [
     url(r'^form_student', views.student_form, name='student_form'),
     url(r'^signin', views.create_user_form, name='create_user_form'),
     url(r'^login', views.login_form, name='login_form'),
+    url(r'^form_tutor_add_student', views.tutor_add_student_form, name='form_tutor_add_student'),
 
     url(r'^logout', views.log_out, name='log_out'),
+    url(r'^user_logout', views.user_logout, name='user_logout'),
     url(r'^register', views.sign_in, name='sign_in'),
     url(r'^user_index', views.user_index, name='user_index'),
     url(r'^detect', views.face_detection, name='detect'),
@@ -25,6 +27,7 @@ urlpatterns = [
     url(r'^create_module', views.create_module, name='create_module'),
     url(r'^create_student', views.create_student, name='create_student'),
     url(r'^add_tutor', views.add_tutor, name='add_tutor'),
+    url(r'^tutor_add_student', views.tutor_add_student, name='tutor_add_student'),
     url(r'^view', views.view_module, name='view_module'),
 
     url(r'^attend_login', attend_views.log_in, name='attend_login'),
