@@ -45,7 +45,6 @@ class User_Module_Permission(models.Model):
     module = models.ForeignKey(Modules, on_delete=models.CASCADE)
     permission = models.CharField(max_length=20)            # 'M' for TA
 
-
 class Student(models.Model):
     name = models.CharField(max_length=50, validators=[RegexValidator(r'^[\w.@+-]+$')])
     email = models.EmailField(blank=True)
@@ -69,11 +68,15 @@ class Student(models.Model):
 
         return _dict
 
+# for fast searching
+class Tutor_Students(models.Model):
+    tutor = models.ForeignKey(User, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    module = models.ForeignKey(Modules, on_delete=models.CASCADE)
 
 def get_image_path(module_id, time):
     return '{0}/{1}/{2}_{3}.jpg'.format(IMG_FOLDER, module_id, time,
                                         datetime.datetime.now().strftime("%M%S"))
-
 
 def get_suffix():
     return datetime.datetime.now().strftime("%M%S")
@@ -112,3 +115,9 @@ def get_records(module):
 
 def get_user_modules(user):
     return User_Module_Permission.objects.filter(user=user, permission__in=['O', 'F', 'M', 'R'])
+
+def get_user(name):
+    return User.objects.filter(username=name)
+
+# def get_user_module_perm(user, module):
+#     return User_Module_Permission.objects.filter(user=user, module__id=module.id)

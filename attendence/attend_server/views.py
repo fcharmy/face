@@ -108,11 +108,11 @@ def module_form(request):
     form = forms.ModuleForm()
     return render(request, 'attend/form_csrf.html', {'url': 'attend:create_module', 'title': 'Create Module', 'form': form})
 
-
 def create_module(request):
     form = forms.ModuleForm(request.POST)
 
     if form.is_valid() and request.user.is_authenticated():
+        print("creating module...")
         try:
             code = form.cleaned_data['code']
             group = api.get_groups_by_name(name=code)
@@ -127,7 +127,7 @@ def create_module(request):
             m = models.Modules(code=code, group_id=group_id, name=form.cleaned_data['name'],
                                academic_year=form.cleaned_data['year'], semester=form.cleaned_data['semester'])
             m.save()
-
+            
             ump, is_exist = models.User_Module_Permission.objects.get_or_create(user=request.user, module=m, permission='F')
 
             m = m.to_dict()
@@ -140,12 +140,47 @@ def create_module(request):
 
     return render(request, 'attend/form_csrf.html', {'url': 'attend:create_module', 'title': 'Create Module', 'form': form})
 
+def tutor_form(request):
+    """ Create student form """
+    if request.user.is_authenticated():
+        # choice = tuple([(m.module.id, m.module.code + ' ' + m.module.name) for m in models.get_user_modules(request)])
+        form = forms.TutorForm({'module':request.session['cur_module_id']})
+
+        return render(request, 'attend/form_csrf.html', {'url': 'attend:add_tutor', 'title': 'Add Tutor', 'form': form})
+
+    return HttpResponseRedirect(reverse('attend:user_index'))
+
+def add_tutor(request):
+    form = forms.TutorForm(request.POST)
+
+    if form.is_valid() and request.user.is_authenticated():
+        try:
+            module = models.Modules.objects.filter(id=form.cleaned_data['module'])
+            tutor = models.get_user(form.cleaned_data['name'])
+
+            if module:
+                if tutor:
+                    ump, is_exist = models.User_Module_Permission.objects.get_or_create(user=tutor[0], module=module[0], defaults={'permission':'M'})
+
+                    return HttpResponseRedirect(reverse('attend:view_module') + '?id=' + str(module[0].id))
+                else:
+                    message = 'Unknown Tutor.'
+            else:
+                message = 'Unknown Module.'
+        except:
+            log.error(traceback.format_exc())
+            message = 'This student name is already exist.'
+
+        return render(request, 'attend/form_csrf.html', {'url': 'attend:add_tutor', 'title': 'Add tutor', 'form': form,
+                                                  'message': message})
+    else:
+        return HttpResponseRedirect(reverse('attend:user_index'))
 
 def student_form(request):
     """ Create student form """
-    if request.user.is_authenticated() and 'module' in request.GET:
+    if request.user.is_authenticated():
         # choice = tuple([(m.module.id, m.module.code + ' ' + m.module.name) for m in models.get_user_modules(request)])
-        form = forms.StudentForm(request.GET)
+        form = forms.StudentForm({'module': request.session['cur_module_id']})
 
         return render(request, 'attend/form_csrf.html', {'url': 'attend:create_student', 'title': 'Add Student', 'form': form})
 
@@ -156,10 +191,9 @@ def create_student(request):
     form = forms.StudentForm(request.POST)
 
     if form.is_valid() and request.user.is_authenticated():
-        try:
-            module = [m.module for m in models.get_user_modules(request.user)
-                      if m.module.id == form.cleaned_data['module']]
 
+        module = models.Modules.objects.filter(id=form.cleaned_data['module'])
+        try:
             if module:
                 student = models.Student(module=module[0], name=form.cleaned_data['name'],
                                          first_name=form.cleaned_data['first_name'], last_name=form.cleaned_data['last_name'],
@@ -207,9 +241,14 @@ def view_module(request):
                 sort_list.sort()
                 data['student'] = list([dict_ for (key, dict_) in sort_list])
 
+                #perm = (models.get_user_module_perm(user=request.user, module=module[0]))[0].permission
+                perm = module[0]['Permission']
+ 
+                request.session['cur_module_id'] = request.GET['id']
+
                 return render(request, 'attend/user.html', {'html': 'attend/dashboard.html', 'modules': request.session['Modules'],
                                                             'attend_records': data['attendance'], 'module': module[0],
-                                                            'students': data['student']})
+                                                            'students': data['student'], 'tutors': data['tutors'], 'is_owner': perm=='F'})
         except:
             log.error(traceback.format_exc())
 

@@ -1,6 +1,7 @@
           <h2 class="page-header">{{ module.CourseCode }} {{ module.CourseName }}
-              {% if user.is_authenticated %}
-                  <small><a href="{% url 'attend:student_form' %}?module={{ module.ID }}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add students</a></small>
+              {% if user.is_authenticated and is_owner %}
+                  <small><a href="{% url 'attend:student_form' %}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add students</a></small>
+                  <small><a href="{% url 'attend:tutor_form' %}" style="font-size: 15px;text-decoration: none;">&nbsp;+ Add tutor</a></small>
               {% endif %}
             <div class="btn-group" style="float: right">
                 <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Table</button>
@@ -36,6 +37,29 @@
           <h3 id="weekly_chart" class="sub-header">Weekly Attendance</h3>
           <canvas id="canvas" height="100"></canvas>
           <br/>
+
+          <h3 id="tutors_table" class="sub-header">Tutors</h3>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in tutors %}
+                    <tr>
+                      <td>{{ item.username }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td><i>No tutor!</i></td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
 
           <h3 id="summary_table" class="sub-header">Attendance Summary
               <small style="font-size: 15px;float: right;">

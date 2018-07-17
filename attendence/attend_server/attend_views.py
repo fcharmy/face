@@ -17,9 +17,10 @@ def log_in(request):
     if form.is_valid():
         try:
             user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
-
+            print('username:'+form.cleaned_data['username'],'password:'+form.cleaned_data['password'])
             if user is not None:
                 # the password verified for the user
+                print('correct password',user.is_active)
                 if user.is_active:
                     data = {"Name": user.get_username(), "UserID": user.id, "Modules": []}
 
@@ -29,10 +30,10 @@ def log_in(request):
                         dict_['Permission'] = m.permission
 
                         data['Modules'].append(dict_)
-
                     return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
+    print('responsing')
     return error_response(2)
 
 
@@ -50,13 +51,20 @@ def update_module(request):
             # return person profile order by person name
             exist_list = api.get_persons_by_group(group=data.get('face_group_id'))
             new_list = models.Student.objects.filter(module_id=data.get('ID'))
+            tutors_list = [ump.user for ump in models.User_Module_Permission.objects.filter(module__id=data.get('ID'), permission='M')]
+
+            new_tutors_list = []
+            for i in range(len(tutors_list)):
+                new_tutors_list.append({
+                    'username': tutors_list[i].username
+                })
 
             # Relationship with data between face and ivle:
             # face: name -> IVLE: UserID - A0123456
             # face: first_name -> IVLE: Name - James Smith
             # face: note -> IVLE: UserGuid - xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
-            if data and new_list:
+            if data and new_list :
                 # if has no persons in face, initial with a empty list
                 exist_list = exist_list if exist_list else []
 
@@ -129,7 +137,7 @@ def update_module(request):
                     else:
                         data['error_delete'] = exist_list
 
-                del exist_list, new_list, add_list
+                del exist_list, new_list, add_list, tutors_list
                 data['student'] = updated_list
                 data['attendance'] = models.get_records(data.get('ID'))
 
@@ -137,6 +145,7 @@ def update_module(request):
                 data['student'] = []
                 data['attendance'] = []
 
+            data['tutors'] = new_tutors_list
             return JsonResponse({'data': data})
         except:
             log.error(traceback.format_exc())
